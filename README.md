@@ -1,2 +1,2 @@
-# LIMS-api
-alam mo na
+# Library Information Management System
+ Alam mo na
