@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Article;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -23,7 +24,10 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             DepartmentSeeder::class,
             CategorySeeder::class,
-            BookSeeder::class
+            BookSeeder::class,
+            PeriodicalSeeder::class,
+            ArticleSeeder::class,
+            ProjectSeeder::class
             ]);
     }
 }

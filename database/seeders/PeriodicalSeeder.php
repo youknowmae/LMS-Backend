@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Periodical;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +13,6 @@ class PeriodicalSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Periodical::factory()->count(30)->create();
     }
 }
