@@ -17,10 +17,19 @@ return new class extends Migration
             $table->string('department', 50);
         });
 
+        Schema::create('patrons', function (Blueprint $table) {
+            $table->id();
+            $table->string('patron')->unique();
+            $table->decimal('fine');
+            $table->text('description');
+            $table->timestamps(1);
+        });
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('username')->unique();
             $table->integer('privilege')->default(3); // 0 -> superadmin, 1 -> admin, 2 -> GC staff, 3 -> student 
+            $table->foreignId('patron_id')->references('id')->on('patrons');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

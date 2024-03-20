@@ -17,15 +17,14 @@ return new class extends Migration
             $table->string('author');
             $table->string('language');
             $table->string('subject');
-            $table->string('image');
             $table->date('date_published');
+            $table->string('image_location');
             $table->string('publisher');
-            $table->text('copyright');
             $table->integer('volume');
             $table->integer('issue');
             $table->integer('pages');
-            $table->text('blurb');
-            $table->boolean('isAvailable')->default(true);
+            $table->text('content');
+            $table->boolean('available')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });

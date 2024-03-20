@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Book>
@@ -17,18 +18,20 @@ class BookFactory extends Factory
     public function definition(): array
     {
         return [
+            'call_number' => Str::random(10),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
-            'image' => fake()->filePath(),
+            'image_location' => fake()->filePath(),
             'language' => fake()->randomElement(['FIL', 'FOR']),
-            'category_id' => fake()->numberBetween(1, 10),
+            'location_id' => fake()->numberBetween(1, 10),
             'publisher' => fake()->company(),
-            'copyright' => fake()->sentences(3, true),
+            'copyright' => fake()->year(),
             'volume' => fake()->numberBetween(1, 3),
             'issue' => fake()->numberBetween(1, 3),
             'pages' => fake()->randomNumber(3),
-            'blurb' => fake()->sentence(),
-            'published_date' => fake()->date()
+            'content' => fake()->sentences(2, true),
+            'remarks' => fake()->sentences(3, true),
+            'date_published' => fake()->date()
         ];
     }
 }
