@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->integer('type'); // 0->books, 1->periodicals, 2->articles, 3->projects
-            $table->string('category');
+            $table->string('location')->unique();
+            $table->string('full_location')->nullable();
             $table->timestamps();
         });
     }
