@@ -18,12 +18,11 @@ return new class extends Migration
             $table->string('language');
             $table->string('subject');
             $table->date('date_published');
-            $table->string('image_location');
-            $table->string('publisher');
-            $table->integer('volume');
-            $table->integer('issue');
-            $table->integer('pages');
-            $table->text('content');
+            $table->integer('volume')->nullable();
+            $table->integer('issue')->nullable();
+            $table->integer('page');
+            $table->text('abstract');
+            $table->text('remarks')->nullable();
             $table->boolean('available')->default(true);
             $table->timestamps();
             $table->softDeletes();

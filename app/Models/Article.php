@@ -9,4 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Article extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $fillable = ['title', 'author', 'language', 'subject', 'date_published',
+                            'volume', 'issue', 'page', 'abstract', 'remarks'];
 }

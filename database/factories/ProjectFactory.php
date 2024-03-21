@@ -18,11 +18,12 @@ class ProjectFactory extends Factory
     {
         return [
             'type' => fake()->numberBetween(1, 4), 
-            'language' => fake()->randomElement(['FIL', 'FOR']),
-            'date_published' => fake()->date(),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
-            'course_id' => fake()->numberBetween(1, 4),   
+            'course_id' => fake()->numberBetween(1, 4), 
+            'image_location' => fake()->filePath(), 
+            'date_published' => fake()->date(), 
+            'language' => fake()->randomElement(['FIL', 'FOR']),
             'abstract' => fake()->sentence(20, true),
         ];
     }

@@ -9,4 +9,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Periodical extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected $fillable = ['material_type', 'title', 'author', 'image_location', 'language',
+                            'publisher', 'copyright', 'volume', 'issue', 
+                            'pages', 'content', 'remarks', 'date_published'];
 }
