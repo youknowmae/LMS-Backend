@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
             BookSeeder::class,
             PeriodicalSeeder::class,
             ArticleSeeder::class,
-            // ProjectSeeder::class
+            ProjectSeeder::class
           ]);
     }
 }

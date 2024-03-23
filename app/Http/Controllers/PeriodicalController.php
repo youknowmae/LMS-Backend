@@ -11,9 +11,9 @@ class PeriodicalController extends Controller
         return Periodical::all();
     }
 
-    // public function getPeriodicalType($controller) {
-    //     return Periodical::where('')
-    // }
+    public function getByType($type) {
+        return Periodical::where('material_type', $type)->get();
+    }
 
     public function getPeriodical($id) {
         return Periodical::find($id);
@@ -25,5 +25,20 @@ class PeriodicalController extends Controller
         $model->save();
 
         return response()->json($model, 200);
+    }
+
+    public function update(Request $request, $id) {
+        $model = Periodical::find($id);
+        $model->update($request->all());
+        $model->save();
+
+        return response()->json($model, 200);
+    }
+
+    public function delete($id) {
+        $model = Periodical::find($id);
+        $model->delete();
+
+        return response()->json('Record Deleted', 200);
     }
 }

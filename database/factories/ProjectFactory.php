@@ -17,7 +17,7 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => fake()->numberBetween(1, 4), 
+            'type' => fake()->randomElement(['thesis', 'dissertation', 'capstone', 'feasibility study']),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
             'course_id' => fake()->numberBetween(1, 4), 
