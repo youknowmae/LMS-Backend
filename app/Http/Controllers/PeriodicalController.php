@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Periodical;
 use Illuminate\Http\Request;
 
 class PeriodicalController extends Controller
 {
+<<<<<<< Updated upstream
     //
+=======
     public function getPeriodicals() {
         return Periodical::all();
     }
@@ -54,4 +55,5 @@ class PeriodicalController extends Controller
     public function opacGetNewspapers(){
         return Periodical::where('material_type', 'newspaper')->select('title', 'copyright', 'author', 'image_location')->paginate(25);
     }
+>>>>>>> Stashed changes
 }

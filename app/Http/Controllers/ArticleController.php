@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
+<<<<<<< Updated upstream
     //
+=======
     public function getArticles() {
         return Article::all();
     }
@@ -42,4 +43,5 @@ class ArticleController extends Controller
     public function opacGetArticles(){
         return Article::select('title', 'publisher', 'author', 'image_location')->paginate(25);
     }
+>>>>>>> Stashed changes
 }

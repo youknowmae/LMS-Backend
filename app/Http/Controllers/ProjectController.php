@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
+<<<<<<< Updated upstream
     //
+=======
     public function getProjects() {
         return Project::all();
     }
@@ -62,4 +63,5 @@ class ProjectController extends Controller
     public function opacGetFeasibility(){
         return Project::where('type', 'feasibility study')->select('title', 'author', 'image_location')->paginate(25);
     }
+>>>>>>> Stashed changes
 }
