@@ -10,8 +10,8 @@ class Book extends Model
 {
     use HasFactory, SoftDeletes;
 
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
+    // public function category()
+    // {
+    //     return $this->belongsTo(Category::class);
+    // }
 }
