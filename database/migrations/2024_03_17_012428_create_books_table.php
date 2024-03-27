@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('publisher');
             $table->year('copyright');
             $table->integer('volume')->nullable();
-            $table->integer('issue')->nullable();
+            $table->string('edition')->nullable();
             $table->integer('pages');
             $table->text('content')->nullable();
             $table->text('remarks')->nullable();

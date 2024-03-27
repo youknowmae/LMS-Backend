@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Book extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['call_number', 'title', 'author', 'image_location', 'language',
-                            'location_id', 'publisher', 'copyright', 'volume', 'issue', 
+    protected $fillable = ['id', 'call_number', 'title', 'author', 'language',
+                            'location_id', 'publisher', 'copyright', 'volume', 'edition', 
                             'pages', 'content', 'remarks', 'date_published'];
 
-    public function category()
+    public function location()
     {
         return $this->belongsTo(Location::class);
     }

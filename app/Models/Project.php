@@ -10,6 +10,11 @@ class Project extends Model
 {
     use HasFactory, SoftDeletes;
     
-    protected $fillable = ['type', 'title', 'author', 'course_id', 'image_location', 'date_published',
+    protected $fillable = ['id', 'type', 'title', 'author', 'course_id', 'image_location', 'date_published',
                             'language', 'abstract'];
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
 }

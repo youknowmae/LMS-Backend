@@ -13,21 +13,25 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Cataloging
-// Get All Materials
 Route::get('/books', [BookController::class, 'getBooks']);
 Route::get('/periodicals', [PeriodicalController::class, 'getPeriodicals']);
 Route::get('/articles', [ArticleController::class, 'getArticles']);
 Route::get('/projects', [ProjectController::class, 'getProjects']);
 
 // Get Materials Using ID 
-Route::get('/book/{id}', [BookController::class, 'getBook']);
-Route::get('/periodical/{id}', [PeriodicalController::class, 'getPeriodical']);
-Route::get('/article/{id}', [ArticleController::class, 'getArticle']);
-Route::get('/project/{id}', [ProjectController::class, 'getProject']);
+Route::get('/book/id/{id}', [BookController::class, 'getBook']);
+Route::get('/periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
+Route::get('/article/id/{id}', [ArticleController::class, 'getArticle']);
+Route::get('/project/id/{id}', [ProjectController::class, 'getProject']);
+
+// Get Material Image
+Route::get('/book/image/{id}', [BookController::class, 'image']);
+Route::get('/periodical/image/{id}', [PeriodicalController::class, 'image']);
+Route::get('/project/image/{id}', [ProjectController::class, 'image']);
 
 // Get Periodicals and Projects Using Type
-Route::get('/periodicals/{type}', [PeriodicalController::class, 'getByType']);
-Route::get('/projects/{type}', [ProjectController::class, 'getByType']);
+Route::get('/periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
+Route::get('/projects/type/{type}', [ProjectController::class, 'getByType']);
 
 // Add Materials
 Route::post('/books/add/', [BookController::class, 'add']);

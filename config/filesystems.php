@@ -33,6 +33,18 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
+            'permissions' => [
+                'file' => [
+                    'public' => 0644,
+                    'private' => 0600,
+                ],
+                'dir' => [
+                    'public' => 0755,
+                    'private' => 0700,
+                ],
+            ],
+            // 'driver' => 'local',
+            // 'root' => storage_path('app'),
             'throw' => false,
         ],
 
@@ -71,6 +83,21 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
+    ],
+
+    'local' => [
+        'driver' => 'local',
+        'root' => storage_path('app'),
+        'permissions' => [
+            'file' => [
+                'public' => 0644,
+                'private' => 0600,
+            ],
+            'dir' => [
+                'public' => 0755,
+                'private' => 0700,
+            ],
+        ],
     ],
 
 ];
