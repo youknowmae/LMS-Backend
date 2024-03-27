@@ -21,31 +21,39 @@
 
 <h3>Single Material (GET): </h3>
 <ol>    
-    <li>/books/{int:id}</li>
+    <li>/book/{int:id}</li>
     <li>/periodical/{int:id}</li>
     <li>/article/{int:id}</li>
     <li>/project/{int:id}</li>
 </ol>
 
+<h3>Single Material Image (GET): </h3>
+<ol>    
+    <li>/book/image/{int:id}</li>
+    <li>/periodical/image/{int:id}</li>
+    <li>/article/image/{int:id}</li>
+    <li>/project/image/{int:id}</li>
+</ol>
+
 <h3>Periodicals and Projects according to type (GET): </h3>
 <ol>
-    <li>/periodicals/{string:type}</li>
-    <li>/projects/{string:type}</li>
+    <li>/periodicals/type/{string:type}</li>
+    <li>/projects/type/{string:type}</li>
 </ol>
 
 <hr>
 <em><strong>Fillables</strong></em>
 <pre>
     <em><b>Books:</b>
-            'call_number': str, 'title': str, 'author': str, 'image_location': str, 'language': str,
-            'location_id': int, 'publisher': str, 'copyright': year, 'volume': int(nullable), 'issue': int(nullable), 
+            'id', 'call_number': str, 'title': str, 'author': str, 'image_location': str, 'language': str,
+            'location_id': int, 'publisher': str, 'copyright': year, 'volume': int(nullable), 'edition': str(nullable), 
             'pages': int, 'content': text(nullable), 'remarks': text(nullable), 'date_published': date
     </em>
 </pre><br>
 
 <pre>
     <em><b>Periodicals:</b>
-            'material_type': str, 'title': str, 'author': str, 'image_location': str, 'language': str,
+            'id', 'material_type': str, 'title': str, 'author': str, 'image_location': str, 'language': str,
             'publisher': str, 'copyright': year, 'volume': int(nullable), 'issue': int(nullable), 
             'pages': int, 'content': text(nullable), 'remarks': text(nullable), 'date_published': date            
     </em>
@@ -60,7 +68,7 @@
 
 <pre>
     <em><b>Projects:</b>
-            'type': str, 'title': str, 'author': str, 'course_id': int(FK), 'image_location': str, 
+            'id', 'type': str, 'title': str, 'author': str, 'course_id': int(FK), 'image_location': str, 
             'date_published': date, 'language': str, abstract': str
     </em>
 </pre><br>
