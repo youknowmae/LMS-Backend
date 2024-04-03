@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
+            $table->string('category');
             $table->string('title');
             $table->string('author');
-            $table->foreignId('course_id')->references('id')->on('departments');
-            $table->string('image_location');
+            $table->string('department');
+            $table->string('course');
+            $table->string('image_location')->nullable();
             $table->date('date_published');
             $table->string('language');
             $table->text('abstract');

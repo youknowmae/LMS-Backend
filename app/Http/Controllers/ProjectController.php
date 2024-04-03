@@ -42,14 +42,14 @@ class ProjectController extends Controller
         try {
             $model->fill($request->except('image_location'));
         } catch (Exception) {
-            return response('Error: Invalid form request. Check values if on correct data format.', 400);
+            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
         }
 
         $ext = $request->file('image_location')->extension();
 
         // Check file extension and raise error
         if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-            return response('Error: Invalid image format. Only PNG, JPG, and JPEG formats are allowed.', 415);
+            return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
         }
 
         // Store image and save path
@@ -75,7 +75,7 @@ class ProjectController extends Controller
         try {
             $model->fill($request->except('image_location'));
         } catch (Exception) {
-            return response('Error: Invalid form request. Check values if on correct data format.', 400);
+            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
         }
 
         if(!empty($request->image_location)) {
@@ -83,7 +83,7 @@ class ProjectController extends Controller
 
             // Check file extension and raise error
             if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-                return response('Error: Invalid image format. Only PNG, JPG, and JPEG formats are allowed.', 415);
+                return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
             }
 
             // Store image and save path

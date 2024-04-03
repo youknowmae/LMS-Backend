@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CatalogingLogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,31 @@ use App\Http\Controllers\ProjectController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+
+    // Add Materials
+    Route::post('/books/process/', [BookController::class, 'add']);
+    Route::post('/periodicals/process/', [PeriodicalController::class, 'add']);
+    Route::post('/articles/process/', [ArticleController::class, 'add']);
+    Route::post('/projects/process/', [ProjectController::class, 'add']);
+
+    // Update Materials
+    Route::put('/books/process/{id}', [BookController::class, 'update']);
+    Route::put('/periodicals/process/{id}', [PeriodicalController::class, 'update']);
+    Route::put('/articles/process/{id}', [ArticleController::class, 'update']);
+    Route::put('/projects/process/{id}', [ProjectController::class, 'update']);
+
+    // Delete Materials
+    Route::delete('/books/process/{id}', [BookController::class, 'delete']);
+    Route::delete('/periodicals/process/{id}', [PeriodicalController::class, 'delete']);
+    Route::delete('/articles/process/{id}', [ArticleController::class, 'delete']);
+    Route::delete('/projects/process/{id}', [ProjectController::class, 'delete']);
+});
 
 // Cataloging
 Route::get('/cataloging/logs', [CatalogingLogController::class, 'get']);
@@ -34,21 +60,3 @@ Route::get('/project/image/{id}', [ProjectController::class, 'image']);
 // Get Periodicals and Projects Using Type
 Route::get('/periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
 Route::get('/projects/type/{type}', [ProjectController::class, 'getByType']);
-
-// Add Materials
-Route::post('/books/add/', [BookController::class, 'add']);
-Route::post('/periodicals/add/', [PeriodicalController::class, 'add']);
-Route::post('/articles/add/', [ArticleController::class, 'add']);
-Route::post('/projects/add/', [ProjectController::class, 'add']);
-
-// Update Materials
-Route::match(['put', 'patch'], '/books/update/{id}', [BookController::class, 'update']);
-Route::match(['put', 'patch'], '/periodicals/update/{id}', [PeriodicalController::class, 'update']);
-Route::match(['put', 'patch'], '/articles/update/{id}', [ArticleController::class, 'update']);
-Route::match(['put', 'patch'], '/projects/update/{id}', [ProjectController::class, 'update']);
-
-// Delete Materials
-Route::delete('/books/delete/{id}', [BookController::class, 'delete']);
-Route::delete('/periodicals/delete/{id}', [PeriodicalController::class, 'delete']);
-Route::delete('/articles/delete/{id}', [ArticleController::class, 'delete']);
-Route::delete('/projects/delete/{id}', [ProjectController::class, 'delete']);

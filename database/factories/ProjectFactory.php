@@ -17,10 +17,11 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => fake()->randomElement(['thesis', 'dissertation', 'capstone', 'feasibility study']),
+            'category' => fake()->randomElement(['thesis', 'dissertation', 'capstone', 'feasibility study']),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
-            'course_id' => fake()->numberBetween(1, 11), 
+            'department' => fake()->randomElement(['CCS', 'CBA']),
+            'course' => fake()->randomElement(['BSIT', 'BSCS', 'BSA', 'BSN']),
             'image_location' => fake()->filePath(), 
             'date_published' => fake()->date(), 
             'language' => fake()->randomElement(['FIL', 'FOR']),

@@ -19,6 +19,7 @@ class BookFactory extends Factory
     {
         return [
             'call_number' => Str::random(10),
+            'isbn' => Str::random(15),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
             // 'image_location' => fake()->filePath(),
