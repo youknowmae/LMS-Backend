@@ -29,7 +29,35 @@ class DepartmentSeeder extends Seeder
             [
                 'course' => 'ACT',
                 'department' => 'CCS'
-            ]
+            ],
+            [
+                'course' => 'BSA',
+                'department' => 'CBA'
+            ],
+            [
+                'course' => 'BSBA',
+                'department' => 'CBA'
+            ],
+            [
+                'course' => 'BSN',
+                'department' => 'CAHS'
+            ],
+            [
+                'course' => 'BSM',
+                'department' => 'CAHS'
+            ],
+            [
+                'course' => 'BSED',
+                'department' => 'CEAS'
+            ],
+            [
+                'course' => 'BSHRM',
+                'department' => 'CHTM'
+            ],
+            [
+                'course' => 'BST',
+                'department' => 'CHTM'
+            ],
         ]);
     }
 }

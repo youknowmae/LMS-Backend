@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('author');
             $table->string('image_location')->nullable();
             $table->string('language');
+            $table->date('receive_date')->nullable();
             $table->string('publisher');
             $table->year('copyright');
             $table->integer('volume')->nullable();

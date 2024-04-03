@@ -20,7 +20,7 @@ class ProjectFactory extends Factory
             'type' => fake()->randomElement(['thesis', 'dissertation', 'capstone', 'feasibility study']),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
-            'course_id' => fake()->numberBetween(1, 4), 
+            'course_id' => fake()->numberBetween(1, 11), 
             'image_location' => fake()->filePath(), 
             'date_published' => fake()->date(), 
             'language' => fake()->randomElement(['FIL', 'FOR']),

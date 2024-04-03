@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CatalogingLogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Cataloging
+Route::get('/cataloging/logs', [CatalogingLogController::class, 'get']);
 Route::get('/books', [BookController::class, 'getBooks']);
 Route::get('/periodicals', [PeriodicalController::class, 'getPeriodicals']);
 Route::get('/articles', [ArticleController::class, 'getArticles']);

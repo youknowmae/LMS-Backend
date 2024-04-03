@@ -20,21 +20,30 @@ class ArticleController extends Controller
         $model->fill($request->all());
         $model->save();
 
+        $log = new CatalogingLogController();
+        $log->add('Added', $model->title, 'article', null);
+
         return response()->json($model, 200);
     }
 
     public function update(Request $request, $id) {
-        $model = Article::find($id);
+        $model = Article::findOrFail($id);
         $model->update($request->all());
         $model->save();
+
+        $log = new CatalogingLogController();
+        $log->add('Updated', $model->title, 'article', null);
 
         return response()->json($model, 200);
     }
     
     public function delete($id) {
-        $model = Article::find($id);
+        $model = Article::findOrFail($id);
         $model->delete();
 
-        return response()->json('Record Deleted', 200);
+        $log = new CatalogingLogController();
+        $log->add('Deleted', $model->title, 'article', null);
+
+        return response('Record Deleted', 200);
     }
 }

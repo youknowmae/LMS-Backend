@@ -24,9 +24,11 @@ return new class extends Migration
             $table->integer('volume')->nullable();
             $table->string('edition')->nullable();
             $table->integer('pages');
+            $table->date('purchase_date')->nullable();
             $table->text('content')->nullable();
             $table->text('remarks')->nullable();
             $table->date('date_published');
+            $table->boolean('main_copy')->default(true);
             $table->boolean('available')->default(true);
             $table->timestamps();
             $table->softDeletes();

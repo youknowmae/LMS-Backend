@@ -22,6 +22,7 @@ class PeriodicalFactory extends Factory
             'author' => fake()->name(),
             'image_location' => fake()->filePath(),
             'language' => fake()->randomElement(['FIL', 'FOR']),
+            'receive_date' => fake()->date(),   
             'publisher' => fake()->company(),
             'copyright' => fake()->year(),
             'volume' => fake()->numberBetween(1, 3),

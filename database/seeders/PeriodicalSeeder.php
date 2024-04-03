@@ -13,6 +13,6 @@ class PeriodicalSeeder extends Seeder
      */
     public function run(): void
     {
-        Periodical::factory()->count(30)->create();
+        Periodical::factory()->count(50)->create();
     }
 }

@@ -29,6 +29,7 @@ class BookFactory extends Factory
             'volume' => fake()->numberBetween(1, 3),
             'edition' => fake()->numberBetween(1, 3),
             'pages' => fake()->randomNumber(3),
+            'purchase_date' => fake()->date(),
             'content' => fake()->sentences(2, true),
             'remarks' => fake()->sentences(3, true),
             'date_published' => fake()->date()

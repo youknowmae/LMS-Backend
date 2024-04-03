@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Models\Project;
 
@@ -56,6 +57,12 @@ class ProjectController extends Controller
 
         $model->image_location = $path;
         $model->save();
+        
+        $type = strtolower($model->type);
+        $course = Department::find($model->course_id)->course;
+
+        $log = new CatalogingLogController();
+        $log->add('Added', $model->title, $type, $course);
 
         return response()->json($model, 201);
     }
@@ -87,13 +94,25 @@ class ProjectController extends Controller
 
         $model->save();
 
+        $type = strtolower($model->type);
+        $course = Department::find($model->course_id)->course;
+
+        $log = new CatalogingLogController();
+        $log->add('Updated', $model->title, $type, $course);
+
         return response()->json($model, 200);
     }
 
     public function delete($id) {
-        $model = Project::find($id);
+        $model = Project::findOrFail($id);
         $model->delete();
+        
+        $type = strtolower($model->type);
+        $course = Department::find($model->course_id)->course;
 
-        return response()->json('Record Deleted', 200);
+        $log = new CatalogingLogController();
+        $log->add('Deleted', $model->title, $type, $course);
+
+        return response('Record Deleted', 200);
     }
 }

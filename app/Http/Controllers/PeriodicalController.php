@@ -56,6 +56,10 @@ class PeriodicalController extends Controller
 
         $model->image_location = $path;
         $model->save();
+        
+        $type = strtolower($model->material_type);
+        $log = new CatalogingLogController();
+        $log->add('Added', $model->title, $type, null);
 
         return response()->json($model, 201);
     }
@@ -87,13 +91,21 @@ class PeriodicalController extends Controller
 
         $model->save();
 
+        $type = strtolower($model->material_type);
+        $log = new CatalogingLogController();
+        $log->add('Updated', $model->title, $type, null);
+
         return response()->json($model, 200);
     }
 
     public function delete($id) {
-        $model = Periodical::find($id);
+        $model = Periodical::findOrFail($id);
         $model->delete();
 
-        return response()->json('Record Deleted', 200);
+        $type = strtolower($model->material_type);
+        $log = new CatalogingLogController();
+        $log->add('Deleted', $model->title, $type, null);
+
+        return response('Record Deleted', 200);
     }
 }
