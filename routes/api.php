@@ -25,10 +25,10 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     Route::get('/cataloging/logs', [CatalogingLogController::class, 'get']);
 
     // Add Materials
-    Route::post('/books/process/', [BookController::class, 'add']);
-    Route::post('/periodicals/process/', [PeriodicalController::class, 'add']);
-    Route::post('/articles/process/', [ArticleController::class, 'add']);
-    Route::post('/projects/process/', [ProjectController::class, 'add']);
+    Route::post('/books/process', [BookController::class, 'add']);
+    Route::post('/periodicals/process', [PeriodicalController::class, 'add']);
+    Route::post('/articles/process', [ArticleController::class, 'add']);
+    Route::post('/projects/process', [ProjectController::class, 'add']);
 
     // Update Materials
     Route::put('/books/process/{id}', [BookController::class, 'update']);
