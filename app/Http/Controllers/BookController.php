@@ -55,14 +55,15 @@ class BookController extends Controller
                 $model = new Book();
                 try {
                     
-                    $model->fill($request->except(['main_copy', 'image_location']));
+                    $model->fill($request->except(['id', 'main_copy', 'image_location']));
                     if($i > 0) {
                         $model->main_copy = false;
-
                         try {
-                            $model->id = $request->id + $i;
+                            if($request->id != null) {
+                                $model->id = $request->id + $i;
+                            }
                         } catch (Exception) {
-
+                            // do something if needed
                         }
                     }
 
