@@ -18,7 +18,9 @@ class UserSeeder extends Seeder
             'role' => 'superadmin',
 
             'department' => 'Library Department',
-            'position' => 'Head'
+            'position' => 'Head',
+            'username' => 'superadmin',
+            'password' => bcrypt('Admin123')
         ]);
 
         User::factory()->count(1)->create([
