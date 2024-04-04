@@ -23,7 +23,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             DepartmentSeeder::class,
             CategorySeeder::class,
-            BookSeeder::class
+            BookSeeder::class,
+            ReservationSeeder::class,
+            ReserveBookSeeder::class
             ]);
     }
 }

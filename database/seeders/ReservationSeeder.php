@@ -14,7 +14,7 @@ class ReservationSeeder extends Seeder
     public function run()
     {
         // Truncate the table to ensure a clean state
-        Reservation::truncate();
+        //Reservation::truncate();
 
         // Use the factory to create 10 reservations
         Reservation::factory()->count(10)->create();
