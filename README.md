@@ -14,7 +14,7 @@
 <em>Default return type is in json format</em>
 
 <h3>Logging in and Logging out</h3>
-<em>Note: Save the auth token to a secured place</em>
+<em>Note: Save the auth token to a secured place and check AuthController</em>
 <ol>
     <li>/login/{subsystem}</li>
     <li>/logout</li>
