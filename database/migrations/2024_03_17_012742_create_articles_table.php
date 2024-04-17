@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
+            $table->enum('material_type', ['journal', 'magazine', 'newspaper']);
             $table->string('title');
             $table->string('author');
             $table->string('language');
             $table->string('subject');
             $table->date('date_published');
+            $table->string('publisher');
             $table->integer('volume')->nullable();
             $table->integer('issue')->nullable();
             $table->integer('page');

@@ -6,56 +6,56 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use DB;
 
-class DepartmentSeeder extends Seeder
+class ProgramSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        DB::table('departments')->insert([
+        DB::table('programs')->insert([
             [
-                'course' => 'BSIT',
+                'program' => 'BSIT',
                 'department' => 'CCS'
             ],
             [
-                'course' => 'BSCS',
+                'program' => 'BSCS',
                 'department' => 'CCS'
             ],
             [
-                'course' => 'BSEMC',
+                'program' => 'BSEMC',
                 'department' => 'CCS'
             ],
             [
-                'course' => 'ACT',
+                'program' => 'ACT',
                 'department' => 'CCS'
             ],
             [
-                'course' => 'BSA',
+                'program' => 'BSA',
                 'department' => 'CBA'
             ],
             [
-                'course' => 'BSBA',
+                'program' => 'BSBA',
                 'department' => 'CBA'
             ],
             [
-                'course' => 'BSN',
+                'program' => 'BSN',
                 'department' => 'CAHS'
             ],
             [
-                'course' => 'BSM',
+                'program' => 'BSM',
                 'department' => 'CAHS'
             ],
             [
-                'course' => 'BSED',
+                'program' => 'BSED',
                 'department' => 'CEAS'
             ],
             [
-                'course' => 'BSHRM',
+                'program' => 'BSHRM',
                 'department' => 'CHTM'
             ],
             [
-                'course' => 'BST',
+                'program' => 'BST',
                 'department' => 'CHTM'
             ],
         ]);

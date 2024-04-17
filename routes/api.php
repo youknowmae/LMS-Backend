@@ -1,13 +1,17 @@
 <?php
 
+use App\Http\Controllers\ImageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CatalogingLogController;
-use App\Http\Controllers\ArticleController;
-use App\Http\Controllers\BookController;
-use App\Http\Controllers\PeriodicalController;
-use App\Http\Controllers\ProjectController;
+
+use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\ArticleController,
+App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, App\Http\Controllers\ProjectController,
+App\Http\Controllers\CatalogingReportController;
+use App\Models\Book;
+
+Route::get('/', function (Request $request) {
+    return response()->json(['Response' => 'API routes are available']);
+});
 
 // logged in user tester
 Route::get('/user', function (Request $request) {
@@ -18,12 +22,20 @@ Route::get('/user', function (Request $request) {
 Route::post('/login/{subsystem}', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+// Tester Routes
+Route::get('cataloging/reports/materials', [CatalogingReportController::class, 'count']);
+Route::get('cataloging/reports/pdf', [CatalogingReportController::class, 'generatePdf']);
+
 // Cataloging Process routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
     
     // View cataloging logs
     Route::get('/cataloging/logs', [CatalogingLogController::class, 'get']);
+    Route::get('books/locations', [BookController::class, 'getLocations']);
 
+    
+    Route::get('books/locations', [BookController::class, 'getLocations']);
+    
     // Add Materials
     Route::post('/books/process', [BookController::class, 'add']);
     Route::post('/periodicals/process', [PeriodicalController::class, 'add']);
@@ -63,5 +75,18 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
 
     // Get Periodicals and Projects Using Type
     Route::get('/periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
+    Route::get('/articles/type/{type}', [ArticleController::class, 'getByType']);
     Route::get('/projects/type/{type}', [ProjectController::class, 'getByType']);
+});
+
+// RED ZONE 
+Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
+    Route::get('/images/delete/single', [ImageController::class, 'delete'])->name('images.delete');
+    Route::get('/images/delete/all/{type}', [ImageController::class, 'deleteAll']);
+});
+
+use App\Models\Location;
+Route::get('/test', function( ) {
+    $books = Book::with('location')->find(1);
+    return $books;
 });

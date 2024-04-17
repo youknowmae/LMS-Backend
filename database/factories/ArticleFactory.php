@@ -17,11 +17,13 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         return [
+            'material_type' => fake()->randomElement(['journal', 'magazine', 'newspaper']),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
             'language' => fake()->randomElement(['FIL', 'FOR']),
             'subject' => fake()->sentences(2, true),
             'date_published' => fake()->date(),
+            'publisher' => fake()->company(),
             'volume' => fake()->numberBetween(1, 3),
             'issue' => fake()->numberBetween(1, 3),
             'page' => fake()->randomNumber(3),

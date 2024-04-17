@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Book extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['id', 'call_number', 'title', 'author', 'language',
+    protected $fillable = ['id', 'isbn', 'call_number', 'title', 'author', 
                             'location_id', 'publisher', 'copyright', 'volume', 'edition', 
-                            'pages', 'content', 'remarks', 'date_published', 'purchase_date'];
+                            'pages', 'content', 'remarks', 'date_published', 'purchased_date'];
 
     public function location()
     {

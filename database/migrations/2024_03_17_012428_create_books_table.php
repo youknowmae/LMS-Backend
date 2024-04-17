@@ -14,18 +14,17 @@ return new class extends Migration
         Schema::create('books', function (Blueprint $table) {
             $table->id();
             $table->string('call_number');
-            $table->string('isbn')->nullable();
+            // $table->string('isbn')->nullable();
             $table->string('title');
             $table->string('author');
             $table->string('image_location')->nullable();
-            $table->string('language');
             $table->foreignId('location_id')->references('id')->on('locations');
-            $table->string('publisher');
+            // $table->string('publisher');
             $table->year('copyright');
             $table->integer('volume')->nullable();
             $table->string('edition')->nullable();
             $table->integer('pages');
-            $table->date('purchase_date')->nullable();
+            $table->date('purchased_date')->nullable();
             $table->text('content')->nullable();
             $table->text('remarks')->nullable();
             $table->date('date_published');

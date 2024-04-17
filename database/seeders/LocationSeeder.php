@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Location;
+use DB;
 
 class LocationSeeder extends Seeder
 {
@@ -13,6 +13,23 @@ class LocationSeeder extends Seeder
      */
     public function run(): void
     {
-        Location::factory()->count(10)->create();
+        DB::table('locations')->insert([
+        [
+            'location' => 'FIL',
+            'full_location' => 'Filipino'
+        ],
+        [
+            'location' => 'FOR',
+            'full_location' => 'Foreign'
+        ],
+        [
+            'location' => 'MED',
+            'full_location' => 'Medical'
+        ],
+        [
+            'location' => 'EWAN',
+            'full_location' => 'Bahala na kayo'
+        ]
+    ]);
     }
 }

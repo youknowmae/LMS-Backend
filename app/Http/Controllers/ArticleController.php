@@ -16,6 +16,10 @@ class ArticleController extends Controller
         return Article::find($id);
     }
 
+    public function getByType($type) {
+        return Article::where('material_type', $type)->get();
+    }
+
     public function add(Request $request) {
         $model = new Article();
 

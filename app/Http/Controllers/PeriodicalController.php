@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Periodical;
+use Exception;
 
 class PeriodicalController extends Controller
 {
@@ -20,15 +21,19 @@ class PeriodicalController extends Controller
     }
 
     public function image($id) {
-        $Periodical = Periodical::find($id);
+        $material = Periodical::find($id);
 
-        // check if it has image
-        if($Periodical->image_location == null)
-            return response('', 200);
+        // check if it has no image
+        if($material->image_location == null)
+            return response('No Image Found', 200);
 
-        $image = 'app/public/' . $Periodical->image_location;
+        $image = 'app/' . $material->image_location;
         $path = storage_path($image);
-        return response()->file($path);
+        try {
+            return response()->file($path);
+        } catch (Exception $e) {
+            return response()->json(['Status' => 'File not found'], 404);
+        }
     }
     
     public function add(Request $request) {
@@ -44,17 +49,29 @@ class PeriodicalController extends Controller
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
         }
 
-        $ext = $request->file('image_location')->extension();
+        if(!empty($request->image_location)) {
+            $ext = $request->file('image_location')->extension();
 
-        // Check file extension and raise error
-        if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-            return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
+            // Check file extension and raise error
+            if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
+                return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
+            }
+
+            // Store image and save path
+            try {
+                $temp = $model->image_location;
+                $path = $request->file('image_location')->store('images/periodicals');
+                $model->image_location = $path;
+
+                if(!empty($temp)) {
+                    $image = new ImageController();
+                    $image->delete($temp);
+                }
+            } catch (Exception $e) {
+                // add function
+            }
         }
 
-        // Store image and save path
-        $path = $request->file('image_location')->store('images', 'public');
-
-        $model->image_location = $path;
         $model->save();
         
         $type = strtolower($model->material_type);

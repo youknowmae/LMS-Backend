@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('category');
             $table->string('title');
             $table->string('author');
-            $table->string('department');
-            $table->string('course');
+            $table->foreignId('program_id')->references('id')->on('programs');
             $table->string('image_location')->nullable();
             $table->date('date_published');
             $table->string('language');

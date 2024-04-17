@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Department;
+use App\Models\Program;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Exception;
 
 class ProjectController extends Controller
 {
     public function getProjects() {
-        return Project::all();
+        $projects = Project::with('program')->get();
+        return $projects;
     }
 
     public function getByType($type) {
@@ -29,7 +31,21 @@ class ProjectController extends Controller
 
         $image = 'app/public/' . $project->image_location;
         $path = storage_path($image);
-        return response()->file($path);
+
+        try {
+            $file_content = file_get_contents($path);
+
+            // Determine the MIME type of the image based on the file extension
+            $mime_type = mime_content_type($path);
+    
+            // Return the image content with the appropriate content type
+            return response()->make($file_content, 200, [
+                'Content-Type' => $mime_type,
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['Error' => 'No image or not a valid file found'], 404);
+        }
+        
     }
 
     public function add(Request $request) {
@@ -59,10 +75,10 @@ class ProjectController extends Controller
         $model->save();
         
         $type = strtolower($model->type);
-        $course = Department::find($model->course_id)->course;
+        $program = Program::find($model->program_id)->course;
 
         $log = new CatalogingLogController();
-        $log->add('Added', $model->title, $type, $course);
+        $log->add('Added', $model->title, $type, $program);
 
         return response()->json($model, 201);
     }
@@ -78,24 +94,22 @@ class ProjectController extends Controller
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
         }
 
-        if(!empty($request->image_location)) {
-            $ext = $request->file('image_location')->extension();
+        $ext = $request->file('image_location')->extension();
 
-            // Check file extension and raise error
-            if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-                return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
-            }
-
-            // Store image and save path
-            $path = $request->file('image_location')->store('images', 'public');
-
-            $model->image_location = $path;
+        // Check file extension and raise error
+        if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
+            return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
         }
+
+        // Store image and save path
+        $path = $request->file('image_location')->store('images/books');
+
+        $model->image_location = $path;
 
         $model->save();
 
         $type = strtolower($model->type);
-        $course = Department::find($model->course_id)->course;
+        $course = Program::find($model->course_id)->course;
 
         $log = new CatalogingLogController();
         $log->add('Updated', $model->title, $type, $course);
@@ -108,7 +122,7 @@ class ProjectController extends Controller
         $model->delete();
         
         $type = strtolower($model->type);
-        $course = Department::find($model->course_id)->course;
+        $course = Program::find($model->course_id)->course;
 
         $log = new CatalogingLogController();
         $log->add('Deleted', $model->title, $type, $course);

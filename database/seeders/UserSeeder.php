@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
 
             'department' => 'Library Department',
             'position' => 'Chief',
-            'username' => 'admin',
+            'username' => 'admin@gmail.com',
             'password' => Hash::make('Admin123')
         ]);
 

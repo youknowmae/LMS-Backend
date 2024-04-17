@@ -18,8 +18,8 @@ class LocationFactory extends Factory
     public function definition(): array
     {
         return [
-            'location' => Str::random(3),
-            'full_location' => fake()->words(2, true),
+            // 'location' => Str::random(3),
+            // 'full_location' => fake()->words(2, true),
         ];
     }
 }
