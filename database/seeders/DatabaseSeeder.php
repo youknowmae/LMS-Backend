@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Article;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,13 +21,28 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+
+        DB::table('patrons')->insert([[
+            'patron' => 'student',
+            'fine' => 500.00,
+            'description' => 'GC students'
+        ],
+        [
+            'patron' => 'faculty',
+            'fine' => 250.00,
+            'description' => 'GC faculty members'
+        ]
+    ]);
+
         $this->call([
             UserSeeder::class,
             DepartmentSeeder::class,
-            CategorySeeder::class,
+            //LocationSeeder::class,
             BookSeeder::class,
-            ReservationSeeder::class,
-            ReserveBookSeeder::class
-            ]);
+            PeriodicalSeeder::class,
+            ArticleSeeder::class,
+            ProjectSeeder::class,
+            AnnouncementSeeder::class
+          ]);
     }
 }
