@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\ArticleController,
 App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, App\Http\Controllers\ProjectController,
 App\Http\Controllers\CatalogingReportController;
+
+use App\Http\Controllers\ReservationController;
 use App\Models\Book;
 
 Route::get('/', function (Request $request) {
@@ -63,6 +65,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 
 // Material viewing routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
+
     Route::get('books', [BookController::class, 'getBooks']);
     Route::get('periodicals', [PeriodicalController::class, 'getPeriodicals']);
     Route::get('articles', [ArticleController::class, 'getArticles']);
@@ -85,6 +88,22 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('projects/type/{type}', [ProjectController::class, 'getByType']);
 
     Route::get('programs', [ProjectController::class, 'getDepartments']);
+});
+
+/* STUDENT ROUTES */
+Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
+    // Reservation routes
+    Route::post('reservation/{id}', [ReservationController::class, 'reserve']);
+    // Reservation Cancel
+    Route::delete('/cancel-reservation/{id}', [ReservationController::class, 'cancelReservation']);
+    
+    
+    // API resource route for reservations
+    Route::get('reservations', [ReservationController::class, 'index']);
+    Route::get('reservations/{reservation}', [ReservationController::class, 'show']);
+    Route::put('reservations/{reservation}', [ReservationController::class, 'update']);
+    Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
+    
 });
 
 // RED ZONE 

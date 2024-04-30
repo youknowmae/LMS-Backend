@@ -27,6 +27,14 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
+            /* for review */
+            // $responseData = [
+            //     'token' => $token,
+            //     'id' => $user->id,
+            //     'department' => $user->department,
+            //     'role' => $user->role
+            // ];
+            
             // Generate token for superadmin and admin only
             if($user->role == 'superadmin' && $subsystem == 'maintenance') {
 

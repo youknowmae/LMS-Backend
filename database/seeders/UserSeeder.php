@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
 
             'department' => 'Library Department',
             'position' => 'Chief',
-            'username' => 'admin@gmail.com',
+            'username' => 'admin',
             'password' => Hash::make('Admin123')
         ]);
 
@@ -44,7 +44,7 @@ class UserSeeder extends Seeder
         User::factory()->count(1)->create([
             'role' => 'user',
             'username' => 'user',
-            'password' => Hash::make('User123'),
+            'password' => Hash::make('123'),
             'department' => 'CCS Department',
             'position' => 'Teacher'
         ]);
