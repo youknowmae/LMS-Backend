@@ -6,10 +6,15 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "buuum/zip": "^1.0",
         "dompdf/dompdf": "^2.0",
+        "hulang/php-zip": "^1.0",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "phpoffice/phpspreadsheet": "^2.0",
+        "radionovel/php-zip": "^1.0",
+        "ysgao/php-zip": "0.2.0.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

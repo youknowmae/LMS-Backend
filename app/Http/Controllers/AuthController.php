@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
+use DateTimeZone;
 use Illuminate\Http\Request;
 use Exception;
 use Auth;
+use DB;
 
 class AuthController extends Controller
 {
+
+    public function user(Request $request) {
+        return $request->user();
+    }
 
     public function login(Request $request, string $subsystem) {
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
@@ -24,11 +31,18 @@ class AuthController extends Controller
             if($user->role == 'superadmin' && $subsystem == 'maintenance') {
 
                 $token = $user->createToken('token-name', ['materials:edit', 'materials:view'])->plainTextToken;
+                
                 return response()->json(['token' => $token], 200);
 
             } else if(in_array($user->role, ['superadmin', 'admin']) && in_array($subsystem, ['cataloging', 'circulation'])) {
 
                 $token = $user->createToken('token-name', ['materials:edit', 'materials:view'])->plainTextToken;
+
+                // sets expiry time
+                $tokenModel = $user->tokens->last();
+                $expiryTime = now()->addHour();
+                $tokenModel->update(['expires_at' => $expiryTime]);
+
                 return response()->json(['token' => $token], 200);
 
             } else if(in_array($user->role, ['user']) && in_array($subsystem, ['student'])) {
@@ -37,13 +51,28 @@ class AuthController extends Controller
                 return response()->json(['token' => $token], 200);
 
             } else {
-                return response()->json(['message' => 'Unauthorized'], 401);
+                return response()->json(['message' => 'Unauthorized'], 403);
             }
         } else {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
     }
 
+    public function refreshToken(Request $request) {
+        $user = $request->user();
+
+        $user->tokens()->delete();
+
+        if(in_array($user->role, ['superadmin', 'admin']))
+            $token = $user->createToken('token-name', ['materials:edit', 'materials:view'])->plainTextToken;
+
+        // sets expiry time
+        $tokenModel = $user->tokens->last();
+        $expiryTime = now()->addHour();
+        $tokenModel->update(['expires_at' => $expiryTime]);
+
+        return response()->json(['token' => $token]);
+    }
     public function logout(Request $request) {
         try {
             auth()->user()->tokens()->delete();

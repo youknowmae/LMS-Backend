@@ -16,6 +16,7 @@ class BookController extends Controller
 
     public function getBooks() {        
         $books = Book::with('location')->get();
+
         return $books;
     }
 
@@ -29,7 +30,7 @@ class BookController extends Controller
 
         // check if it has no image
         if($material->image_location == null)
-            return response('No Image Found', 404);
+            return response()->json(['Response' => 'No Image Found'], 200);
 
         $image = 'app/' . $material->image_location;
         $path = storage_path($image);
@@ -50,24 +51,15 @@ class BookController extends Controller
                 $model = new Book();
                 try {
                     
-                    $model->fill($request->except(['id', 'main_copy', 'image_location']));
-                    if($i > 0) {
-                        $model->main_copy = false;
-                        try {
-                            if($request->id != null) {
-                                $model->id = $request->id + $i;
-                            }
-                        } catch (Exception) {
-                            // do something if needed
-                        }
-                    } else {
-                        try {
-                            if($request->id != null) {
-                                $model->id = $request->id + $i;
-                            }
-                        } catch (Exception) {
-                            // do something if needed
-                        }
+                    $model->fill($request->except(['id', 'image_location']));
+
+                    // get id if request has an id
+                    if($i > 0 && $request->id != null) {
+
+                        $model->id = $request->id + $i;
+                    } else if($i == 0 && $request->id != null) {
+
+                        $model->id = $request->id;
                     }
 
                 } catch (Exception) {
@@ -86,10 +78,8 @@ class BookController extends Controller
                     $path = $request->file('image_location')->store('images/books');
 
                     $model->image_location = $path;
-                    $model->save();  
-                } else {
-                    $model->save();
-                }
+                } 
+                $model->save();
             }
         }
 

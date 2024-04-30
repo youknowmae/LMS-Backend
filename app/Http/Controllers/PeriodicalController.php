@@ -25,7 +25,7 @@ class PeriodicalController extends Controller
 
         // check if it has no image
         if($material->image_location == null)
-            return response('No Image Found', 200);
+            return response()->json(['Response' => 'No Image Found'], 200);
 
         $image = 'app/' . $material->image_location;
         $path = storage_path($image);
@@ -123,6 +123,6 @@ class PeriodicalController extends Controller
         $log = new CatalogingLogController();
         $log->add('Deleted', $model->title, $type, null);
 
-        return response('Record Deleted', 200);
+        return response()->json(['Response' => 'Record Deleted'], 200);
     }
 }

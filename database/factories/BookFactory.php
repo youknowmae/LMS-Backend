@@ -22,18 +22,15 @@ class BookFactory extends Factory
             // 'isbn' => Str::random(15),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
-            // 'image_location' => fake()->filePath(),
-            // 'language' => fake()->randomElement(['Filipino', 'English', 'Spanish', 'Alienese', 'Manganese']),
             'location_id' => fake()->numberBetween(1, 4),
-            // 'publisher' => fake()->company(),
-            'copyright' => fake()->year(),
+            'publisher' => fake()->company(),
             'volume' => fake()->numberBetween(1, 3),
             'edition' => fake()->numberBetween(1, 3),
             'pages' => fake()->randomNumber(3),
             'purchased_date' => fake()->date(),
             'content' => fake()->sentences(2, true),
-            'remarks' => fake()->sentences(3, true),
-            'date_published' => fake()->date()
+            'remarks' => fake()->randomElement(['Purchased', 'Donated', 'Replacement']),
+            'copyright' => fake()->date()
         ];
     }
 }

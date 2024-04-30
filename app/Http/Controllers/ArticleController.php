@@ -28,7 +28,7 @@ class ArticleController extends Controller
             $model->save();
     
             $log = new CatalogingLogController();
-            $log->add('Added', $model->title, 'article', null);
+            $log->add('Added', $model->title, 'article', $model->material_type);
     
             return response()->json($model, 200);
         } catch (Exception $e) {

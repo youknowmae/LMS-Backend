@@ -19,16 +19,14 @@ return new class extends Migration
             $table->string('author');
             $table->string('image_location')->nullable();
             $table->foreignId('location_id')->references('id')->on('locations');
-            // $table->string('publisher');
-            $table->year('copyright');
+            $table->string('publisher');
             $table->integer('volume')->nullable();
             $table->string('edition')->nullable();
             $table->integer('pages');
             $table->date('purchased_date')->nullable();
             $table->text('content')->nullable();
             $table->text('remarks')->nullable();
-            $table->date('date_published');
-            $table->boolean('main_copy')->default(true);
+            $table->date('copyright');
             $table->boolean('available')->default(true);
             $table->timestamps();
             $table->softDeletes();
