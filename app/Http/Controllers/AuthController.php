@@ -27,36 +27,50 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            /* for review */
-            // $responseData = [
-            //     'token' => $token,
-            //     'id' => $user->id,
-            //     'department' => $user->department,
-            //     'role' => $user->role
-            // ];
-            
             // Generate token for superadmin and admin only
             if($user->role == 'superadmin' && $subsystem == 'maintenance') {
 
-                $token = $user->createToken('token-name', ['materials:edit', 'materials:view'])->plainTextToken;
+                $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
                 
-                return response()->json(['token' => $token], 200);
+                $responseData = [
+                    'token' => $token,
+                    'id' => $user->id,
+                    'displayName' => $user->first_name + $user->last_name,
+                    'role' => $user->role
+                ];
+
+                return response()->json($responseData, 200);
 
             } else if(in_array($user->role, ['superadmin', 'admin']) && in_array($subsystem, ['cataloging', 'circulation'])) {
 
-                $token = $user->createToken('token-name', ['materials:edit', 'materials:view'])->plainTextToken;
+                $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
 
                 // sets expiry time
                 $tokenModel = $user->tokens->last();
                 $expiryTime = now()->addHour();
                 $tokenModel->update(['expires_at' => $expiryTime]);
+                
+                $responseData = [
+                    'token' => $token,
+                    'id' => $user->id,
+                    'displayName' => $user->first_name + $user->last_name,
+                    'role' => $user->role
+                ];
 
-                return response()->json(['token' => $token], 200);
+                return response()->json($responseData, 200);
 
             } else if(in_array($user->role, ['user']) && in_array($subsystem, ['student'])) {
-
+                
                 $token = $user->createToken('token-name', ['materials:view'])->plainTextToken;
-                return response()->json(['token' => $token], 200);
+
+                $responseData = [
+                    'token' => $token,
+                    'id' => $user->id,
+                    'department' => $user->department,
+                    'role' => $user->role
+                ];
+
+                return response()->json($responseData, 200);
 
             } else {
                 return response()->json(['message' => 'Unauthorized'], 403);

@@ -64,7 +64,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 });
 
 // Material viewing routes
-Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
+Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], function () {
 
     Route::get('books', [BookController::class, 'getBooks']);
     Route::get('periodicals', [PeriodicalController::class, 'getPeriodicals']);

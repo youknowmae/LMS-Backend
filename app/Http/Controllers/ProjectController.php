@@ -17,10 +17,6 @@ class ProjectController extends Controller
     public function getByType($type) {
         return Project::where('type', $type)->get();
     }
-
-    public function getDepartments() {
-        return Project::with('program')->get();
-    }
     
     public function getProject($id) {
         return Project::find($id);
