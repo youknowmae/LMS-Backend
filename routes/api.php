@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ProgramController;
 use GuzzleHttp\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -87,7 +88,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
     Route::get('articles/type/{type}', [ArticleController::class, 'getByType']);
     Route::get('projects/type/{type}', [ProjectController::class, 'getByType']);
 
-    Route::get('programs', [ProjectController::class, 'getDepartments']);
+    Route::get('programs', [ProgramController::class, 'get']);
 });
 
 /* STUDENT ROUTES */
@@ -113,8 +114,8 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
 });
 
 use App\Models\Location;
-Route::get('/test', function( ) {
-    $books = Book::with('location')->find(1);
+Route::get('/test', function() {
+    $books = Location::find(1)->books;
     return $books;
 });
 

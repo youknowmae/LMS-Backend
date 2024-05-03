@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('program', 10)->unique();
             $table->string('department', 50);
+            $table->string('category');
         });
 
         Schema::create('patrons', function (Blueprint $table) {

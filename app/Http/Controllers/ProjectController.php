@@ -6,12 +6,23 @@ use App\Models\Program;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use Exception;
+use DB;
 
 class ProjectController extends Controller
 {
     public function getProjects() {
-        $projects = Project::with('program')->get();
-        return $projects;
+        $projects = Project::with(['program', 'projectAuthors'])->get()->sortByDesc('created_at');
+
+        $projects->each(function ($project) {
+            $project->projectAuthors = $project->projectAuthors->sortBy('name')->values();
+        });
+
+        $project_array = [];
+        foreach($projects as $project) {
+            array_push($project_array, $project);
+        }
+
+        return $project_array;
     }
 
     public function getByType($type) {
@@ -49,6 +60,7 @@ class ProjectController extends Controller
     }
 
     public function add(Request $request) {
+
         // Validate image
         $request->validate([
             'image_location' => 'required|image|mimes:jpeg,png,jpg|max:4096', // Adjust the max size as needed
@@ -74,6 +86,14 @@ class ProjectController extends Controller
         $model->image_location = $path;
         $model->save();
         
+        $authors = json_decode($request->authors, true);
+
+        foreach($authors as $author) {
+            DB::table('project_authors')->insert(
+                ['name' => $author['value'], 'project_id' => $model->id]
+            );
+        }
+
         $type = strtolower($model->type);
         $program = Program::find($model->program_id)->course;
 
@@ -91,7 +111,7 @@ class ProjectController extends Controller
         try {
             $model->fill($request->except('image_location'));
         } catch (Exception) {
-            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
+            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
 
         $ext = $request->file('image_location')->extension();
@@ -125,8 +145,8 @@ class ProjectController extends Controller
         $course = Program::find($model->course_id)->course;
 
         $log = new CatalogingLogController();
-        $log->add('Deleted', $model->title, $type, $course);
+        $log->add('Archived', $model->title, $type, $course);
 
-        return response('Record Deleted', 200);
+        return response()->json(['Response' => 'Record Archived'], 200);
     }
 }

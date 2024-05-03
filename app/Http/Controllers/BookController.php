@@ -15,9 +15,15 @@ class BookController extends Controller
     }
 
     public function getBooks() {        
-        $books = Book::with('location')->get();
+        $books = Book::with('location')->get()->sortByDesc('created_at');
 
-        return $books;
+        $book_array = [];
+        foreach($books as $book){
+            array_push($book_array, $book);
+        }
+        
+        return $book_array;
+        
     }
 
     public function getBook($id) {
@@ -104,7 +110,7 @@ class BookController extends Controller
         try {
             $model->fill($request->except('image_location'));
         } catch (Exception) {
-            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
+            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
 
         if(!empty($request->image_location)) {
@@ -152,8 +158,8 @@ class BookController extends Controller
         $location = Location::where('id', $model->location_id)->value('location');
         
         $log = new CatalogingLogController();
-        $log->add('Deleted', $model->title, 'book', $location);
+        $log->add('Archived', $model->title, 'book', $location);
 
-        return response()->json(['Response' => 'Record Deleted'], 200);
+        return response()->json(['Response' => 'Record Archived'], 200);
     }
 }

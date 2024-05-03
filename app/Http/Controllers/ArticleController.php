@@ -17,7 +17,14 @@ class ArticleController extends Controller
     }
 
     public function getByType($type) {
-        return Article::where('material_type', $type)->get();
+        $articles = Article::where('material_type', $type)->get()->sortByDesc('created_at');
+
+        $article_array = [];
+        foreach($articles as $book){
+            array_push($article_array, $book);
+        }
+        
+        return $article_array;
     }
 
     public function add(Request $request) {
@@ -32,7 +39,7 @@ class ArticleController extends Controller
     
             return response()->json($model, 200);
         } catch (Exception $e) {
-            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
+            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
     }
 
@@ -56,8 +63,8 @@ class ArticleController extends Controller
         $model->delete();
 
         $log = new CatalogingLogController();
-        $log->add('Deleted', $model->title, 'article', null);
+        $log->add('Archived', $model->title, 'article', null);
 
-        return response('Record Deleted', 200);
+        return response()->json(['Response' => 'Record Deleted'], 200);
     }
 }

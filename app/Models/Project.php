@@ -10,11 +10,14 @@ class Project extends Model
 {
     use HasFactory, SoftDeletes;
     
-    protected $fillable = ['id', 'category', 'title', 'author', 'program_id', 'image_location', 'date_published',
+    protected $fillable = ['id', 'category', 'title', 'program_id', 'image_location', 'date_published',
                             'language', 'abstract'];
 
-    public function program()
-    {
+    public function program(){
         return $this->belongsTo(Program::class);
+    }
+
+    public function projectAuthors() {
+        return $this->hasMany(ProjectAuthor::class);
     }
 }

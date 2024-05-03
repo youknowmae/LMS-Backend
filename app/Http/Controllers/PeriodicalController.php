@@ -9,11 +9,25 @@ use Exception;
 class PeriodicalController extends Controller
 {
     public function getPeriodicals() {
-        return Periodical::all();
+        $periodicals = Periodical::all()->sortByDesc('created_at');
+
+        $periodical_array = [];
+        foreach($periodicals as $periodical){
+            array_push($periodical_array, $periodical);
+        }
+        
+        return $periodical_array;
     }
 
     public function getByType($type) {
-        return Periodical::where('material_type', $type)->get();
+        $periodicals = Periodical::where('material_type', $type)->get()->sortByDesc('created_at');
+
+        $periodical_array = [];
+        foreach($periodicals as $periodical){
+            array_push($periodical_array, $periodical);
+        }
+        
+        return $periodical_array;
     }
 
     public function getPeriodical($id) {
@@ -46,7 +60,7 @@ class PeriodicalController extends Controller
         try {
             $model->fill($request->except('image_location'));
         } catch (Exception) {
-            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
+            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
 
         if(!empty($request->image_location)) {
@@ -121,8 +135,8 @@ class PeriodicalController extends Controller
 
         $type = strtolower($model->material_type);
         $log = new CatalogingLogController();
-        $log->add('Deleted', $model->title, $type, null);
+        $log->add('Archived', $model->title, $type, null);
 
-        return response()->json(['Response' => 'Record Deleted'], 200);
+        return response()->json(['Response' => 'Record Archived'], 200);
     }
 }

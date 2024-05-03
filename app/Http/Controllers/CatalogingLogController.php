@@ -12,7 +12,7 @@ class CatalogingLogController extends Controller
     }
 
     public function add(string $action, string $title, string $type, ?string $location) {
-        if(in_array($type, ['book', 'thesis', 'dissertation', 'feasibility study', 'article'])) {
+        if(in_array($type, ['book', 'article'])) {
             if($action == 'Added' && $type != 'article')
                 $pre = 'to';
             else if ($action == 'Added' && $type == 'article')
@@ -20,6 +20,8 @@ class CatalogingLogController extends Controller
             else
                 $pre = 'from';
             $log = $action . ' \'' . $title . '\' ' . $type . ' ' . $pre . ' ' . $location;
+        } else if (in_array($type, ['thesis', 'feasibility study', 'capstone', 'research'])){
+            $log = $action . ' \'' . $title . '\'' . $type . ' of program ' . $location;
         } else {
             $log = $action . ' \'' . $title . '\' ' . $type;
         }

@@ -26,7 +26,7 @@ class ArticleFactory extends Factory
             'publisher' => fake()->company(),
             'volume' => fake()->numberBetween(1, 3),
             'issue' => fake()->numberBetween(1, 3),
-            'page' => fake()->randomNumber(3),
+            'pages' => fake()->randomNumber(3),
             'abstract' => fake()->sentences(2, true),
             'remarks' => fake()->sentence()
         ];

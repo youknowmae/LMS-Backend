@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('publisher');
             $table->integer('volume')->nullable();
             $table->integer('issue')->nullable();
-            $table->integer('page');
-            $table->text('abstract');
+            $table->string('pages');
+            $table->text('abstract')->nullable();
             $table->text('remarks')->nullable();
             $table->boolean('available')->default(true);
             $table->timestamps();

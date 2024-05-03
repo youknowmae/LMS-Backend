@@ -53,7 +53,7 @@ class AuthController extends Controller
                 $responseData = [
                     'token' => $token,
                     'id' => $user->id,
-                    'displayName' => $user->first_name + $user->last_name,
+                    'displayName' => $user->first_name . ' ' . $user->last_name,
                     'role' => $user->role
                 ];
 
@@ -86,7 +86,7 @@ class AuthController extends Controller
         $user->tokens()->delete();
 
         if(in_array($user->role, ['superadmin', 'admin']))
-            $token = $user->createToken('token-name', ['materials:edit', 'materials:view'])->plainTextToken;
+            $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
 
         // sets expiry time
         $tokenModel = $user->tokens->last();

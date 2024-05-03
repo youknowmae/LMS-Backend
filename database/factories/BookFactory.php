@@ -30,6 +30,8 @@ class BookFactory extends Factory
             'purchased_date' => fake()->date(),
             'content' => fake()->sentences(2, true),
             'remarks' => fake()->randomElement(['Purchased', 'Donated', 'Replacement']),
+            'price' => fake()->randomFloat(2, 100, 2000),
+            'source_of_fund' => fake()->randomElement(['Donated', 'Purchased', 'Replacement']),
             'copyright' => fake()->date()
         ];
     }
