@@ -19,7 +19,6 @@ class BookFactory extends Factory
     {
         return [
             'call_number' => Str::random(10),
-            // 'isbn' => Str::random(15),
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
             'location_id' => fake()->numberBetween(1, 4),
@@ -27,9 +26,8 @@ class BookFactory extends Factory
             'volume' => fake()->numberBetween(1, 3),
             'edition' => fake()->numberBetween(1, 3),
             'pages' => fake()->randomNumber(3),
-            'purchased_date' => fake()->date(),
-            'content' => fake()->sentences(2, true),
-            'remarks' => fake()->randomElement(['Purchased', 'Donated', 'Replacement']),
+            'acquired_date' => fake()->date(),
+            'remarks' => fake()->sentence(),
             'price' => fake()->randomFloat(2, 100, 2000),
             'source_of_fund' => fake()->randomElement(['Donated', 'Purchased', 'Replacement']),
             'copyright' => fake()->date()

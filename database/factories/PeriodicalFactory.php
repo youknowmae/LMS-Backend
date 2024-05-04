@@ -21,7 +21,7 @@ class PeriodicalFactory extends Factory
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
             'image_location' => fake()->filePath(),
-            'language' => fake()->randomElement(['English', 'Tagalog']),
+            'language' => fake()->randomElement(['english', 'tagalog']),
             'receive_date' => fake()->date(),   
             'publisher' => fake()->company(),
             'copyright' => fake()->year(),

@@ -23,8 +23,7 @@ return new class extends Migration
             $table->integer('volume')->nullable();
             $table->string('edition')->nullable();
             $table->integer('pages');
-            $table->date('purchased_date')->nullable();
-            $table->text('content')->nullable();
+            $table->date('acquired_date')->nullable();
             $table->text('remarks')->nullable();
             $table->date('copyright');
             $table->string('source_of_fund');

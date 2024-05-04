@@ -15,7 +15,7 @@ class BookController extends Controller
     }
 
     public function getBooks() {        
-        $books = Book::with('location')->get()->sortByDesc('created_at');
+        $books = Book::with('location')->get()->sortByDesc('updated_at');
 
         $book_array = [];
         foreach($books as $book){
@@ -36,14 +36,14 @@ class BookController extends Controller
 
         // check if it has no image
         if($material->image_location == null)
-            return response()->json(['Response' => 'No Image Found'], 200);
+            return response()->json(['Response' => 'No Image Found'], 404);
 
         $image = 'app/' . $material->image_location;
         $path = storage_path($image);
         try {
             return response()->file($path);
         } catch (Exception $e) {
-            return response()->json(['Status' => 'File not found'], 404);
+            return response()->json(['Status' => 'Invalid file not found'], 404);
         }
     }
 

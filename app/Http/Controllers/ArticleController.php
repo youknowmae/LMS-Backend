@@ -9,7 +9,14 @@ use Exception;
 class ArticleController extends Controller
 {
     public function getArticles() {
-        return Article::all();
+        $articles = Article::all()->sortByDesc('updated_at');
+
+        $article_array = [];
+        foreach($articles as $article){
+            array_push($article_array, $article);
+        }
+        
+        return $article_array;
     }
 
     public function getArticle($id) {
@@ -17,7 +24,7 @@ class ArticleController extends Controller
     }
 
     public function getByType($type) {
-        $articles = Article::where('material_type', $type)->get()->sortByDesc('created_at');
+        $articles = Article::where('material_type', $type)->get()->sortByDesc('updated_at');
 
         $article_array = [];
         foreach($articles as $book){

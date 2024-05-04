@@ -11,7 +11,7 @@ class Book extends Model
     use HasFactory, SoftDeletes;
     protected $fillable = ['id', 'isbn', 'call_number', 'title', 'author', 'publisher',
                             'location_id', 'copyright', 'volume', 'edition', 'remarks',
-                            'pages', 'content', 'remarks', 'purchased_date', 'source_of_fund',
+                            'pages', 'content', 'remarks', 'acquired_date', 'source_of_fund',
                             'price'];
 
     public function location()

@@ -9,7 +9,7 @@ use Exception;
 class PeriodicalController extends Controller
 {
     public function getPeriodicals() {
-        $periodicals = Periodical::all()->sortByDesc('created_at');
+        $periodicals = Periodical::all()->sortByDesc('updated_at');
 
         $periodical_array = [];
         foreach($periodicals as $periodical){
@@ -20,7 +20,7 @@ class PeriodicalController extends Controller
     }
 
     public function getByType($type) {
-        $periodicals = Periodical::where('material_type', $type)->get()->sortByDesc('created_at');
+        $periodicals = Periodical::where('material_type', $type)->get()->sortByDesc('updated_at');
 
         $periodical_array = [];
         foreach($periodicals as $periodical){
@@ -39,14 +39,14 @@ class PeriodicalController extends Controller
 
         // check if it has no image
         if($material->image_location == null)
-            return response()->json(['Response' => 'No Image Found'], 200);
+            return response()->json(['Response' => 'No Image Found'], 404);
 
         $image = 'app/' . $material->image_location;
         $path = storage_path($image);
         try {
             return response()->file($path);
         } catch (Exception $e) {
-            return response()->json(['Status' => 'File not found'], 404);
+            return response()->json(['Status' => 'Invalid file found'], 404);
         }
     }
     
