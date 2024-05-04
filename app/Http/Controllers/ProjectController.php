@@ -11,18 +11,18 @@ use DB;
 class ProjectController extends Controller
 {
     public function getProjects() {
-        $projects = Project::with(['program', 'projectAuthors'])->get()->sortByDesc('created_at');
+        $projects = Project::with(['program', 'projectAuthors'])->orderByDesc('created_at')->get();
 
         $projects->each(function ($project) {
             $project->projectAuthors = $project->projectAuthors->sortBy('name')->values();
         });
 
-        $project_array = [];
-        foreach($projects as $project) {
-            array_push($project_array, $project);
-        }
+        // $project_array = [];
+        // foreach($projects as $project) {
+        //     array_push($project_array, $project);
+        // }
 
-        return $project_array;
+        return $projects;
     }
 
     public function getByType($type) {
@@ -95,10 +95,10 @@ class ProjectController extends Controller
         }
 
         $type = strtolower($model->type);
-        $program = Program::find($model->program_id)->course;
+        $program = Program::find($model->program_id)->program;
 
         $log = new CatalogingLogController();
-        $log->add('Added', $model->title, $type, $program);
+        $log->add($request->user()->id, 'Added', $model->title, $type, $program);
 
         return response()->json($model, 201);
     }
@@ -114,38 +114,40 @@ class ProjectController extends Controller
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
 
-        $ext = $request->file('image_location')->extension();
+        if($request->image_location != null) {
+            $ext = $request->file('image_location')->extension();
 
-        // Check file extension and raise error
-        if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-            return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
+            // Check file extension and raise error
+            if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
+                return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
+            }
+
+            // Store image and save path
+            $path = $request->file('image_location')->store('images/books');
+
+            $model->image_location = $path;
         }
-
-        // Store image and save path
-        $path = $request->file('image_location')->store('images/books');
-
-        $model->image_location = $path;
-
+        
         $model->save();
 
         $type = strtolower($model->type);
-        $course = Program::find($model->course_id)->course;
+        $program = Program::find($model->program_id)->program;
 
         $log = new CatalogingLogController();
-        $log->add('Updated', $model->title, $type, $course);
+        $log->add($request->user()->id, 'Updated', $model->title, $type, $program);
 
         return response()->json($model, 200);
     }
 
-    public function delete($id) {
+    public function delete(Request $request, $id) {
         $model = Project::findOrFail($id);
         $model->delete();
         
         $type = strtolower($model->type);
-        $course = Program::find($model->course_id)->course;
+        $program = Program::find($model->program_id)->program;
 
         $log = new CatalogingLogController();
-        $log->add('Archived', $model->title, $type, $course);
+        $log->add($request->user()->id, 'Archived', $model->title, $type, $program);
 
         return response()->json(['Response' => 'Record Archived'], 200);
     }

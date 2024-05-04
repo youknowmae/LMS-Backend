@@ -15,15 +15,9 @@ class BookController extends Controller
     }
 
     public function getBooks() {        
-        $books = Book::with('location')->get()->sortByDesc('updated_at');
-
-        $book_array = [];
-        foreach($books as $book){
-            array_push($book_array, $book);
-        }
+        $books = Book::with('location')->orderByDesc('updated_at')->get();
         
-        return $book_array;
-        
+        return $books;
     }
 
     public function getBook($id) {
@@ -98,7 +92,7 @@ class BookController extends Controller
         else
             $title = $model->title . ' (' . $request->copies . ')';
 
-        $log->add('Added', $title, 'book', $location);
+        $log->add($request->user()->id, 'Added', $title, 'book', $location);
         
         return response()->json($model, 201);
     }
@@ -141,12 +135,12 @@ class BookController extends Controller
         $location = Location::where('id', $model->location_id)->value('location');
 
         $log = new CatalogingLogController();
-        $log->add('Updated', $model->title, 'book', $location);
+        $log->add($request->user()->id, 'Updated', $model->title, 'book', $location);
 
         return response()->json($model, 200);
     }
 
-    public function delete($id) {
+    public function delete(Request $request, $id) {
         $model = Book::findOrFail($id);
 
         if(!empty($model->image_location)) {
@@ -158,7 +152,7 @@ class BookController extends Controller
         $location = Location::where('id', $model->location_id)->value('location');
         
         $log = new CatalogingLogController();
-        $log->add('Archived', $model->title, 'book', $location);
+        $log->add($request->user()->id, 'Archived', $model->title, 'book', $location);
 
         return response()->json(['Response' => 'Record Archived'], 200);
     }

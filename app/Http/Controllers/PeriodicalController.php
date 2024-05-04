@@ -90,7 +90,7 @@ class PeriodicalController extends Controller
         
         $type = strtolower($model->material_type);
         $log = new CatalogingLogController();
-        $log->add('Added', $model->title, $type, null);
+        $log->add($request->user()->id, 'Added', $model->title, $type, null);
 
         return response()->json($model, 201);
     }
@@ -124,18 +124,18 @@ class PeriodicalController extends Controller
 
         $type = strtolower($model->material_type);
         $log = new CatalogingLogController();
-        $log->add('Updated', $model->title, $type, null);
+        $log->add($request->user()->id, 'Updated', $model->title, $type, null);
 
         return response()->json($model, 200);
     }
 
-    public function delete($id) {
+    public function delete(Request $request, $id) {
         $model = Periodical::findOrFail($id);
         $model->delete();
 
         $type = strtolower($model->material_type);
         $log = new CatalogingLogController();
-        $log->add('Archived', $model->title, $type, null);
+        $log->add($request->user()->id, 'Archived', $model->title, $type, null);
 
         return response()->json(['Response' => 'Record Archived'], 200);
     }

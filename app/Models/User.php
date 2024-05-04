@@ -61,4 +61,8 @@ class User extends Authenticatable
     {
         return $this->role === $role;
     }
+
+    public function logs() {
+        return $this->hasMany(CatalogingLog::class);
+    }
 }

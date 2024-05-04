@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 class CatalogingLogController extends Controller
 {
     public function get() {
-        return CatalogingLog::orderByDesc('create_date')->get();
+        return CatalogingLog::with('user')->orderByDesc('create_date')->get();
     }
 
-    public function add(string $action, string $title, string $type, ?string $location) {
+    public function add(int $id, string $action, string $title, string $type, ?string $location) {
         if(in_array($type, ['book', 'article'])) {
             if($action == 'Added' && $type != 'article')
                 $pre = 'to';
@@ -27,8 +27,11 @@ class CatalogingLogController extends Controller
         }
 
         $model = CatalogingLog::create([
+            'user_id' => $id,
             'action' => $action,
             'log' => $log
         ]);
+
+        $model->save();
     }
 }

@@ -10,5 +10,9 @@ class CatalogingLog extends Model
     use HasFactory;
     public $timestamps = false;
 
-    protected $fillable = ['action', 'log'];
+    protected $fillable = ['user_id', 'action', 'log'];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

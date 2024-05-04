@@ -9,14 +9,9 @@ use Exception;
 class ArticleController extends Controller
 {
     public function getArticles() {
-        $articles = Article::all()->sortByDesc('updated_at');
-
-        $article_array = [];
-        foreach($articles as $article){
-            array_push($article_array, $article);
-        }
+        $articles = Article::all()->orderByDesc('updated_at');
         
-        return $article_array;
+        return $articles;
     }
 
     public function getArticle($id) {
@@ -24,14 +19,9 @@ class ArticleController extends Controller
     }
 
     public function getByType($type) {
-        $articles = Article::where('material_type', $type)->get()->sortByDesc('updated_at');
-
-        $article_array = [];
-        foreach($articles as $book){
-            array_push($article_array, $book);
-        }
+        $articles = Article::where('material_type', $type)->orderByDesc('updated_at')->get();
         
-        return $article_array;
+        return $articles;
     }
 
     public function add(Request $request) {
@@ -42,7 +32,7 @@ class ArticleController extends Controller
             $model->save();
     
             $log = new CatalogingLogController();
-            $log->add('Added', $model->title, 'article', $model->material_type);
+            $log->add($request->user()->id, 'Added', $model->title, 'article', $model->material_type);
     
             return response()->json($model, 200);
         } catch (Exception $e) {
@@ -57,7 +47,7 @@ class ArticleController extends Controller
             $model->save();
 
             $log = new CatalogingLogController();
-            $log->add('Updated', $model->title, 'article', null);
+            $log->add($request->user()->id, 'Updated', $model->title, 'article', null);
     
             return response()->json($model, 200);
         } catch (Exception $e) {
@@ -65,12 +55,12 @@ class ArticleController extends Controller
         }
     }
     
-    public function delete($id) {
+    public function delete(Request $request, $id) {
         $model = Article::findOrFail($id);
         $model->delete();
 
         $log = new CatalogingLogController();
-        $log->add('Archived', $model->title, 'article', null);
+        $log->add($request->user()->id, 'Archived', $model->title, 'article', null);
 
         return response()->json(['Response' => 'Record Deleted'], 200);
     }
