@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             DepartmentSeeder::class,
-            //LocationSeeder::class,
+            LocationSeeder::class,
             BookSeeder::class,
             PeriodicalSeeder::class,
             ArticleSeeder::class,

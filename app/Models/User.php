@@ -61,4 +61,35 @@ class User extends Authenticatable
     {
         return $this->role === $role;
     }
+
+    // Relationship with favorites
+    
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    // Define relationships for favorite items
+    public function favoriteBooks()
+    {
+        return $this->hasMany(FavoriteBook::class);
+    }
+
+    public function favoritePeriodicals()
+    {
+        return $this->hasMany(FavoritePeriodical::class);
+    }
+
+    public function favoriteArticles()
+    {
+        return $this->hasMany(FavoriteArticle::class);
+    }
+
+    public function favoriteProjects()
+    {
+        return $this->hasMany(FavoriteProject::class);
+    }
+
+
 }
+ 

@@ -9,10 +9,32 @@ class Reservation extends Model
 {
     use HasFactory;
 
-    protected $guard = 'Reservation';
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'user_id',
+        'book_id',
+        'start_date',
+        'end_date',
+        'status'
+    ];
 
-    protected $table = 'reservations';
+    /**
+     * Get the user that owns the reservation.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
-    protected $fillable = ['user_id', 'reservation_date', 'status', ];
-   
+    /**
+     * Get the book that the reservation belongs to.
+     */
+    public function book()
+    {
+        return $this->belongsTo(Book::class);
+    }
 }

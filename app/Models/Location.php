@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CatalogingLog extends Model
+class Location extends Model
 {
     use HasFactory;
-    public $timestamps = false;
 
-    protected $fillable = ['action', 'log'];
+    public function books(){
+        return $this->hasMany(Book::class);
+    }
 }

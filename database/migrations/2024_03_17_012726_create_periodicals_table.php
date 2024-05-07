@@ -13,20 +13,21 @@ return new class extends Migration
     {
         Schema::create('periodicals', function (Blueprint $table) {
             $table->id();
+            $table->string('material_type');
             $table->string('title');
             $table->string('author');
-            $table->foreignId('category_id')->references('id')->on('categories');
-            $table->string('material_type');
+            $table->string('image_location')->nullable();
             $table->string('language');
-            $table->string('image');
-            $table->date('date_published');
+            $table->date('receive_date')->nullable();
             $table->string('publisher');
-            $table->text('copyright');
-            $table->integer('volume');
-            $table->integer('issue');
+            $table->year('copyright');
+            $table->integer('volume')->nullable();
+            $table->integer('issue')->nullable();
             $table->integer('pages');
-            $table->text('blurb');
-            $table->boolean('isAvailable')->default(true);
+            $table->text('content')->nullable();
+            $table->text('remarks')->nullable();
+            $table->date('date_published');
+            $table->boolean('available')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -56,6 +56,8 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
     Route::get('/article/id/{id}', [ArticleController::class, 'getArticle']);
     Route::get('/project/id/{id}', [ProjectController::class, 'getProject']);
+    // added to get projects with filtered categories per department
+    Route::get('/projects/categories/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);
 
     // Get Material Image
     Route::get('/book/image/{id}', [BookController::class, 'image']);
