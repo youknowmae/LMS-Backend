@@ -2,6 +2,7 @@
 
 use App\Models\Book;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LockerController;
 
 // default view
 Route::get('/', function (Request $request) {
@@ -23,3 +24,10 @@ Route::post('/inventory/clear', 'InventoryController@clear')->middleware('auth')
 Route::get('/inventory/scan', 'InventoryController@showScanForm');
 Route::post('/inventory/scan', 'InventoryController@processScanForm');
 
+Route::get('/lockers/add', [LockerController::class, 'showAddForm'])
+    ->name('lockers.add')
+    ->middleware('authorizeToAddLockers');
+
+Route::post('/lockers/add', [LockerController::class, 'add'])
+    ->name('lockers.store')
+    ->middleware('authorizeToAddLockers');

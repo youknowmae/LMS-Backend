@@ -25,7 +25,13 @@ protected $middlewarePriority = [
 
 protected $routeMiddleware = [
 // Other middleware...
-'auth' => \App\Http\Middleware\Authenticate::class,
-'check.access' => \App\Http\Middleware\CheckPermittedAccess::class,
+    'auth' => \App\Http\Middleware\Authenticate::class,
+    'check.access' => \App\Http\Middleware\CheckPermittedAccess::class,
+    'authorizeToAddLockers' => \App\Http\Middleware\AuthorizeToAddLockers::class,
+
+
 ];
+
 }
+
+
