@@ -18,3 +18,8 @@ Route::resource('patron-types', 'PatronTypeController');
 
 Route::resource('announcements', 'AnnouncementController');
 
+Route::post('/inventory/clear', 'InventoryController@clear')->middleware('auth');
+
+Route::get('/inventory/scan', 'InventoryController@showScanForm');
+Route::post('/inventory/scan', 'InventoryController@processScanForm');
+
