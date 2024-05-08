@@ -16,3 +16,5 @@ Route::resource('personnel', PersonnelController::class);
 
 Route::resource('patron-types', 'PatronTypeController');
 
+Route::resource('announcements', 'AnnouncementController');
+

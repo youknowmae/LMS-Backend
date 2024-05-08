@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Announcement extends Model
 {
-    use HasFactory;
+    protected $fillable = ['title', 'category', 'date', 'author', 'blurb', 'file_path'];
 
-    protected $fillable = [
-        'title',
-        'category',
-        'author_id',
-        'text',
-        'images'
-    ];
+    public function setFilePathAttribute($file)
+    {
+        if ($file) {
+            $path = Storage::disk('public')->put('announcements', $file);
+            $this->attributes['file_path'] = $path;
+        }
+    }
 }

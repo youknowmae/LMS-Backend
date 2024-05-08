@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('category');
-            $table->foreignId('author_id')->references('id')->on('users');
-            $table->string('text');
-            $table->string('image')->nullable();
+            $table->date('date');
+            $table->string('author');
+            $table->text('blurb');
+            $table->string('file_path')->nullable();
             $table->timestamps();
         });
+
     }
 
     /**
