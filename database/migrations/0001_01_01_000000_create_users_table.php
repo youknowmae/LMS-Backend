@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -33,17 +32,23 @@ return new class extends Migration
             $table->foreignId('patron_id')->references('id')->on('patrons');
             $table->string('password');
             $table->rememberToken();
-
+        
             // details
             $table->string('first_name', 30);
             $table->string('middle_name', 30)->nullable();
             $table->string('last_name', 30);
             $table->string('ext_name', 10)->nullable();
-            $table->string('course_id', 10)->nullable(); // students
-            $table->string('department', 50)->nullable(); // staffs
-            $table->string('position', 50)->nullable(); // staffs
+            $table->string('course_id', 10)->nullable();
+            $table->string('department', 50)->nullable();
+            $table->string('position', 50)->nullable(); 
+            $table->string('profile_image')->nullable(); // Add profile image field
+            
+            // New columns
+            $table->string('main_address')->nullable();
+            $table->string('domain_email')->nullable();
+            
             $table->timestamps();
-            $table->softDeletes();
+            $table->softDeletes();  
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

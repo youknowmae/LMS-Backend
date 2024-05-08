@@ -163,4 +163,7 @@ class ProjectController extends Controller
 
         return response()->json(['Response' => 'Record Archived'], 200);
     }
+
+    
+
 }

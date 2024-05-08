@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -30,7 +29,10 @@ class UserFactory extends Factory
             'middle_name' => fake()->lastName(),
             'last_name' => fake()->lastName(),
             'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10)
+            'remember_token' => Str::random(10),
+            'main_address' => fake()->email(),
+            'domain_email' => fake()->safeEmailDomain(),
+            'profile_image' => fake()->imageUrl($width = 200, $height = 200, 'people') // Generates a fake image URL
         ];
     }
     

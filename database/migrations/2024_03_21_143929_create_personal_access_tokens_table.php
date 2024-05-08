@@ -17,13 +17,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('token', 64)->unique();
             $table->text('abilities')->nullable();
-            $table->timestamp('last_used_at')->useCurrent();
+            $table->timestamp('last_used_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
-
-        // Update existing rows to set the default expiration time
-        DB::statement("UPDATE personal_access_tokens SET expires_at = NOW() + INTERVAL 1 HOUR WHERE expires_at IS NULL");
     }
 
     /**
