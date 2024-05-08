@@ -24,6 +24,18 @@ class ArticleController extends Controller
         return $articles;
     }
 
+    // FOR STUDENT PORTAL
+    public function viewArticles() {
+        $articles = Article::
+        select(['material_type', 'title', 'author', 'language', 'subject', 'date_published', 
+        'publisher', 'volume', 'issue', 'abstract'])
+        ->orderByDesc('created_at')->get();
+        
+        return $articles;
+    }
+
+    /* FOR PROCESSING */
+
     public function add(Request $request) {
 
         $request->validate([

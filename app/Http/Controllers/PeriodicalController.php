@@ -34,6 +34,22 @@ class PeriodicalController extends Controller
     public function getPeriodical($id) {
         return Periodical::find($id);
     }
+
+    // FOR STUDENT PORTAL
+    public function viewPeriodicals() {
+        $periodicals = Periodical::
+        select(['title', 'author', 'material_type', 'image_location', 'language', 'volume', 'issue', 'copyright'])
+        ->orderByDesc('updated_at')->get();
+
+        foreach($periodicals as $periodical) {
+            if($periodical->image_location != null)
+                $periodical->image_location = 'http://localhost:8000' . Storage::url($periodical->image_location);
+        }
+        
+        return $periodicals;
+    }
+
+    /* PROCESSING OF DATA */
     
     public function add(Request $request) {
         

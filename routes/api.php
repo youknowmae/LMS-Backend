@@ -77,17 +77,6 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
     Route::get('periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
     Route::get('article/id/{id}', [ArticleController::class, 'getArticle']);
     Route::get('project/id/{id}', [ProjectController::class, 'getProject']);
-    Route::get('/book/id/{id}', [BookController::class, 'getBook']);
-    Route::get('/periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
-    Route::get('/article/id/{id}', [ArticleController::class, 'getArticle']);
-    Route::get('/project/id/{id}', [ProjectController::class, 'getProject']);
-    // added to get projects with filtered categories per department
-    Route::get('/projects/categories/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);
-
-    // Get Material Image
-    Route::get('book/image/{id}', [BookController::class, 'image']);
-    Route::get('periodical/image/{id}', [PeriodicalController::class, 'image']);
-    Route::get('project/image/{id}', [ProjectController::class, 'image']);
 
     // Get Periodicals and Projects Using Type
     Route::get('periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
@@ -99,6 +88,13 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
 
 /* STUDENT ROUTES */
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
+
+    // ROUTES FOR VIEWING 
+    Route::get('books', [BookController::class, 'viewBooks']);
+    Route::get('periodicals', [PeriodicalController::class, 'viewPeriodicals']);
+    Route::get('articles', [ArticleController::class, 'viewArticles']);
+    Route::get('projects/{department}', [ProjectController::class, 'viewProjectsByDepartment']);
+
     // Reservation routes
     Route::post('reservation/{id}', [ReservationController::class, 'reserve']);
     // Reservation Cancel

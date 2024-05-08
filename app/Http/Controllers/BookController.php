@@ -10,7 +10,6 @@ use Storage;
 
 class BookController extends Controller
 {
-    // Get functions 
     public function getLocations() {
         return Location::all();
     }
@@ -29,6 +28,34 @@ class BookController extends Controller
         $book = Book::with('location')->findOrFail($id);
         return $book;
     }
+
+    // FOR STUDENT PORTAL
+    public function viewBooks() {
+        $books = Book::with('location')->orderByDesc('updated_at')->get();
+        
+        $books_array = [];
+        foreach($books as $book) {
+            $image_url = null;
+            if($book->image_location != null)
+                $image_url = 'http://localhost:8000' . Storage::url($book->image_location);
+
+            array_push($books_array, [
+                'id' => $book->id,
+                'image_url' => $image_url,
+                'location' => $book->location->location,
+                'full_location' => $book->location->full_location,
+                'title' => $book->title,
+                'author' => $book->author,
+                'volume' => $book->volume,
+                'edition' => $book->edition,
+                'available' => $book->available,
+                'copyright' => $book->copyright
+            ]);
+        }
+        return $books_array;
+    }
+
+    /* PROCESSING OF DATA */
 
     public function add(Request $request) {
 
