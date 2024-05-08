@@ -22,7 +22,6 @@ class BookFactory extends Factory
             'title' => fake()->words(3, true),
             'author' => fake()->name(),
             'location_id' => fake()->numberBetween(1, 4),
-            'publisher' => fake()->company(),
             'volume' => fake()->numberBetween(1, 3),
             'edition' => fake()->numberBetween(1, 3),
             'pages' => fake()->randomNumber(3),
@@ -30,7 +29,7 @@ class BookFactory extends Factory
             'remarks' => fake()->sentence(),
             'price' => fake()->randomFloat(2, 100, 2000),
             'source_of_fund' => fake()->randomElement(['Donated', 'Purchased', 'Replacement']),
-            'copyright' => fake()->date()
+            'copyright' => fake()->numberBetween(1990, 2024)
         ];
     }
 }

@@ -14,9 +14,9 @@ class CatalogingReportController extends Controller
 {
     public function countMaterials(){
         // for books
-        $titles = Book::get()->count();
-        $volumes = Book::select('call_number', 'title', 'author', 'copyright', 'volume', 'edition', 'pages')
-        ->distinct()->get()->count();
+        $books = Book::all();
+        $titles = $books->unique('title')->count();
+        $volumes = $books->count();
 
         // for periodicals
         $periodicals = Periodical::all();
@@ -130,16 +130,6 @@ class CatalogingReportController extends Controller
                 $x['edition'], $x['pages'], $x['remarks'],
             ]);
         }
-
-        // $sheet = $spreadsheet->getActiveSheet();
-        // $sheet->getStyle($sheet->calculateWorksheetDimension())->getFont()->setSize(11)->setName('Arial');
-        // $sheet->getStyle($sheet->calculateWorksheetDimension())->getAlignment()->setHorizontal('center')->setWrapText(true);
-        // $sheet->getStyle('A1:H1')->getAlignment()->setHorizontal('center');
-        // $sheet->setCellValue('A1', 'ACC. NUMBER')->setCellValue('B1', 'DATE_RECEIVED')
-        // ->setCellValue('C1', 'CALL NUMBER')->setCellValue('D1', 'AUTHOR')->setCellValue('E1', 'TITLE')
-        // ->setCellValue('F1', 'EDITION')->setCellValue('G1', 'PAGES')->setCellValue('H1', 'SOURCE OF FUND');
-        // $sheet->fromArray($material_arr, null, 'A2')
-        // ->calculateColumnWidths();
 
         $sheet = $spreadsheet->getActiveSheet();
 

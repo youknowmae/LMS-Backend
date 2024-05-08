@@ -113,10 +113,13 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('images/delete/all/{type}', [ImageController::class, 'deleteAll']);
 });
 
-use App\Models\Location;
-Route::get('/test', function() {
-    $books = Location::find(1)->books;
-    return $books;
-});
-
 Route::get('excel/{type}/{date}', [CatalogingReportController::class, 'excel']);
+
+Route::get('test/{text}', function(string $text) {
+    $pass = Hash::make('password');
+    return response()->json(['text' => Hash::check($text, $pass)], 200);
+    if(Hash::make($text) == Hash::make('password'))
+        return response()->json(['response' => 'match'], 200);
+    else 
+        return response()->json(['response' => 'not a match'], 400);
+});

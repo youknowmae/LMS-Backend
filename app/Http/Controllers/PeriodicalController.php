@@ -5,63 +5,57 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Periodical;
 use Exception;
+use Storage;
 
 class PeriodicalController extends Controller
 {
     public function getPeriodicals() {
-        $periodicals = Periodical::all()->sortByDesc('updated_at');
+        $periodicals = Periodical::orderByDesc('updated_at')->get();
 
-        $periodical_array = [];
-        foreach($periodicals as $periodical){
-            array_push($periodical_array, $periodical);
+        foreach($periodicals as $periodical) {
+            if($periodical->image_location != null)
+                $periodical->image_location = 'http://localhost:8000' . Storage::url($periodical->image_location);
         }
         
-        return $periodical_array;
+        return $periodicals;
     }
 
     public function getByType($type) {
-        $periodicals = Periodical::where('material_type', $type)->get()->sortByDesc('updated_at');
+        $periodicals = Periodical::where('material_type', $type)->orderByDesc('updated_at')->get();
 
-        $periodical_array = [];
-        foreach($periodicals as $periodical){
-            array_push($periodical_array, $periodical);
+        foreach($periodicals as $periodical) {
+            if($periodical->image_location != null)
+                $periodical->image_location = 'http://localhost:8000' . Storage::url($periodical->image_location);
         }
         
-        return $periodical_array;
+        return $periodicals;
     }
 
     public function getPeriodical($id) {
         return Periodical::find($id);
     }
-
-    public function image($id) {
-        $material = Periodical::find($id);
-
-        // check if it has no image
-        if($material->image_location == null)
-            return response()->json(['Response' => 'No Image Found'], 404);
-
-        $image = 'app/' . $material->image_location;
-        $path = storage_path($image);
-        try {
-            return response()->file($path);
-        } catch (Exception $e) {
-            return response()->json(['Status' => 'Invalid file found'], 404);
-        }
-    }
     
     public function add(Request $request) {
-        // Validate image
+        
         $request->validate([
-            'image_location' => 'required|image|mimes:jpeg,png,jpg|max:4096', // Adjust the max size as needed
+            'material_type' => 'required|string|max:15',
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:155',
+            'issue' => 'required|integer',
+            'language' => 'required|string|max:15',
+            'receive_date' => 'required|date',
+            'date_published' => 'required|date',
+            'copyright' => 'required|integer|min:1900|max:'.date('Y'),
+            'publisher' =>'required|string|max:255',
+            'volume' => 'required|integer',
+            'remarks' => 'nullable|string|max:512',
+            'pages' => 'required|integer',
+            'image_location' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $model = new Periodical();
-        try {
-            $model->fill($request->except('image_location'));
-        } catch (Exception) {
-            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
-        }
+
+        $model->fill($request->except('image_location'));
 
         if(!empty($request->image_location)) {
             $ext = $request->file('image_location')->extension();
@@ -71,19 +65,20 @@ class PeriodicalController extends Controller
                 return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
             }
 
-            // Store image and save path
-            try {
-                $temp = $model->image_location;
-                $path = $request->file('image_location')->store('images/periodicals');
-                $model->image_location = $path;
+            /// Store image and save path
+            if($request->image_location != null) {
+                $ext = $request->file('image_location')->extension();
 
-                if(!empty($temp)) {
-                    $image = new ImageController();
-                    $image->delete($temp);
+                // Check file extension and raise error
+                if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
+                    return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
                 }
-            } catch (Exception $e) {
-                // add function
-            }
+
+                // Store image and save path
+                $path = $request->file('image_location')->store('public/images/periodicals');
+
+                $model->image_location = $path;
+            } 
         }
 
         $model->save();
@@ -96,15 +91,26 @@ class PeriodicalController extends Controller
     }
 
     public function update(Request $request, $id) {
-        // return response($request);
-        $model = Periodical::findOrFail($id);
-        // return response($model);
 
-        try {
-            $model->fill($request->except('image_location'));
-        } catch (Exception) {
-            return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
-        }
+        $request->validate([
+            'material_type' => 'nullable|string|max:15',
+            'title' => 'nullable|string|max:255',
+            'author' => 'nullable|string|max:155',
+            'issue' => 'nullable|integer',
+            'language' => 'nullable|string|max:15',
+            'receive_date' => 'nullable|date',
+            'date_published' => 'nullable|date',
+            'copyright' => 'nullable|integer|min:1900|max:'.date('Y'),
+            'publisher' =>'nullable|string|max:255',
+            'volume' => 'nullable|integer',
+            'remarks' => 'nullable|string|max:512',
+            'pages' => 'nullable|integer',
+            'image_location' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $model = Periodical::findOrFail($id);
+
+        $model->fill($request->except('image_location'));
 
         if(!empty($request->image_location)) {
             $ext = $request->file('image_location')->extension();
@@ -115,9 +121,21 @@ class PeriodicalController extends Controller
             }
 
             // Store image and save path
-            $path = $request->file('image_location')->store('images', 'public');
+            try {
+                $materials = Periodical::withTrashed()->where('image_location', '=', $model->image_location)->count();
 
-            $model->image_location = $path;
+                if(!empty($model->image_location) && $materials == 1) {
+                    
+                    $image = new ImageController();
+                    $image->delete($model->image_location);
+                }
+                
+                $path = $request->file('image_location')->store('public/images/periodicals');
+                $model->image_location = $path;
+
+            } catch (Exception $e) {
+                // add function
+            }
         }
 
         $model->save();
@@ -131,6 +149,13 @@ class PeriodicalController extends Controller
 
     public function delete(Request $request, $id) {
         $model = Periodical::findOrFail($id);
+        $materials = Periodical::withTrashed()->where('image_location', '=', $model->image_location)->count();
+
+        if(!empty($model->image_location) && $materials == 1) {
+            
+            $image = new ImageController();
+            $image->delete($model->image_location);
+        }
         $model->delete();
 
         $type = strtolower($model->material_type);

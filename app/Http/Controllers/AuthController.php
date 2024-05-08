@@ -83,7 +83,7 @@ class AuthController extends Controller
     public function refreshToken(Request $request) {
         $user = $request->user();
 
-        $user->tokens()->delete();
+        $user->currentAccessToken()->delete();
 
         if(in_array($user->role, ['superadmin', 'admin']))
             $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
@@ -95,6 +95,7 @@ class AuthController extends Controller
 
         return response()->json(['token' => $token]);
     }
+
     public function logout(Request $request) {
         try {
             auth()->user()->tokens()->delete();

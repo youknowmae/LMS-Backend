@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 use Exception;
 use DB;
+use Storage;
 
 class ProjectController extends Controller
 {
@@ -17,11 +18,10 @@ class ProjectController extends Controller
             $project->projectAuthors = $project->projectAuthors->sortBy('name')->values();
         });
 
-        // $project_array = [];
-        // foreach($projects as $project) {
-        //     array_push($project_array, $project);
-        // }
-
+        foreach($projects as $project) {
+            if($project->image_location != null)
+                $project->image_location = 'http://localhost:8000' . Storage::url($project->image_location);
+        }
         return $projects;
     }
 
@@ -33,37 +33,18 @@ class ProjectController extends Controller
         return Project::find($id);
     }
 
-    public function image($id) {
-        $project = Project::find($id);
-
-        // check if it has image
-        if($project->image_location == null)
-            return response('', 200);
-
-        $image = 'app/public/' . $project->image_location;
-        $path = storage_path($image);
-
-        try {
-            $file_content = file_get_contents($path);
-
-            // Determine the MIME type of the image based on the file extension
-            $mime_type = mime_content_type($path);
-    
-            // Return the image content with the appropriate content type
-            return response()->make($file_content, 200, [
-                'Content-Type' => $mime_type,
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['Error' => 'No image or not a valid file found'], 404);
-        }
-        
-    }
-
     public function add(Request $request) {
 
-        // Validate image
+        // VALIDATION
         $request->validate([
-            'image_location' => 'required|image|mimes:jpeg,png,jpg|max:4096', // Adjust the max size as needed
+            'program_id' => 'required|integer|max:255',
+            'category' => 'required|string|max:125',
+            'title' => 'required|string|max:255',
+            'authors' => 'required|string|max:1024',
+            'language' => 'required|string|max:25',
+            'date_published' => 'required|date',
+            'abstract' => 'required|string|max:2048',
+            'image_location' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $model = new Project();
@@ -81,7 +62,7 @@ class ProjectController extends Controller
         }
 
         // Store image and save path
-        $path = $request->file('image_location')->store('images', 'public');
+        $path = $request->file('image_location')->store('public/images/projects');
 
         $model->image_location = $path;
         $model->save();
@@ -104,9 +85,20 @@ class ProjectController extends Controller
     }
 
     public function update(Request $request, $id) {
-        // return response($request);
+        
+        // VALIDATION
+        $request->validate([
+            'program_id' => 'required|integer|max:255',
+            'category' => 'required|string|max:125',
+            'title' => 'required|string|max:255',
+            'authors' => 'required|string|max:1024',
+            'language' => 'required|string|max:25',
+            'date_published' => 'required|date',
+            'abstract' => 'required|string|max:2048',
+            'image_location' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
         $model = Project::findOrFail($id);
-        // return response($model);
 
         try {
             $model->fill($request->except('image_location'));
@@ -123,9 +115,21 @@ class ProjectController extends Controller
             }
 
             // Store image and save path
-            $path = $request->file('image_location')->store('images/books');
+            try {
+                $materials = Project::withTrashed()->where('image_location', '=', $model->image_location)->count();
 
-            $model->image_location = $path;
+                if(!empty($model->image_location) && $materials == 1) {
+                    
+                    $image = new ImageController();
+                    $image->delete($model->image_location);
+                }
+                
+                $path = $request->file('image_location')->store('public/images/projects');
+                $model->image_location = $path;
+
+            } catch (Exception $e) {
+                // add function
+            }
         }
         
         $model->save();
@@ -141,6 +145,14 @@ class ProjectController extends Controller
 
     public function delete(Request $request, $id) {
         $model = Project::findOrFail($id);
+        $materials = Project::withTrashed()->where('image_location', '=', $model->image_location)->count();
+
+        if(!empty($model->image_location) && $materials == 1) {
+            
+            $image = new ImageController();
+            $image->delete($model->image_location);
+        }
+        $model->delete();
         $model->delete();
         
         $type = strtolower($model->type);

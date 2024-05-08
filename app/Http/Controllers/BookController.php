@@ -6,6 +6,7 @@ use App\Models\Book;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\Location;
+use Storage;
 
 class BookController extends Controller
 {
@@ -17,6 +18,10 @@ class BookController extends Controller
     public function getBooks() {        
         $books = Book::with('location')->orderByDesc('updated_at')->get();
         
+        foreach($books as $book) {
+            if($book->image_location != null)
+                $book->image_location = 'http://localhost:8000' . Storage::url($book->image_location);
+        }
         return $books;
     }
 
@@ -25,23 +30,25 @@ class BookController extends Controller
         return $book;
     }
 
-    public function image($id) {
-        $material = Book::find($id);
-
-        // check if it has no image
-        if($material->image_location == null)
-            return response()->json(['Response' => 'No Image Found'], 404);
-
-        $image = 'app/' . $material->image_location;
-        $path = storage_path($image);
-        try {
-            return response()->file($path);
-        } catch (Exception $e) {
-            return response()->json(['Status' => 'Invalid file not found'], 404);
-        }
-    }
-
     public function add(Request $request) {
+
+        $request->validate([
+            'id' => 'nullable|integer',
+            'title' => 'required|string|max:255',
+            'author' => 'required|string|max:255',
+            'copyright' => 'required|integer|min:1900|max:'.date('Y'),
+            'volume' => 'nullable|integer',
+            'edition' => 'nullable|integer',
+            'pages' => 'required|integer',
+            'acquired_date' => 'required|date',
+            'source_of_fund' => 'required|string',
+            'price' => 'nullable|numeric',
+            'location_id' => 'required|integer',
+            'call_number' => 'required|string|max:50',
+            'copies' => 'required|integer|min:1|max:20',
+            'remarks' => 'nullable|string|max:512',
+            'image_location' => 'nullable|mimes:jpeg,jpg,png|max:2048'
+        ]);
 
         if($request->copies < 1) {
             return response('Error: Invalid number of copies', 400);
@@ -75,7 +82,7 @@ class BookController extends Controller
                     }
 
                     // Store image and save path
-                    $path = $request->file('image_location')->store('images/books');
+                    $path = $request->file('image_location')->store('public/images/books');
 
                     $model->image_location = $path;
                 } 
@@ -99,6 +106,24 @@ class BookController extends Controller
 
     public function update(Request $request, $id) {
         
+        $request->validate([
+            'id' => 'nullable|integer',
+            'title' => 'nullable|string|max:255',
+            'author' => 'nullable|string|max:255',
+            'copyright' => 'nullable|integer|min:1900|max:'.date('Y'),
+            'volume' => 'nullable|integer',
+            'edition' => 'nullable|integer',
+            'pages' => 'nullable|integer',
+            'acquired_date' => 'nullable|date',
+            'source_of_fund' => 'nullable|string',
+            'price' => 'nullable|numeric',
+            'location_id' => 'nullable|integer',
+            'call_number' => 'nullable|string|max:50',
+            'copies' => 'nullable|integer|min:1|max:20',
+            'remarks' => 'nullable|string|max:512',
+            'image_location' => 'nullable|mimes:jpeg,jpg,png|max:2048'
+        ]);
+
         $model = Book::findOrFail($id);
 
         try {
@@ -117,14 +142,17 @@ class BookController extends Controller
 
             // Store image and save path
             try {
-                $temp = $model->image_location;
-                $path = $request->file('image_location')->store('images/books');
+                $books = Book::withTrashed()->where('image_location', '=', $model->image_location)->count();
+
+                if(!empty($model->image_location) && $books == 1) {
+                    
+                    $image = new ImageController();
+                    $image->delete($model->image_location);
+                }
+                
+                $path = $request->file('image_location')->store('public/images/books');
                 $model->image_location = $path;
 
-                if(!empty($temp)) {
-                    $image = new ImageController();
-                    $image->delete($temp);
-                }
             } catch (Exception $e) {
                 // add function
             }
@@ -142,8 +170,10 @@ class BookController extends Controller
 
     public function delete(Request $request, $id) {
         $model = Book::findOrFail($id);
+        $books = Book::withTrashed()->where('image_location', '=', $model->image_location)->count();
 
-        if(!empty($model->image_location)) {
+        if(!empty($model->image_location) && $books == 1) {
+            
             $image = new ImageController();
             $image->delete($model->image_location);
         }
@@ -154,6 +184,6 @@ class BookController extends Controller
         $log = new CatalogingLogController();
         $log->add($request->user()->id, 'Archived', $model->title, 'book', $location);
 
-        return response()->json(['Response' => 'Record Archived'], 200);
+        return response()->json(['Response' => $books], 200);
     }
 }

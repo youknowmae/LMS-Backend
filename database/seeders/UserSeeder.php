@@ -28,6 +28,8 @@ class UserSeeder extends Seeder
 
             'department' => 'Library Department',
             'position' => 'Chief',
+            'first_name' => 'Tony',
+            'last_name' => 'Stark',
             'username' => 'admin',
             'password' => Hash::make('Admin123')
         ]);

@@ -18,13 +18,12 @@ return new class extends Migration
             $table->string('author');
             $table->string('image_location')->nullable();
             $table->string('language');
-            $table->date('receive_date')->nullable();
+            $table->date('receive_date');
             $table->string('publisher');
             $table->year('copyright');
-            $table->integer('volume')->nullable();
-            $table->string('issue')->nullable();
+            $table->integer('volume');
+            $table->string('issue');
             $table->integer('pages');
-            $table->text('content')->nullable();
             $table->text('remarks')->nullable();
             $table->date('date_published');
             $table->boolean('available')->default(true);
