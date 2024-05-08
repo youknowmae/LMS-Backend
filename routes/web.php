@@ -1,12 +1,13 @@
 <?php
 
+use App\Models\Book;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\PeriodicalController;
 use App\Http\Controllers\ProjectController;
-use App\Models\Book;
-use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\BorrowBookController;
+use App\Http\Controllers\BorrowMaterialController;
 //circulation
 use App\Http\Controllers\CirculationLogController;
 
@@ -25,6 +26,12 @@ Route::get('/article/{id}', [ArticleController::class, 'getArticle']);
 Route::get('/projects', [ProjectController::class, 'getProjects']);
 Route::get('/project/{id}', [ProjectController::class, 'getProject']);
 
+Route::get('/token', function() 
+    {
+        return response()->json(['csrf_token' => csrf_token()]);
+    });
+
+
 // Add Materials
 //circulation
         //users
@@ -39,6 +46,7 @@ Route::get('/project/{id}', [ProjectController::class, 'getProject']);
         Route::get('/token', function() {
             return response()->json(['csrf_token' => csrf_token()]);
         });
+
 // Update Materials
 
 // Delete Materials
