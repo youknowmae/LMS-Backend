@@ -14,3 +14,5 @@ Route::middleware(['auth', 'check.access:Circulation'])->group(function () {
 
 Route::resource('personnel', PersonnelController::class);
 
+Route::resource('patron-types', 'PatronTypeController');
+
