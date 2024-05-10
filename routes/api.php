@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\ArticleController,
 App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, App\Http\Controllers\ProjectController,
 App\Http\Controllers\CatalogingReportController;
+use App\Http\Controllers\UserController;
 use App\Models\Book;
 
 Route::get('/', function (Request $request) {
@@ -90,3 +91,5 @@ Route::get('/test', function( ) {
     $books = Book::with('location')->find(1);
     return $books;
 });
+
+Route::get('/personnels', [UserController::class, 'index']);
