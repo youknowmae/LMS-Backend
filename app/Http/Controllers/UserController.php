@@ -16,6 +16,12 @@ class UserController extends Controller
         // return response()->json(['Response' => 'User Controller']); // This line will not be executed if the exception is thrown
 
     }
+    public function show(User $user, Request $request)
+    {
+        return response()->json(['user'=>$user]);
+        // return response()->json(['Response' => 'User Controller']); // This line will not be executed if the exception is thrown
+
+    }
 
     public function store(Request $request)
     {   
