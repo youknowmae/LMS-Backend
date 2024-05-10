@@ -94,3 +94,5 @@ Route::get('/test', function( ) {
 
 Route::get('/personnels', [UserController::class, 'index']);
 Route::post('/personnels', [UserController::class, 'store']);
+Route::put('/personnels/{user}', [UserController::class, 'update']);
+Route::delete('/personnels/{user}', [UserController::class, 'delete']);

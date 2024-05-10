@@ -39,4 +39,34 @@ class UserController extends Controller
             'data'=> $user
         ]);
     }
+
+    public function update(User $user, Request $request)
+    {
+        $user->update([
+            'patron_id' => $request->patron_id,
+            'role' => 'admin',
+            'department' => $request->department,
+            'position' => $request->position,
+            'password' => Hash::make($request->password),
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
+            'ext_name' => $request->ext_name,
+
+        ]);
+        return response()->json([
+            'message'=> 'User Updated',
+            'data'=> $user->fresh()
+        ]);
+    }
+
+    public function delete(User $user, Request $request)
+    {
+        $user->delete();
+
+        return response()->json([
+            'message'=> 'User Delete',
+            'data'=> []
+        ]);
+    }
 }
