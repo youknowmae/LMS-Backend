@@ -113,21 +113,34 @@ class CatalogingReportController extends Controller
         return $dompdf->stream($date);
     }
 
-    public function excel(string $type, string $date) {
+    public function excel(Request $request, string $type) {
         $spreadsheet = new Spreadsheet();
-        $dateParsed = Carbon::parse($date);
 
-        $materials = Book::
-            where('created_at', '>=', $dateParsed)
+        $startDateParsed = null;
+        $endDateParsed = null;
+
+        if($request->startDate)
+            $startDateParsed = Carbon::parse($request->startDate);
+        if($request->endDate)
+            $endDateParsed = Carbon::parse($request->endDate);
+
+        if($startDateParsed) {
+            $materials = Book::
+            where([
+                ['created_at', '>=', $startDateParsed . ' 00:00:00'],
+                ['created_at', '<=', $endDateParsed . ' 23:59:59'],
+                ['copyright', '=', $request->copyright]
+            ])
             ->get()
             ->toArray();
+        }
 
         $material_arr = [];
         foreach($materials as $x) {
             $x_date = Carbon::parse($x['copyright']);
             array_push($material_arr, [
                 $x['id'], $x_date->format('m.d.Y'), $x['call_number'], $x['author'], $x['title'],
-                $x['edition'], $x['pages'], $x['remarks'],
+                $x['edition'], $x['pages'], $x['source_of_fund'],
             ]);
         }
 
@@ -136,7 +149,7 @@ class CatalogingReportController extends Controller
         $sheet->fromArray($material_arr, null, 'A2')
         ->calculateColumnWidths();
 
-        $sheet->setCellValue('A1', 'ACC. NUMBER')->setCellValue('B1', 'DATE RECEIVED')
+        $sheet->setCellValue('A1', "ACC. \nNUMBER")->setCellValue('B1', 'DATE RECEIVED')
         ->setCellValue('C1', 'CALL NUMBER')->setCellValue('D1', 'AUTHOR')->setCellValue('E1', 'TITLE')
         ->setCellValue('F1', 'EDITION')->setCellValue('G1', 'PAGES')->setCellValue('H1', 'SOURCE OF FUND');
         $sheet->fromArray($material_arr, null, 'A2');

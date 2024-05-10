@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('category');
             $table->string('title');
             $table->foreignId('program_id')->references('id')->on('programs');
-            $table->string('image_location')->nullable();
+            $table->string('image_url')->nullable();
             $table->date('date_published');
             $table->string('language');
             $table->text('abstract');

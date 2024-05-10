@@ -19,8 +19,8 @@ class ProjectController extends Controller
         });
 
         foreach($projects as $project) {
-            if($project->image_location != null)
-                $project->image_location = 'http://localhost:8000' . Storage::url($project->image_location);
+            if($project->image_url != null)
+                $project->image_url = 'http://localhost:8000' . Storage::url($project->image_url);
         }
         return $projects;
     }
@@ -36,8 +36,8 @@ class ProjectController extends Controller
         });
 
         foreach($projects as $project) {
-            if($project->image_location != null)
-                $project->image_location = 'http://localhost:8000' . Storage::url($project->image_location);
+            if($project->image_url != null)
+                $project->image_url = 'http://localhost:8000' . Storage::url($project->image_url);
         }
         return $projects;
     }
@@ -59,8 +59,8 @@ class ProjectController extends Controller
             if($project->program->department == $department) {
                 
                 $image_url = null;
-                if($project->image_location != null)
-                    $image_url = 'http://localhost:8000' . Storage::url($project->image_location);
+                if($project->image_url != null)
+                    $image_url = 'http://localhost:8000' . Storage::url($project->image_url);
                 
                 // for authors
                 $authors = $project->projectAuthors->sortBy('name')->values();
@@ -112,34 +112,37 @@ class ProjectController extends Controller
             'language' => 'required|string|max:25',
             'date_published' => 'required|date',
             'abstract' => 'required|string|max:2048',
-            'image_location' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $model = new Project();
         try {
-            $model->fill($request->except('image_location'));
+            $model->fill($request->except('image_url'));
         } catch (Exception) {
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
         }
 
-        $ext = $request->file('image_location')->extension();
+        if($request->image_url) {
+            $ext = $request->file('image_url')->extension();
 
-        // Check file extension and raise error
-        if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-            return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
+            // Check file extension and raise error
+            if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
+                return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
+            }
+
+            // Store image and save path
+            $path = $request->file('image_url')->store('public/images/projects');
+
+            $model->image_url = $path;
         }
-
-        // Store image and save path
-        $path = $request->file('image_location')->store('public/images/projects');
-
-        $model->image_location = $path;
+        
         $model->save();
         
         $authors = json_decode($request->authors, true);
 
         foreach($authors as $author) {
             DB::table('project_authors')->insert(
-                ['name' => $author['value'], 'project_id' => $model->id]
+                ['name' => $author, 'project_id' => $model->id]
             );
         }
 
@@ -163,19 +166,19 @@ class ProjectController extends Controller
             'language' => 'required|string|max:25',
             'date_published' => 'required|date',
             'abstract' => 'required|string|max:2048',
-            'image_location' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $model = Project::findOrFail($id);
 
         try {
-            $model->fill($request->except('image_location'));
+            $model->fill($request->except('image_url'));
         } catch (Exception) {
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
 
-        if($request->image_location != null) {
-            $ext = $request->file('image_location')->extension();
+        if($request->image_url != null) {
+            $ext = $request->file('image_url')->extension();
 
             // Check file extension and raise error
             if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
@@ -184,16 +187,16 @@ class ProjectController extends Controller
 
             // Store image and save path
             try {
-                $materials = Project::withTrashed()->where('image_location', '=', $model->image_location)->count();
+                $materials = Project::withTrashed()->where('image_url', '=', $model->image_url)->count();
 
-                if(!empty($model->image_location) && $materials == 1) {
+                if(!empty($model->image_url) && $materials == 1) {
                     
                     $image = new ImageController();
-                    $image->delete($model->image_location);
+                    $image->delete($model->image_url);
                 }
                 
-                $path = $request->file('image_location')->store('public/images/projects');
-                $model->image_location = $path;
+                $path = $request->file('image_url')->store('public/images/projects');
+                $model->image_url = $path;
 
             } catch (Exception $e) {
                 // add function
@@ -201,6 +204,16 @@ class ProjectController extends Controller
         }
         
         $model->save();
+
+        DB::table('project_authors')->where('project_id', '=', $model->id)->delete();
+
+        $authors = json_decode($request->authors, true);
+
+        foreach($authors as $author) {
+            DB::table('project_authors')->insert(
+                ['name' => $author, 'project_id' => $model->id]
+            );
+        }
 
         $type = strtolower($model->type);
         $program = Program::find($model->program_id)->program;
@@ -213,14 +226,13 @@ class ProjectController extends Controller
 
     public function delete(Request $request, $id) {
         $model = Project::findOrFail($id);
-        $materials = Project::withTrashed()->where('image_location', '=', $model->image_location)->count();
+        $materials = Project::withTrashed()->where('image_url', '=', $model->image_url)->count();
 
-        if(!empty($model->image_location) && $materials == 1) {
+        if(!empty($model->image_url) && $materials == 1) {
             
             $image = new ImageController();
-            $image->delete($model->image_location);
+            $image->delete($model->image_url);
         }
-        $model->delete();
         $model->delete();
         
         $type = strtolower($model->type);

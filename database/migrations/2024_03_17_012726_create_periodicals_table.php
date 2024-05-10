@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('material_type');
             $table->string('title');
             $table->string('author');
-            $table->string('image_location')->nullable();
+            $table->string('image_url')->nullable();
             $table->string('language');
             $table->date('receive_date');
             $table->string('publisher');

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('call_number');
             $table->string('title');
             $table->string('author');
-            $table->string('image_location')->nullable();
+            $table->string('image_url')->nullable();
             $table->foreignId('location_id')->references('id')->on('locations');
             $table->integer('volume')->nullable();
             $table->string('edition')->nullable();

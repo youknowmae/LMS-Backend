@@ -18,8 +18,8 @@ class BookController extends Controller
         $books = Book::with('location')->orderByDesc('updated_at')->get();
         
         foreach($books as $book) {
-            if($book->image_location != null)
-                $book->image_location = 'http://localhost:8000' . Storage::url($book->image_location);
+            if($book->image_url != null)
+                $book->image_url = 'http://localhost:8000' . Storage::url($book->image_url);
         }
         return $books;
     }
@@ -36,8 +36,8 @@ class BookController extends Controller
         $books_array = [];
         foreach($books as $book) {
             $image_url = null;
-            if($book->image_location != null)
-                $image_url = 'http://localhost:8000' . Storage::url($book->image_location);
+            if($book->image_url != null)
+                $image_url = 'http://localhost:8000' . Storage::url($book->image_url);
 
             array_push($books_array, [
                 'id' => $book->id,
@@ -74,7 +74,7 @@ class BookController extends Controller
             'call_number' => 'required|string|max:50',
             'copies' => 'required|integer|min:1|max:20',
             'remarks' => 'nullable|string|max:512',
-            'image_location' => 'nullable|mimes:jpeg,jpg,png|max:2048'
+            'image_url' => 'nullable|mimes:jpeg,jpg,png|max:2048'
         ]);
 
         if($request->copies < 1) {
@@ -85,7 +85,7 @@ class BookController extends Controller
                 $model = new Book();
                 try {
                     
-                    $model->fill($request->except(['id', 'image_location']));
+                    $model->fill($request->except(['id', 'image_url']));
 
                     // get id if request has an id
                     if($i > 0 && $request->id != null) {
@@ -100,8 +100,8 @@ class BookController extends Controller
                     return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
                 }
 
-                if($request->image_location != null) {
-                    $ext = $request->file('image_location')->extension();
+                if($request->image_url != null) {
+                    $ext = $request->file('image_url')->extension();
 
                     // Check file extension and raise error
                     if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
@@ -109,9 +109,9 @@ class BookController extends Controller
                     }
 
                     // Store image and save path
-                    $path = $request->file('image_location')->store('public/images/books');
+                    $path = $request->file('image_url')->store('public/images/books');
 
-                    $model->image_location = $path;
+                    $model->image_url = $path;
                 } 
                 $model->save();
             }
@@ -148,19 +148,19 @@ class BookController extends Controller
             'call_number' => 'nullable|string|max:50',
             'copies' => 'nullable|integer|min:1|max:20',
             'remarks' => 'nullable|string|max:512',
-            'image_location' => 'nullable|mimes:jpeg,jpg,png|max:2048'
+            'image_url' => 'nullable|mimes:jpeg,jpg,png|max:2048'
         ]);
 
         $model = Book::findOrFail($id);
 
         try {
-            $model->fill($request->except('image_location'));
+            $model->fill($request->except('image_url'));
         } catch (Exception) {
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
 
-        if(!empty($request->image_location)) {
-            $ext = $request->file('image_location')->extension();
+        if(!empty($request->image_url)) {
+            $ext = $request->file('image_url')->extension();
 
             // Check file extension and raise error
             if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
@@ -169,16 +169,16 @@ class BookController extends Controller
 
             // Store image and save path
             try {
-                $books = Book::withTrashed()->where('image_location', '=', $model->image_location)->count();
+                $books = Book::withTrashed()->where('image_url', '=', $model->image_url)->count();
 
-                if(!empty($model->image_location) && $books == 1) {
+                if(!empty($model->image_url) && $books == 1) {
                     
                     $image = new ImageController();
-                    $image->delete($model->image_location);
+                    $image->delete($model->image_url);
                 }
                 
-                $path = $request->file('image_location')->store('public/images/books');
-                $model->image_location = $path;
+                $path = $request->file('image_url')->store('public/images/books');
+                $model->image_url = $path;
 
             } catch (Exception $e) {
                 // add function
@@ -197,12 +197,12 @@ class BookController extends Controller
 
     public function delete(Request $request, $id) {
         $model = Book::findOrFail($id);
-        $books = Book::withTrashed()->where('image_location', '=', $model->image_location)->count();
+        $books = Book::withTrashed()->where('image_url', '=', $model->image_url)->count();
 
-        if(!empty($model->image_location) && $books == 1) {
+        if(!empty($model->image_url) && $books == 1) {
             
             $image = new ImageController();
-            $image->delete($model->image_location);
+            $image->delete($model->image_url);
         }
         $model->delete();
 

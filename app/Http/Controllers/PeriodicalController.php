@@ -13,8 +13,8 @@ class PeriodicalController extends Controller
         $periodicals = Periodical::orderByDesc('updated_at')->get();
 
         foreach($periodicals as $periodical) {
-            if($periodical->image_location != null)
-                $periodical->image_location = 'http://localhost:8000' . Storage::url($periodical->image_location);
+            if($periodical->image_url != null)
+                $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
         }
         
         return $periodicals;
@@ -24,8 +24,8 @@ class PeriodicalController extends Controller
         $periodicals = Periodical::where('material_type', $type)->orderByDesc('updated_at')->get();
 
         foreach($periodicals as $periodical) {
-            if($periodical->image_location != null)
-                $periodical->image_location = 'http://localhost:8000' . Storage::url($periodical->image_location);
+            if($periodical->image_url != null)
+                $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
         }
         
         return $periodicals;
@@ -38,12 +38,12 @@ class PeriodicalController extends Controller
     // FOR STUDENT PORTAL
     public function viewPeriodicals() {
         $periodicals = Periodical::
-        select(['title', 'author', 'material_type', 'image_location', 'language', 'volume', 'issue', 'copyright'])
+        select(['title', 'author', 'material_type', 'image_url', 'language', 'volume', 'issue', 'copyright'])
         ->orderByDesc('updated_at')->get();
 
         foreach($periodicals as $periodical) {
-            if($periodical->image_location != null)
-                $periodical->image_location = 'http://localhost:8000' . Storage::url($periodical->image_location);
+            if($periodical->image_url != null)
+                $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
         }
         
         return $periodicals;
@@ -66,15 +66,15 @@ class PeriodicalController extends Controller
             'volume' => 'required|integer',
             'remarks' => 'nullable|string|max:512',
             'pages' => 'required|integer',
-            'image_location' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $model = new Periodical();
 
-        $model->fill($request->except('image_location'));
+        $model->fill($request->except('image_url'));
 
-        if(!empty($request->image_location)) {
-            $ext = $request->file('image_location')->extension();
+        if(!empty($request->image_url)) {
+            $ext = $request->file('image_url')->extension();
 
             // Check file extension and raise error
             if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
@@ -82,8 +82,8 @@ class PeriodicalController extends Controller
             }
 
             /// Store image and save path
-            if($request->image_location != null) {
-                $ext = $request->file('image_location')->extension();
+            if($request->image_url != null) {
+                $ext = $request->file('image_url')->extension();
 
                 // Check file extension and raise error
                 if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
@@ -91,9 +91,9 @@ class PeriodicalController extends Controller
                 }
 
                 // Store image and save path
-                $path = $request->file('image_location')->store('public/images/periodicals');
+                $path = $request->file('image_url')->store('public/images/periodicals');
 
-                $model->image_location = $path;
+                $model->image_url = $path;
             } 
         }
 
@@ -121,15 +121,15 @@ class PeriodicalController extends Controller
             'volume' => 'nullable|integer',
             'remarks' => 'nullable|string|max:512',
             'pages' => 'nullable|integer',
-            'image_location' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $model = Periodical::findOrFail($id);
 
-        $model->fill($request->except('image_location'));
+        $model->fill($request->except('image_url'));
 
-        if(!empty($request->image_location)) {
-            $ext = $request->file('image_location')->extension();
+        if(!empty($request->image_url)) {
+            $ext = $request->file('image_url')->extension();
 
             // Check file extension and raise error
             if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
@@ -138,16 +138,16 @@ class PeriodicalController extends Controller
 
             // Store image and save path
             try {
-                $materials = Periodical::withTrashed()->where('image_location', '=', $model->image_location)->count();
+                $materials = Periodical::withTrashed()->where('image_url', '=', $model->image_url)->count();
 
-                if(!empty($model->image_location) && $materials == 1) {
+                if(!empty($model->image_url) && $materials == 1) {
                     
                     $image = new ImageController();
-                    $image->delete($model->image_location);
+                    $image->delete($model->image_url);
                 }
                 
-                $path = $request->file('image_location')->store('public/images/periodicals');
-                $model->image_location = $path;
+                $path = $request->file('image_url')->store('public/images/periodicals');
+                $model->image_url = $path;
 
             } catch (Exception $e) {
                 // add function
@@ -165,12 +165,12 @@ class PeriodicalController extends Controller
 
     public function delete(Request $request, $id) {
         $model = Periodical::findOrFail($id);
-        $materials = Periodical::withTrashed()->where('image_location', '=', $model->image_location)->count();
+        $materials = Periodical::withTrashed()->where('image_url', '=', $model->image_url)->count();
 
-        if(!empty($model->image_location) && $materials == 1) {
+        if(!empty($model->image_url) && $materials == 1) {
             
             $image = new ImageController();
-            $image->delete($model->image_location);
+            $image->delete($model->image_url);
         }
         $model->delete();
 

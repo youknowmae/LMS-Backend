@@ -13,6 +13,7 @@ App\Http\Controllers\CatalogingReportController;
 use App\Http\Controllers\ReservationController;
 use App\Models\Book;
 
+Route::post('/studentlogin', [AuthController::class, 'studentLogin']);
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
 });
@@ -90,10 +91,10 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
 
     // ROUTES FOR VIEWING 
-    Route::get('books', [BookController::class, 'viewBooks']);
-    Route::get('periodicals', [PeriodicalController::class, 'viewPeriodicals']);
-    Route::get('articles', [ArticleController::class, 'viewArticles']);
-    Route::get('projects/{department}', [ProjectController::class, 'viewProjectsByDepartment']);
+    Route::get('student/books', [BookController::class, 'viewBooks']);
+    Route::get('student/periodicals', [PeriodicalController::class, 'viewPeriodicals']);
+    Route::get('student/articles', [ArticleController::class, 'viewArticles']);
+    Route::get('student/projects/{department}', [ProjectController::class, 'viewProjectsByDepartment']);
 
     // Reservation routes
     Route::post('reservation/{id}', [ReservationController::class, 'reserve']);
@@ -115,7 +116,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('images/delete/all/{type}', [ImageController::class, 'deleteAll']);
 });
 
-Route::get('excel/{type}/{date}', [CatalogingReportController::class, 'excel']);
+Route::post('cataloging/reports/excel/{type}', [CatalogingReportController::class, 'excel']);
 
 Route::get('test/{text}', function(string $text) {
     $pass = Hash::make('password');

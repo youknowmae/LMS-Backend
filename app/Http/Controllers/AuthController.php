@@ -2,15 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use DateTime;
-use DateTimeZone;
 use Illuminate\Http\Request;
 use Exception;
 use Auth;
-use DB;
+use DB, Http;
 
 class AuthController extends Controller
 {
+
+    // public function studentLogin(Request $request) {
+    //     $auth_url = 'http://127.0.0.1:8001/api/login';
+    //     $details = Http::get($auth_url)->json();
+    //     return response()->json($details, 200);
+    // }
+
+    public function studentLogin(Request $request)
+    {
+        // Get credentials from the request
+        $credentials = $request->only('username', 'password');
+
+        // Send credentials to the external authentication API
+        $response = Http::post('http://127.0.0.1:8001/api/login', $credentials);
+
+        // Check if the authentication was successful
+        if ($response->successful()) {
+            // Extract user data from the response
+            $userData = $response->json();
+
+            // Generate token
+            $token = $this->generateToken($userData);
+
+            // Return the token to the client
+            return response()->json(['token' => $token], 200);
+        } else {
+            // Return error response if authentication failed
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+    }
+
+    private function generateToken($userData)
+{
+    // Generate token using Sanctum
+    // You can provide any name for the token
+    $token = Auth::guard('sanctum')->login($userData)->plainTextToken();
+
+    // Return the generated token
+    return $token;
+}
 
     public function user(Request $request) {
         return $request->user();
