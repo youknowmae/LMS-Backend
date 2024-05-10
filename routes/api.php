@@ -93,3 +93,4 @@ Route::get('/test', function( ) {
 });
 
 Route::get('/personnels', [UserController::class, 'index']);
+Route::post('/personnels', [UserController::class, 'store']);
