@@ -24,8 +24,19 @@ class UserController extends Controller
     }
 
     public function store(Request $request)
-    {   
-        
+    {
+        $request->validate([
+            'username' => 'required|unique:users',
+            'patron_id' => 'required|unique:users',
+            'department' => 'required',
+            'position' => 'required',
+            'password' => 'required',
+            'first_name' => 'required',
+            'middle_name' => 'required',
+            'last_name' => 'required',
+            'ext_name' => 'nullable',
+        ]);
+
         $user = User::create([
             'username' => $request->username,
             'patron_id' => $request->patron_id,
@@ -41,13 +52,27 @@ class UserController extends Controller
         ]);
 
         return response()->json([
-            'message'=> 'User Created',
+            'message'=> 'User created successfully',
             'data'=> $user
         ]);
     }
 
-    public function update(User $user, Request $request)
+    public function update(User $user, Request $request, $id)
     {
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'username' => 'required|unique:users,username,'.$user->id,
+            'patron_id' => 'required|unique:users,patron_id,'.$user->id,
+            'department' => 'required',
+            'position' => 'required',
+            'password' => 'nullable',
+            'first_name' => 'required',
+            'middle_name' => 'required',
+            'last_name' => 'required',
+            'ext_name' => 'nullable',
+        ]);
+
         $user->update([
             'patron_id' => $request->patron_id,
             'role' => 'admin',
@@ -61,18 +86,18 @@ class UserController extends Controller
 
         ]);
         return response()->json([
-            'message'=> 'User Updated',
+            'message'=> 'User updated successfully',
             'data'=> $user->fresh()
         ]);
     }
 
-    public function delete(User $user, Request $request)
+    public function destroy(User $user, Request $request, $id)
     {
+        $user = User::findOrFail($id);
         $user->delete();
 
         return response()->json([
-            'message'=> 'User Delete',
-            'data'=> []
+            'message'=> 'User deleted successfully',
         ]);
     }
 }
