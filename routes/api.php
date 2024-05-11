@@ -9,6 +9,7 @@ App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, 
 App\Http\Controllers\CatalogingReportController;
 use App\Http\Controllers\UserController;
 use App\Models\Book;
+use App\Http\Controllers\CirculationLogController;
 
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
@@ -29,14 +30,14 @@ Route::get('cataloging/reports/pdf', [CatalogingReportController::class, 'genera
 
 // Cataloging Process routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
-    
+
     // View cataloging logs
     Route::get('/cataloging/logs', [CatalogingLogController::class, 'get']);
     Route::get('books/locations', [BookController::class, 'getLocations']);
 
-    
+
     Route::get('books/locations', [BookController::class, 'getLocations']);
-    
+
     // Add Materials
     Route::post('/books/process', [BookController::class, 'add']);
     Route::post('/periodicals/process', [PeriodicalController::class, 'add']);
@@ -63,7 +64,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/articles', [ArticleController::class, 'getArticles']);
     Route::get('/projects', [ProjectController::class, 'getProjects']);
 
-    // Get Materials Using ID 
+    // Get Materials Using ID
     Route::get('/book/id/{id}', [BookController::class, 'getBook']);
     Route::get('/periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
     Route::get('/article/id/{id}', [ArticleController::class, 'getArticle']);
@@ -80,7 +81,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/projects/type/{type}', [ProjectController::class, 'getByType']);
 });
 
-// RED ZONE 
+// RED ZONE
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
     Route::get('/images/delete/single', [ImageController::class, 'delete'])->name('images.delete');
     Route::get('/images/delete/all/{type}', [ImageController::class, 'deleteAll']);
@@ -92,8 +93,18 @@ Route::get('/test', function( ) {
     return $books;
 });
 
+//Routes for Personnels
 Route::get('/personnels', [UserController::class, 'index']);
 Route::post('/personnels', [UserController::class, 'store']);
 Route::get('/personnels/{user}', [UserController::class, 'show']);
 Route::put('/personnels/{user}', [UserController::class, 'update']);
 Route::delete('/personnels/{user}', [UserController::class, 'delete']);
+
+//Routes for Circulation
+Route::middleware(['auth'])->group(function () {
+    Route::get('/circulation-logs', [CirculationLogController::class, 'index']);
+    Route::post('/circulation-logs', [CirculationLogController::class, 'store']);
+    Route::get('/circulation-logs/{id}', [CirculationLogController::class, 'show']);
+    Route::put('/circulation-logs/{id}', [CirculationLogController::class, 'update']);
+    Route::delete('/circulation-logs/{id}', [CirculationLogController::class, 'destroy']);
+});
