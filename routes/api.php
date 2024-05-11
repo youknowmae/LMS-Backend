@@ -94,11 +94,13 @@ Route::get('/test', function( ) {
 });
 
 //Routes for Personnels
-Route::get('/personnels', [UserController::class, 'index']);
-Route::post('/personnels', [UserController::class, 'store']);
-Route::get('/personnels/{user}', [UserController::class, 'show']);
-Route::put('/personnels/{user}', [UserController::class, 'update']);
-Route::delete('/personnels/{user}', [UserController::class, 'delete']);
+Route::middleware(['auth', 'check.access:Personnel'])->group(function () {
+    Route::get('/personnels', [UserController::class, 'index']);
+    Route::post('/personnels', [UserController::class, 'store']);
+    Route::get('/personnels/{user}', [UserController::class, 'show']);
+    Route::put('/personnels/{user}', [UserController::class, 'update']);
+    Route::delete('/personnels/{user}', [UserController::class, 'delete']);
+});
 
 //Routes for Circulation
 Route::middleware(['auth'])->group(function () {
@@ -108,3 +110,4 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/circulation-logs/{id}', [CirculationLogController::class, 'update']);
     Route::delete('/circulation-logs/{id}', [CirculationLogController::class, 'destroy']);
 });
+
