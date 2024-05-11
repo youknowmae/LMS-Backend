@@ -20,6 +20,7 @@ class AnnouncementFactory extends Factory
         return [
             'title' => fake()->title(),
             'category' => Str::random(10),  //ano nga ba laman ng category HAHAHAHHA
+            'date' => fake()->date,
             'author_id' => fake()->numberBetween(1, 5),
             'text' => fake()->sentence(4),
             'image' => fake()->url()
