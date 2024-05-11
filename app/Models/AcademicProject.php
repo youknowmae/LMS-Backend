@@ -5,11 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CatalogingLog extends Model
+class AcademicProject extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-
-    protected $fillable = ['action', 'log'];
+    protected $fillable = ['college', 'courses'];
 }
-

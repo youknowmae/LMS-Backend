@@ -111,3 +111,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/circulation-logs/{id}', [CirculationLogController::class, 'destroy']);
 });
 
+//Routes for Cataloging
+Route::prefix('cataloging')->group(function () {
+    Route::get('/logs', [CatalogingLogController::class, 'get']);
+    Route::post('/logs/{action}/{title}/{type}/{location?}', [CatalogingLogController::class, 'add']);
+    Route::get('/reports', [CatalogingReportController::class, 'index']);
+    Route::post('/cataloging/filters', [CatalogingLogController::class, 'createFilter']);
+    Route::post('/cataloging/academic-projects', [CatalogingLogController::class, 'addAcademicProject']);
+
+
+});
