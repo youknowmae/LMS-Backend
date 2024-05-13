@@ -16,6 +16,7 @@ use App\Http\Controllers\CatalogingCategoryController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AcademicProjectController;
 use App\Http\Controllers\PersonnelController;
+use App\Http\Controllers\AnnouncementController;
 
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
@@ -188,6 +189,15 @@ function authenticationRoutes(): void
         Route::post('/', [AcademicProjectController::class, 'store']);
         Route::put('/{academicProject}', [AcademicProjectController::class, 'update']);
         Route::delete('/{academicProject}', [AcademicProjectController::class, 'destroy']);
+    });
+
+    //Announcement routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/announcements', [AnnouncementController::class, 'index']);
+        Route::post('/announcements', [AnnouncementController::class, 'store']);
+        Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show']);
+        Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update']);
+        Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
     });
 }
 
