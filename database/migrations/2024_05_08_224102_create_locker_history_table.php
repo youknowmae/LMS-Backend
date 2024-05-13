@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateLockerHistoryTable extends Migration
 {
-public function up()
+public function up(): void
 {
 Schema::create('locker_history', function (Blueprint $table) {
 $table->id();
@@ -16,7 +16,7 @@ $table->timestamps();
 });
 }
 
-public function down()
+public function down(): void
 {
 Schema::dropIfExists('locker_history');
 }

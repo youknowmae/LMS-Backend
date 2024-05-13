@@ -4,15 +4,102 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inventory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
 
 class InventoryController extends Controller
 {
     /**
+     * Enter barcode.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function enterBarcode(Request $request): JsonResponse
+    {
+        // Validate request data
+        $request->validate([
+            'barcode' => 'required|unique:inventories, barcode',
+            'accession_number' => 'required|unique:inventories,accession_number',
+            'title' => 'required',
+            'author' => 'required',
+            'location' => 'required',
+            'status' => 'required|in:available,unavailable,missing',
+        ]);
+
+        // Create new inventory item
+        $inventoryItem = new Inventory();
+        $inventoryItem->barcode = $request->barcode;
+        $inventoryItem->accession_number = $request->accession_number;
+        $inventoryItem->title = $request->title;
+        $inventoryItem->author = $request->author;
+        $inventoryItem->location = $request->location;
+        $inventoryItem->status = $request->status;
+        $inventoryItem->save();
+
+        return response()->json(['message' => 'Barcode entered successfully', 'inventoryItem' => $inventoryItem], 201);
+    }
+
+    /**
+     * Scan barcode.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function scanBarcode(Request $request): JsonResponse
+    {
+        // Validate request data
+        $request->validate([
+            'barcode' => 'required|exists:inventories,barcode',
+        ]);
+
+        // Retrieve the inventory item by barcode
+        $inventoryItem = Inventory::where('barcode', $request->barcode)->first();
+
+        return response()->json(['message' => 'Barcode scanned successfully', 'inventoryItem' => $inventoryItem]);
+    }
+
+    /**
+     * Clear history.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function clearHistory(Request $request): JsonResponse
+    {
+        try {
+            // Truncate the inventory table
+            Inventory::truncate();
+
+            return response()->json(['message' => 'Barcode scan history cleared successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to clear barcode scan history'], 500);
+        }
+    }
+
+    /**
+     * Filter inventory items based on status.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function filterByStatus(Request $request): JsonResponse
+    {
+        // Get status from request
+        $status = $request->input('status');
+
+        // Query inventory items based on status
+        $inventoryItems = Inventory::where('status', $status)->get();
+
+        return response()->json(['inventoryItems' => $inventoryItems]);
+    }
+
+    /**
      * Show the barcode scanning form.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
-    public function showScanForm()
+    public function showScanForm(): View
     {
         return view('inventory.scan');
     }
@@ -20,10 +107,10 @@ class InventoryController extends Controller
     /**
      * Process the barcode scanning form.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function processScanForm(Request $request)
+    public function processScanForm(Request $request): JsonResponse
     {
         // Validate the form input (barcode)
         $request->validate([
@@ -53,10 +140,10 @@ class InventoryController extends Controller
     /**
      * Clear the inventory table.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function clear(Request $request)
+    public function clear(Request $request): JsonResponse
     {
         // Check if the user has the necessary role or permission
         if (!$request->user()->hasRole('admin')) {

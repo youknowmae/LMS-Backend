@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -199,6 +200,11 @@ function authenticationRoutes(): void
         Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update']);
         Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
     });
+//Inventory routes
+    Route::prefix('inventory')->group(function () {
+        Route::post('/enter', [InventoryController::class, 'enterBarcode']);
+        Route::post('/scan', [InventoryController::class, 'scanBarcode']);
+        Route::post('/clear', [InventoryController::class, 'clearHistory']);
+    });
 }
-
 authenticationRoutes();
