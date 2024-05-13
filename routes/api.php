@@ -7,9 +7,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\ArticleController,
 App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, App\Http\Controllers\ProjectController,
 App\Http\Controllers\CatalogingReportController;
+
 use App\Http\Controllers\UserController;
 use App\Models\Book;
 use App\Http\Controllers\CirculationLogController;
+use App\Http\Controllers\CatalogingFilterController;
+use App\Http\Controllers\CatalogingCategoryController;
+use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\AcademicProjectController;
 
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
@@ -119,5 +124,70 @@ Route::prefix('cataloging')->group(function () {
     Route::post('/cataloging/filters', [CatalogingLogController::class, 'createFilter']);
     Route::post('/cataloging/academic-projects', [CatalogingLogController::class, 'addAcademicProject']);
 
+    //filters
+    Route::get('/materialscontent', [CatalogingLogController::class, 'materialsContent']);
+    Route::post('/filters/category', [CatalogingFilterController::class, 'updateCategoryFilters']);
+    Route::post('/filters/location', [CatalogingFilterController::class, 'updateLocationFilters']);
+    Route::post('/categories', [CatalogingCategoryController::class, 'addCategory']);
 
+    //search for materials
+    Route::get('/materials/search', [MaterialController::class, 'search']);
+
+    //search for academic projects
+    Route::get('/academic-projects/search', [AcademicProjectController::class, 'search']);
 });
+
+// Authentication routes
+/**
+ * @return void
+ */
+function authenticationRoutes(): void
+{
+    Route::post('/login/{subsystem}', [AuthController::class, 'login']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+// Material routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/books', [MaterialController::class, 'getAllBooks']);
+        Route::get('/periodicals', [MaterialController::class, 'getAllPeriodicals']);
+        Route::get('/articles', [MaterialController::class, 'getAllArticles']);
+        Route::get('/projects', [MaterialController::class, 'getAllProjects']);
+
+        Route::get('/book/id/{id}', [MaterialController::class, 'getBookById']);
+        Route::get('/periodical/id/{id}', [MaterialController::class, 'getPeriodicalById']);
+        Route::get('/article/id/{id}', [MaterialController::class, 'getArticleById']);
+        Route::get('/project/id/{id}', [MaterialController::class, 'getProjectById']);
+
+        Route::get('/book/image/{id}', [MaterialController::class, 'getBookImage']);
+        Route::get('/periodical/image/{id}', [MaterialController::class, 'getPeriodicalImage']);
+        Route::get('/project/image/{id}', [MaterialController::class, 'getProjectImage']);
+
+        Route::get('/periodicals/type/{type}', [MaterialController::class, 'getPeriodicalsByType']);
+        Route::get('/projects/type/{type}', [MaterialController::class, 'getProjectsByType']);
+
+        Route::post('/books/process', [MaterialController::class, 'addBook']);
+        Route::post('/periodicals/process', [MaterialController::class, 'addPeriodical']);
+        Route::post('/articles/process', [MaterialController::class, 'addArticle']);
+        Route::post('/projects/process', [MaterialController::class, 'addProject']);
+
+        Route::post('/books/process/{id}', [MaterialController::class, 'updateBook']);
+        Route::post('/periodicals/process/{id}', [MaterialController::class, 'updatePeriodical']);
+        Route::post('/articles/process/{id}', [MaterialController::class, 'updateArticle']);
+        Route::post('/projects/process/{id}', [MaterialController::class, 'updateProject']);
+
+        Route::delete('/books/process/{id}', [MaterialController::class, 'deleteBook']);
+        Route::delete('/periodicals/process/{id}', [MaterialController::class, 'deletePeriodical']);
+        Route::delete('/articles/process/{id}', [MaterialController::class, 'deleteArticle']);
+        Route::delete('/projects/process/{id}', [MaterialController::class, 'deleteProject']);
+    });
+
+// Academic projects routes
+    Route::prefix('academic-projects')->group(function () {
+        Route::get('/', [AcademicProjectController::class, 'index']);
+        Route::post('/', [AcademicProjectController::class, 'store']);
+        Route::put('/{academicProject}', [AcademicProjectController::class, 'update']);
+        Route::delete('/{academicProject}', [AcademicProjectController::class, 'destroy']);
+    });
+}
+
+authenticationRoutes();
