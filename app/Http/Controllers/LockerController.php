@@ -2,28 +2,83 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Locker;
 use Illuminate\Http\Request;
-use App\Models\LockerHistory;
+use Illuminate\Http\JsonResponse;
 
 class LockerController extends Controller
 {
-    public function showAddForm()
+    /**
+     * Display a listing of the lockers.
+     *
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
     {
-        return view('lockers.add');
+        $lockers = Locker::all();
+        return response()->json(['lockers' => $lockers]);
     }
 
-    public function add(Request $request)
+    /**
+     * Store a newly created locker in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'number_of_lockers' => 'required|integer|min:1',
+            'lockerID' => 'required',
+            'status' => 'required',
+            'date_time' => 'required',
         ]);
 
-        // Store the history of locker additions
-        LockerHistory::create([
-            'number_of_lockers' => $request->number_of_lockers,
-            'added_at' => now(),
+        $locker = Locker::create($request->all());
+
+        return response()->json(['message' => 'Locker created successfully', 'locker' => $locker], 201);
+    }
+
+    /**
+     * Display the specified locker.
+     *
+     * @param Locker $locker
+     * @return JsonResponse
+     */
+    public function show(Locker $locker): JsonResponse
+    {
+        return response()->json(['locker' => $locker]);
+    }
+
+    /**
+     * Update the specified locker in storage.
+     *
+     * @param Request $request
+     * @param Locker $locker
+     * @return JsonResponse
+     */
+    public function update(Request $request, Locker $locker): JsonResponse
+    {
+        $request->validate([
+            'lockerID' => 'required',
+            'status' => 'required',
+            'date_time' => 'required',
         ]);
 
-        return redirect()->route('lockers.add')->with('success', 'Lockers added successfully.');
+        $locker->update($request->all());
+
+        return response()->json(['message' => 'Locker updated successfully', 'locker' => $locker]);
+    }
+
+    /**
+     * Remove the specified locker from storage.
+     *
+     * @param Locker $locker
+     * @return JsonResponse
+     */
+    public function destroy(Locker $locker): JsonResponse
+    {
+        $locker->delete();
+
+        return response()->json(['message' => 'Locker deleted successfully']);
     }
 }

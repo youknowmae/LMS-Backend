@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\LockerController;
+use App\Http\Controllers\LockersLogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -149,7 +151,7 @@ function authenticationRoutes(): void
     Route::post('/login/{subsystem}', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-// Material routes
+//Material routes
     Route::middleware(['auth'])->group(function () {
         Route::get('/books', [MaterialController::class, 'getAllBooks']);
         Route::get('/periodicals', [MaterialController::class, 'getAllPeriodicals']);
@@ -184,7 +186,7 @@ function authenticationRoutes(): void
         Route::delete('/projects/process/{id}', [MaterialController::class, 'deleteProject']);
     });
 
-// Academic projects routes
+//Academic projects routes
     Route::prefix('academic-projects')->group(function () {
         Route::get('/', [AcademicProjectController::class, 'index']);
         Route::post('/', [AcademicProjectController::class, 'store']);
@@ -205,6 +207,23 @@ function authenticationRoutes(): void
         Route::post('/enter', [InventoryController::class, 'enterBarcode']);
         Route::post('/scan', [InventoryController::class, 'scanBarcode']);
         Route::post('/clear', [InventoryController::class, 'clearHistory']);
+    });
+
+    Route::prefix('lockers')->group(function () {
+        Route::get('/', [LockerController::class, 'index']);
+        Route::post('/', [LockerController::class, 'store']);
+        Route::get('/{locker}', [LockerController::class, 'show']);
+        Route::put('/{locker}', [LockerController::class, 'update']);
+        Route::delete('/{locker}', [LockerController::class, 'destroy']);
+
+        // Locker history routes
+        Route::prefix('{locker}/history')->group(function () {
+            Route::get('/', [LockersLogController::class, 'index']);
+            Route::post('/', [LockersLogController::class, 'store']);
+            Route::get('/{lockersLog}', [LockersLogController::class, 'show']);
+            Route::put('/{lockersLog}', [LockersLogController::class, 'update']);
+            Route::delete('/{lockersLog}', [LockersLogController::class, 'destroy']);
+        });
     });
 }
 authenticationRoutes();
