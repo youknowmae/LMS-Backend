@@ -15,6 +15,7 @@ use App\Http\Controllers\CatalogingFilterController;
 use App\Http\Controllers\CatalogingCategoryController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AcademicProjectController;
+use App\Http\Controllers\PersonnelController;
 
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
@@ -100,11 +101,11 @@ Route::get('/test', function( ) {
 
 //Routes for Personnels
 Route::middleware(['auth', 'check.access:Personnel'])->group(function () {
-    Route::get('/personnels', [UserController::class, 'index']);
-    Route::post('/personnels', [UserController::class, 'store']);
-    Route::get('/personnels/{user}', [UserController::class, 'show']);
-    Route::put('/personnels/{user}', [UserController::class, 'update']);
-    Route::delete('/personnels/{user}', [UserController::class, 'delete']);
+    Route::get('/personnels', [PersonnelController::class, 'index']);
+    Route::post('/personnels', [PersonnelController::class, 'store']);
+    Route::get('/personnels/{personnel}', [PersonnelController::class, 'show']);
+    Route::put('/personnels/{personnel}', [PersonnelController::class, 'update']);
+    Route::delete('/personnels/{personnel}', [PersonnelController::class, 'destroy']);
 });
 
 //Routes for Circulation

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,16 +10,13 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::whereNot('role', 'superadmin')->get();
-        return response()->json(['users'=>$users]);
-        // return response()->json(['Response' => 'User Controller']); // This line will not be executed if the exception is thrown
-
+        $users = User::where('role', '<>', 'superadmin')->get();
+        return response()->json(['users' => $users]);
     }
-    public function show(User $user, Request $request)
-    {
-        return response()->json(['user'=>$user]);
-        // return response()->json(['Response' => 'User Controller']); // This line will not be executed if the exception is thrown
 
+    public function show(User $user)
+    {
+        return response()->json(['user' => $user]);
     }
 
     public function store(Request $request)
@@ -48,7 +44,6 @@ class UserController extends Controller
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
             'ext_name' => $request->ext_name,
-
         ]);
 
         return response()->json([
@@ -57,7 +52,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(User $user, Request $request, $id)
+    public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
@@ -83,15 +78,15 @@ class UserController extends Controller
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
             'ext_name' => $request->ext_name,
-
         ]);
+
         return response()->json([
             'message'=> 'User updated successfully',
             'data'=> $user->fresh()
         ]);
     }
 
-    public function destroy(User $user, Request $request, $id)
+    public function destroy($id)
     {
         $user = User::findOrFail($id);
         $user->delete();

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -16,20 +15,26 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
-    // protected $fillable = [
-    //     'name',
-    //     'email',
-    //     'password',
-    //     'role',
-        
-    // ];
-    protected $guarded = [];
+    protected $fillable = [
+        'username',
+        'patron_id',
+        'role',
+        'department',
+        'position',
+        'password',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'ext_name',
+        'access',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $hidden = [
         'password',
@@ -37,29 +42,42 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array
      */
-    protected function casts(): array
-    {
-        return [
-            // 'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'access' => 'array',
+    ];
 
-    public function username()
+    /**
+     * Retrieve the username column name.
+     *
+     * @return string
+     */
+    public function username(): string
     {
         return 'username';
     }
 
-    public function findForIdentifier($username)
+    /**
+     * Find user by username.
+     *
+     * @param string $username
+     * @return mixed
+     */
+    public function findForIdentifier(string $username)
     {
         return $this->where('username', $username)->first();
     }
 
-    public function hasRole($role)
+    /**
+     * Check if user has a specific role.
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole(string $role): bool
     {
         return $this->role === $role;
     }
