@@ -2,54 +2,73 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\BorrowMaterialController;
 use App\Models\BorrowMaterial;
 use App\Models\BorrowBook;
+use Exeption;
 use Illuminate\Http\Request;
+use Storage;
+
+
 
 class BorrowBookController extends Controller
 {
+    //function for borrowing books
     public function borrowbook(Request $request)
 {
     // Validate the incoming request data
     $request->validate([
-        'user_id' => 'required|numeric',
+        'user_id' => 'required|integer',
         'fine' => 'required|numeric',
         'borrow_date' => 'required|date',
         'borrow_expiration' => 'required|date',
         'book_id' => 'required|exists:books,id',
-        // Validation for the new fields
-        'name' => 'required|string',
-        'patron_type' => 'required|string',
-        'department' => 'required|string',
-        'name_of_staff' => 'nullable|string',
-        'position' => 'nullable|string',
+        // // Validation for the new fields
+        // 'name' => 'required|string',
+        // 'patron_type' => 'required|string',
+        // 'department' => 'required|string',
+        // 'name_of_staff' => 'nullable|string',
+        // 'position' => 'nullable|string',
     ]);
 
-        // Create a new borrow request
-        $borrowMaterial = new BorrowMaterial();
-        $borrowMaterial->user_id = $request->user_id;
-        $borrowMaterial->fine = $request->fine;
-        $borrowMaterial->borrow_date = $request->borrow_date;
-        $borrowMaterial->borrow_expiration = $request->borrow_expiration;
-        // Set the values for the new fields
-        $borrowMaterial->name = $request->name;
-        $borrowMaterial->patron_type = $request->patron_type;
-        $borrowMaterial->department = $request->department;
-        $borrowMaterial->name_of_staff = $request->name_of_staff;
-        $borrowMaterial->position = $request->position;
-        $borrowMaterial->save();
+    // Get the BorrowMaterialController instance
+    $borrowMaterialController = new BorrowMaterialController();
 
-        // Associate the book with the borrow request
-        $borrowBook = new BorrowBook();
-        $borrowBook->borrow_material_id = $borrowMaterial->id;
-        $borrowBook->book_id = $request->book_id;
-        $borrowBook->save();
+    // Check if user_id exists in the $users array
+    $userExists = $borrowMaterialController->checkUserExists($request->user_id);
 
-        // Redirect back with a success message
-        return redirect()->back()->with('success', 'Book borrowed successfully!');
+    if (!$userExists) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+    //proceed
+
+    $borrow = new BorrowMaterial();
+    $borrow->user_id = $request->user_id;
+    $borrow->fine = $request->fine;
+    $borrow->borrow_date = $request->borrow_date;
+    $borrow->borrow_expiration = $request->borrow_expiration;
+    error_log($borrow);
+    $borrow->save();
+    // return response()->json($borrow);
+
+     $book = new BorrowBook();
+     $book-> request_id = $borrow->id;
+     $book-> book_id = $request-> book_id;
+     $book->save();
+     error_log($book);
+
+     // Create an array containing both borrow material and borrow book objects
+    $data = [
+        'borrow_material' => $borrow,
+        'borrow_book' => $book,
+    ];
+
+// Return the array as JSON response
+return response()->json($data);
 }
 
 
+    // function for reserving books
 
 }
 

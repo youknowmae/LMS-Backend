@@ -16,6 +16,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+
 // Get Materials
 Route::get('/books', [BookController::class, 'getBooks']);
 Route::get('/book/{id}', [BookController::class, 'getBook']);
@@ -26,27 +28,8 @@ Route::get('/article/{id}', [ArticleController::class, 'getArticle']);
 Route::get('/projects', [ProjectController::class, 'getProjects']);
 Route::get('/project/{id}', [ProjectController::class, 'getProject']);
 
-Route::get('/token', function() 
-    {
-        return response()->json(['csrf_token' => csrf_token()]);
-    });
-
-
 // Add Materials
-//circulation
-        //users
-        Route::get('/users', [BorrowMaterialController::class, 'userlist']);
         
-        //returned
-        Route::get('/borrow-list', [BorrowMaterialController::class, 'borrowlist']);
-
-        //borrow
-        Route::post('/borrow-request/book', [BorrowMaterialController::class, 'request']);
-
-        Route::get('/token', function() {
-            return response()->json(['csrf_token' => csrf_token()]);
-        });
-
 // Update Materials
 
 // Delete Materials

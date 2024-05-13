@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\ArticleController,
 App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, App\Http\Controllers\ProjectController,
-App\Http\Controllers\CatalogingReportController;
+App\Http\Controllers\CatalogingReportController, App\Http\Controllers\BorrowBookController,App\Http\Controllers\BorrowMaterialController
+;
+
+
 
 use App\Http\Controllers\ReservationController;
 use App\Models\Book;
@@ -62,6 +65,23 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     Route::delete('periodicals/process/{id}', [PeriodicalController::class, 'delete']);
     Route::delete('articles/process/{id}', [ArticleController::class, 'delete']);
     Route::delete('projects/process/{id}', [ProjectController::class, 'delete']);
+});
+
+
+// Circulation Process Routes
+Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
+
+    
+
+    // get user list from array
+    Route::get('/users', [BorrowMaterialController::class, 'userlist']);
+        
+    // borrow list
+    Route::get('/borrow-list', [BorrowMaterialController::class, 'borrowlist']);
+
+    // borrow book 
+    Route::post('/borrow/book', [BorrowBookController::class, 'borrowbook']);
+
 });
 
 // Material viewing routes

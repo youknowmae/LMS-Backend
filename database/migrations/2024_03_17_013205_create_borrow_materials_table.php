@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('borrow_materials', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('user_id');
             $table->float('fine');
             $table->timestamp('borrow_date')->useCurrent();
             $table->date('borrow_expiration');
             $table->timestamp('date_returned')->nullable(true)->useCurrentOnUpdate();
-            $table->boolean('paid');
+            $table->boolean('paid')->default(0);
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

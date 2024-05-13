@@ -9,41 +9,30 @@ use App\Models\User; // Import the User model
 
 class BorrowMaterialController extends Controller
 {
-    //borrow function
-    public function request(Request $request)
-    {
-        $type = $request->input('type'); 
-        switch ($type) 
-        {
-            case 'book':
-               
-                $borrowBookController = new BorrowBookController();
-                return $borrowBookController->borrowBook($request);
-                break;
-
-            case 'project':
-                
-                break;
-
-            case 'article':
-                
-                break;
-
-            default:
-                
-                break;
-        }
-    }
 
     
+    // user list array data
+    private $users = [
+        ['username' => 'John Doe', 'student_id' => '202110111', 'course_id' => 'CS101', 'department' => 'Computer Science'],
+        ['username' => 'Jane Smith', 'student_id' => '202110123', 'course_id' => 'ENG201', 'department' => 'English Literature'],
+        ['username' => 'Ehdrian Lim', 'student_id' => '202110134', 'course_id' => 'ENG201', 'department' => 'English Literature'],
+    ];
 
-    //to get user list
+    // check if user exists in the array
+    public function checkUserExists($userId)
+    {
+        foreach ($this->users as $user) {
+            if ($user['student_id'] == $userId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    //get user list
     public function userlist()
     {
-        // Retrieve from the users table
-        $users = User::select('username', 'course_id', 'department')->get();
-
-        
-        return $users;
+        return response()->json($this->users, 200);
     }
 }
