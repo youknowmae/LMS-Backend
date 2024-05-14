@@ -13,14 +13,20 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->integer('type');
+            $table->string('category');
+            $table->string('title');
+            $table->string('authors');
+            $table->foreignId('program_id')->references('id')->on('programs');
+            $table->string('image_url')->nullable();
+            $table->date('date_published');
             $table->string('language');
             $table->date('date_published');
             $table->string('title');
             $table->string('author');
             $table->foreignId('course_id')->references('id')->on('departments');
             $table->text('abstract');
-            $table->boolean('isAvailable')->default(true);
+            $table->string('keywords');
+            $table->boolean('available')->default(true);
             $table->timestamps();
         });
     }

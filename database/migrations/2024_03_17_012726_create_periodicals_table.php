@@ -14,9 +14,8 @@ return new class extends Migration
         Schema::create('periodicals', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('author');
-            $table->foreignId('category_id')->references('id')->on('categories');
-            $table->string('material_type');
+            $table->string('authors');
+            $table->string('image_url')->nullable();
             $table->string('language');
             $table->string('image');
             $table->date('date_published');

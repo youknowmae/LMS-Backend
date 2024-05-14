@@ -17,7 +17,18 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'material_type' => fake()->randomElement(['journal', 'magazine', 'newspaper']),
+            'title' => fake()->words(3, true),
+            'authors' => fake()->name(),
+            'language' => fake()->randomElement(['english', 'tagalog']),
+            'subject' => fake()->sentences(2, true),
+            'date_published' => fake()->date(),
+            'publisher' => fake()->company(),
+            'volume' => fake()->numberBetween(1, 3),
+            'issue' => fake()->numberBetween(1, 3),
+            'pages' => fake()->randomNumber(3),
+            'abstract' => fake()->sentences(2, true),
+            'remarks' => fake()->sentence()
         ];
     }
 }

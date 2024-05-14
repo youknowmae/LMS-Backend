@@ -12,6 +12,8 @@ class ArticleSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Article::factory()->count(1000)->create([
+            'authors' => '["Ubaldo, Jay-vee", "Rizal, Jose"]'
+        ]);
     }
 }

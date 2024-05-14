@@ -18,12 +18,8 @@ class BookFactory extends Factory
     {
         return [
             'title' => fake()->words(3, true),
-            'author' => fake()->name(),
-            'image' => fake()->filePath(),
-            'language' => fake()->randomElement(['FIL', 'FOR']),
-            'category_id' => fake()->numberBetween(1, 10),
-            'publisher' => fake()->company(),
-            'copyright' => fake()->sentences(3, true),
+            'authors' => fake()->name(),
+            'location_id' => fake()->numberBetween(1, 4),
             'volume' => fake()->numberBetween(1, 3),
             'issue' => fake()->numberBetween(1, 3),
             'pages' => fake()->randomNumber(3),
