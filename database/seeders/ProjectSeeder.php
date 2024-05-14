@@ -39,7 +39,7 @@ class ProjectSeeder extends Seeder
         Project::factory()->count(20)->create([
             'program_id' => fn() => fake()->numberBetween(5, 9),
             'category' => fn() => fake()->randomElement(['Research', 'Feasibility Study']),
-            'author' => '["Ubaldo, Jay-vee", "Rizal, Jose"]',
+            'authors' => '["Ubaldo, Jay-vee", "Rizal, Jose"]',
             'keywords' => '["technology", "magic", "chakra", "haki"]'
         ]);
 

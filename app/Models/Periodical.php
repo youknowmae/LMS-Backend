@@ -13,8 +13,4 @@ class Periodical extends Model
     protected $fillable = ['id', 'material_type', 'title', 'authors', 'image_location', 'language',
                             'publisher', 'copyright', 'volume', 'issue', 'receive_date',
                             'pages', 'content', 'remarks', 'date_published'];
-
-    protected $fillable = ['id', 'material_type', 'title', 'author', 'image_location', 'language',
-                            'publisher', 'copyright', 'volume', 'issue', 'receive_date',
-                            'pages', 'content', 'remarks', 'date_published'];
 }
