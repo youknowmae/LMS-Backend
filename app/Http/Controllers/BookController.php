@@ -6,7 +6,7 @@ use App\Models\Book;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\Location;
-use Storage;
+use Storage, Str;
 
 class BookController extends Controller
 {
@@ -20,12 +20,16 @@ class BookController extends Controller
         foreach($books as $book) {
             if($book->image_url != null)
                 $book->image_url = 'http://localhost:8000' . Storage::url($book->image_url);
+
+            $book->authors = json_decode($book->authors);
         }
         return $books;
     }
 
     public function getBook($id) {
         $book = Book::with('location')->findOrFail($id);
+        $book->authors = json_decode($book->authors);
+
         return $book;
     }
 
@@ -45,7 +49,7 @@ class BookController extends Controller
                 'location' => $book->location->location,
                 'full_location' => $book->location->full_location,
                 'title' => $book->title,
-                'author' => $book->author,
+                'author' => json_decode($book->author),
                 'volume' => $book->volume,
                 'edition' => $book->edition,
                 'available' => $book->available,
@@ -62,7 +66,7 @@ class BookController extends Controller
         $request->validate([
             'id' => 'nullable|integer',
             'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
+            'authors' => 'required|string|max:255',
             'copyright' => 'required|integer|min:1900|max:'.date('Y'),
             'volume' => 'nullable|integer',
             'edition' => 'nullable|integer',
@@ -85,7 +89,7 @@ class BookController extends Controller
                 $model = new Book();
                 try {
                     
-                    $model->fill($request->except(['id', 'image_url']));
+                    $model->fill($request->except(['id', 'image_url', 'title']));
 
                     // get id if request has an id
                     if($i > 0 && $request->id != null) {
@@ -113,9 +117,19 @@ class BookController extends Controller
 
                     $model->image_url = $path;
                 } 
-                $model->save();
             }
         }
+
+        $model->title = Str::title($request->title);
+        $authors = json_decode($request->authors, true);
+
+        foreach($authors as &$author) {
+            $author = Str::title($author);
+        }
+
+        $model->authors = json_encode($authors);
+        
+        $model->save();
 
         $location = Location::where('id', $model->location_id)->value('location');
 
@@ -136,7 +150,7 @@ class BookController extends Controller
         $request->validate([
             'id' => 'nullable|integer',
             'title' => 'nullable|string|max:255',
-            'author' => 'nullable|string|max:255',
+            'authors' => 'nullable|string|max:255',
             'copyright' => 'nullable|integer|min:1900|max:'.date('Y'),
             'volume' => 'nullable|integer',
             'edition' => 'nullable|integer',
@@ -154,7 +168,7 @@ class BookController extends Controller
         $model = Book::findOrFail($id);
 
         try {
-            $model->fill($request->except('image_url'));
+            $model->fill($request->except('image_url', 'title', 'authors'));
         } catch (Exception) {
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
@@ -184,6 +198,15 @@ class BookController extends Controller
                 // add function
             }
         }
+
+        $model->title = Str::title($request->title);
+        $authors = json_decode($request->authors, true);
+
+        foreach($authors as &$author) {
+            $author = Str::title($author);
+        }
+
+        $model->authors = json_encode($authors);
 
         $model->save();
         

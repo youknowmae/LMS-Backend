@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('material_type');
             $table->string('title');
-            $table->string('author');
+            $table->string('authors');
             $table->string('image_url')->nullable();
             $table->string('language');
             $table->date('receive_date');

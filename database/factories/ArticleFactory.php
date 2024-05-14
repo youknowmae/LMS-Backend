@@ -19,7 +19,7 @@ class ArticleFactory extends Factory
         return [
             'material_type' => fake()->randomElement(['journal', 'magazine', 'newspaper']),
             'title' => fake()->words(3, true),
-            'author' => fake()->name(),
+            'authors' => fake()->name(),
             'language' => fake()->randomElement(['english', 'tagalog']),
             'subject' => fake()->sentences(2, true),
             'date_published' => fake()->date(),

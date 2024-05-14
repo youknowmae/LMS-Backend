@@ -13,6 +13,8 @@ class PeriodicalSeeder extends Seeder
      */
     public function run(): void
     {
-        Periodical::factory()->count(50)->create();
+        Periodical::factory()->count(5000)->create([
+            'authors' => '["Ubaldo, Jay-vee", "Rizal, Jose"]'
+        ]);
     }
 }

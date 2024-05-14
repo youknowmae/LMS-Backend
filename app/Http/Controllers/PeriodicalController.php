@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Periodical;
 use Exception;
-use Storage;
+use Storage, Str;
 
 class PeriodicalController extends Controller
 {
@@ -15,6 +15,8 @@ class PeriodicalController extends Controller
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
                 $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
+            
+            $periodical->authors = json_decode($periodical->authors);
         }
         
         return $periodicals;
@@ -26,6 +28,8 @@ class PeriodicalController extends Controller
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
                 $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
+
+            $periodical->authors = json_decode($periodical->authors);
         }
         
         return $periodicals;
@@ -44,6 +48,8 @@ class PeriodicalController extends Controller
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
                 $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
+
+            $periodical->authors = json_decode($periodical->authors);
         }
         
         return $periodicals;
@@ -56,7 +62,7 @@ class PeriodicalController extends Controller
         $request->validate([
             'material_type' => 'required|string|max:15',
             'title' => 'required|string|max:255',
-            'author' => 'required|string|max:155',
+            'authors' => 'required|string|max:155',
             'issue' => 'required|integer',
             'language' => 'required|string|max:15',
             'receive_date' => 'required|date',
@@ -71,7 +77,7 @@ class PeriodicalController extends Controller
 
         $model = new Periodical();
 
-        $model->fill($request->except('image_url'));
+        $model->fill($request->except('image_url', 'author'));
 
         if(!empty($request->image_url)) {
             $ext = $request->file('image_url')->extension();
@@ -97,6 +103,15 @@ class PeriodicalController extends Controller
             } 
         }
 
+        $model->title = Str::title($request->title);
+        $authors = json_decode($request->authors, true);
+
+        foreach($authors as &$author) {
+            $author = Str::title($author);
+        }
+
+        $model->authors = json_encode($authors);
+        
         $model->save();
         
         $type = strtolower($model->material_type);

@@ -80,7 +80,7 @@ class ProgramSeeder extends Seeder
             [
                 'program' => 'BACOMM',
                 'department' => 'CEAS',
-                'category' => 'Classroom Based Action Research'
+                'category' => 'Thesis'
             ],
             [
                 'program' => 'BEED',

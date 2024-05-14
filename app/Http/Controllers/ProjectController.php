@@ -5,29 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Program;
 use Illuminate\Http\Request;
 use App\Models\Project;
-use Exception;
-use DB;
-use Storage;
+use Exception, DB, Storage, Str;
 
 class ProjectController extends Controller
 {
     public function getProjects() {
-        $projects = Project::with(['program', 'projectAuthors'])->orderByDesc('created_at')->get();
+        $projects = Project::with(['program'])->orderByDesc('created_at')->get();
 
-        $projects->each(function ($project) {
-            $project->projectAuthors = $project->projectAuthors->sortBy('name')->values();
-        });
-
-        foreach($projects as $project) {
+        foreach($projects as &$project) {
             if($project->image_url != null)
                 $project->image_url = 'http://localhost:8000' . Storage::url($project->image_url);
+
+            $project->authors = json_decode($project->authors);
         }
         return $projects;
     }
 
     public function getByDepartment($department) {
         // for getting by departments -> student portal
-        $projects = Project::with(['program', 'projectAuthors'])->orderByDesc('created_at')->get();
+        $projects = Project::with(['program'])->orderByDesc('created_at')->get();
 
         $projects = $projects->where('program', '=', $department);
         
@@ -38,6 +34,8 @@ class ProjectController extends Controller
         foreach($projects as $project) {
             if($project->image_url != null)
                 $project->image_url = 'http://localhost:8000' . Storage::url($project->image_url);
+
+            $project->authors = json_decode($project->authors);
         }
         return $projects;
     }
@@ -61,15 +59,12 @@ class ProjectController extends Controller
                 $image_url = null;
                 if($project->image_url != null)
                     $image_url = 'http://localhost:8000' . Storage::url($project->image_url);
-                
-                // for authors
-                $authors = $project->projectAuthors->sortBy('name')->values();
 
                 if (isset($projects_array[$project->category])) {
 
                     // there is a match
                     $projects_array[$project->category][] = [
-                        'authors' => $authors->pluck('name')->toArray(),
+                        'authors' => json_decode($project->authors),
                         'title' => $project->title, 
                         'category' => $project->category,
                         'program' => $project->program->program,
@@ -83,7 +78,7 @@ class ProjectController extends Controller
                     // there is no match
                     $projects_array[$project->category] = [
                         [
-                            'authors' => $authors->pluck('name')->toArray(),
+                            'authors' => json_decode($project->authors),
                             'title' => $project->title, 
                             'category' => $project->category,
                             'program' => $project->program->program,
@@ -117,7 +112,7 @@ class ProjectController extends Controller
 
         $model = new Project();
         try {
-            $model->fill($request->except('image_url'));
+            $model->fill($request->except('image_url', 'authors'));
         } catch (Exception) {
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
         }
@@ -136,15 +131,17 @@ class ProjectController extends Controller
             $model->image_url = $path;
         }
         
-        $model->save();
-        
         $authors = json_decode($request->authors, true);
 
-        foreach($authors as $author) {
-            DB::table('project_authors')->insert(
-                ['name' => $author, 'project_id' => $model->id]
-            );
+        foreach($authors as &$author) {
+            $author = Str::title($author);
         }
+
+        sort($authors);
+
+        $model->authors = json_encode($authors);
+        
+        $model->save();
 
         $type = strtolower($model->type);
         $program = Program::find($model->program_id)->program;
@@ -172,7 +169,7 @@ class ProjectController extends Controller
         $model = Project::findOrFail($id);
 
         try {
-            $model->fill($request->except('image_url'));
+            $model->fill($request->except('image_url', 'authors'));
         } catch (Exception) {
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.'], 400);
         }
@@ -203,17 +200,17 @@ class ProjectController extends Controller
             }
         }
         
-        $model->save();
-
-        DB::table('project_authors')->where('project_id', '=', $model->id)->delete();
-
         $authors = json_decode($request->authors, true);
 
-        foreach($authors as $author) {
-            DB::table('project_authors')->insert(
-                ['name' => $author, 'project_id' => $model->id]
-            );
+        foreach($authors as &$author) {
+            $author = Str::title($author);
         }
+
+        sort($authors);
+
+        $model->authors = json_encode($authors);
+        
+        $model->save();
 
         $type = strtolower($model->type);
         $program = Program::find($model->program_id)->program;

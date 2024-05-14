@@ -11,6 +11,10 @@ class ArticleController extends Controller
     public function getArticles() {
         $articles = Article::all()->orderByDesc('updated_at');
         
+        foreach($articles as $article) {
+            $article->authors = json_decode($article->authors);
+        }
+        
         return $articles;
     }
 
@@ -21,6 +25,10 @@ class ArticleController extends Controller
     public function getByType($type) {
         $articles = Article::where('material_type', $type)->orderByDesc('updated_at')->get();
         
+        foreach($articles as $article) {
+            $article->authors = json_decode($article->authors);
+        }
+
         return $articles;
     }
 

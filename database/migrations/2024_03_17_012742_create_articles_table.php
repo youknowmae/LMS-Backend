@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->enum('material_type', ['journal', 'magazine', 'newspaper']);
             $table->string('title');
-            $table->string('author');
+            $table->string('authors');
             $table->string('language');
             $table->string('subject');
             $table->date('date_published');

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Exception;
 use Auth;
-use DB, Http;
+use DB, Http, Str, Hash;
 
 class AuthController extends Controller
 {
@@ -18,6 +18,7 @@ class AuthController extends Controller
 
     public function studentLogin(Request $request)
     {
+
         // Get credentials from the request
         $credentials = $request->only('username', 'password');
 
@@ -29,26 +30,37 @@ class AuthController extends Controller
             // Extract user data from the response
             $userData = $response->json();
 
-            // Generate token
-            $token = $this->generateToken($userData);
+            // Generate a random API token
+            $apiToken = Str::random(80); // Adjust the length as needed
+
+            // Hash the token before storing it
+            $hashedToken = Hash::make($apiToken);
+
+            $expiryTime = now()->addHour();
+            $now = now();
+
+            DB::table('personal_access_tokens')->insert([
+                'tokenable_type' => 'StudentUser',
+                'name' => 'student-token',
+                'tokenable_id' => null,
+                'token' => $hashedToken,
+                'expires_at' => $expiryTime,
+                'updated_at' => $now,
+                'created_at' => $now
+            ]);
 
             // Return the token to the client
-            return response()->json(['token' => $token], 200);
+            return response()->json([
+                'token' => $apiToken,
+                'first_name' => $userData['details']['first_name'],
+                'last_name' => $userData['details']['last_name'],
+                'student_number' => $userData['details']['student_number']
+            ], 200);
         } else {
             // Return error response if authentication failed
             return response()->json(['message' => 'Unauthorized'], 401);
         }
     }
-
-    private function generateToken($userData)
-{
-    // Generate token using Sanctum
-    // You can provide any name for the token
-    $token = Auth::guard('sanctum')->login($userData)->plainTextToken();
-
-    // Return the generated token
-    return $token;
-}
 
     public function user(Request $request) {
         return $request->user();

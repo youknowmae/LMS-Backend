@@ -88,7 +88,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
 });
 
 /* STUDENT ROUTES */
-Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
+Route::group(['middleware' => ['studentauth']], function () {
 
     // ROUTES FOR VIEWING 
     Route::get('student/books', [BookController::class, 'viewBooks']);
