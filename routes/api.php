@@ -9,6 +9,8 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\PeriodicalController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\AnnouncementController;
+
 
 // logged in user tester
 Route::get('/user', function (Request $request) {
@@ -16,8 +18,11 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Login Routes
+// Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+// Route::post('/login/{subsystem}', [AuthController::class, 'login']);
 Route::post('/login/{subsystem}', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
 
 // Cataloging Process routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
@@ -56,8 +61,6 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
     Route::get('/article/id/{id}', [ArticleController::class, 'getArticle']);
     Route::get('/project/id/{id}', [ProjectController::class, 'getProject']);
-    // added to get projects with filtered categories per department
-    Route::get('/projects/categories/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);
 
     // Get Material Image
     Route::get('/book/image/{id}', [BookController::class, 'image']);
@@ -71,7 +74,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
 
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
     // Reservation routes
-    Route::post('reservation/{id}', [ReservationController::class, 'reserve']);
+    Route::post('reservations', [ReservationController::class, 'store']); // Changed from 'reservation/{id}' to 'reservations'
     // Reservation Cancel
     Route::delete('/cancel-reservation/{id}', [ReservationController::class, 'cancelReservation']);
     
@@ -82,4 +85,17 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::put('reservations/{reservation}', [ReservationController::class, 'update']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
     
-    });
+});
+
+    Route::get('/periodicals', [PeriodicalController::class, 'index']);
+    Route::post('/periodicals', [PeriodicalController::class, 'store']);
+    Route::get('/periodicals/{material_type}', [PeriodicalController::class, 'getPeriodicalByMaterialType']);
+    Route::put('/periodicals/{id}', [PeriodicalController::class, 'update']);
+    Route::delete('/periodicals/{id}', [PeriodicalController::class, 'destroy']);
+
+
+    Route::get('/announcements', [AnnouncementController::class, 'index']);
+    Route::post('/announcements', [AnnouncementController::class, 'store']);
+    Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
+    Route::put('/announcements/{id}', [AnnouncementController::class, 'update']);
+    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
