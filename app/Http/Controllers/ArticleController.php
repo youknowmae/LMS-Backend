@@ -7,14 +7,25 @@ use App\Models\Article;
 
 class ArticleController extends Controller
 {
-    /**
-     * Retrieve all articles.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function getArticles()
     {
-        return Article::all();
+        // Retrieve all articles
+        $articles = Article::all();
+
+        return response()->json($articles);
+    }
+    /**
+     * Retrieve articles filtered by material type.
+     *
+     * @param  string  $materialType
+     * @return \Illuminate\Http\Response
+     */
+    public function getArticlesByMaterialType($materialType)
+    {
+        // Filter articles by material type
+        $filteredArticles = Article::where('material_type', $materialType)->get();
+
+        return response()->json($filteredArticles);
     }
 
     /**

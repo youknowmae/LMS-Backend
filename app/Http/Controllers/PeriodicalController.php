@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Periodical;
+use App\Models\Periodical;
 
 class PeriodicalController extends Controller
 {

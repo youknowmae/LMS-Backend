@@ -45,7 +45,7 @@ class UserSeeder extends Seeder
             'role' => 'user',
             'username' => 'user',
             'password' => Hash::make('123'),
-            'department' => 'CCS Department',
+            'department' => 'CCS',
             'position' => 'Teacher'
         ]);
 
