@@ -283,6 +283,7 @@ class ProjectController extends Controller
         $project =Project::with('program')->findOrfail($id);
 
         $project->authors = json_decode($project->authors);
+        $project->keywords = json_decode($project->keywords);
 
         return $project;
     }
@@ -295,7 +296,7 @@ class ProjectController extends Controller
         $search = $request->input('search');
         $sort = $request->input('sort', 'date_published desc');
     
-        $projects = Project::select('id', 'title', 'date_published', 'image_url', 'abstract', 'authors')
+        $projects = Project::select('id', 'title', 'date_published', 'image_url', 'abstract', 'authors')    
                              ->where('category', $category);
 
         $sort = $this->validateSort($sort);
