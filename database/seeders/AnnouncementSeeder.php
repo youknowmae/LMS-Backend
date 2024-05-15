@@ -11,7 +11,7 @@ class AnnouncementSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run()
     {
         Announcement::factory(10)->create();
     }
