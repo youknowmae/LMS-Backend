@@ -266,6 +266,47 @@ class ProjectController extends Controller
     //     return response()->json($projectCategories);
     // }
 
-    
+    public function opacGetProjects($category){
+        if(!in_array($category, ['thesis', 'Classroom Based Action Research', 'capstone', 'feasibility study', 'research', 'dissertation'])){
+            return response()->json(['error' => 'Page not found'], 404);
+        }
 
+        $projects =Project::select('id', 'title', 'image_url', 'date_published', 'authors')
+                            ->where('category', $category)
+                            ->orderby('date_published', 'desc');
+
+        return $projects->paginate(24);
+    }
+
+    public function opacGetProject($id){
+
+        $project =Project::with('program')->findOrfail($id);
+
+        $project->authors = json_decode($project->authors);
+
+        return $project;
+    }
+
+    public function opacSearch(Request $request, $category) {
+        if(!in_array($category, ['thesis', 'Classroom Based Action Research', 'capstone', 'feasibility study', 'research', 'dissertation'])){
+            return response()->json(['error' => 'Page not found'], 404);
+        }
+
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'date_published desc');
+    
+        $projects = Project::select('id', 'title', 'date_published', 'image_url', 'abstract', 'authors')
+                             ->where('category', $category);
+
+        $sort = $this->validateSort($sort);
+
+        $projects->where(function ($query) use ($search) {
+            $query->where('title', 'like', '%' . $search . "%")
+                  ->orWhere('authors', 'like', '%' . $search . "%");
+        });
+        
+        $projects->orderBy($sort[0], $sort[1]);
+
+        return $projects->paginate(24);
+    }
 }
