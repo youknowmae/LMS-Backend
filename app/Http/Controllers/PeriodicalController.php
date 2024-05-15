@@ -195,4 +195,44 @@ class PeriodicalController extends Controller
 
         return response()->json(['Response' => 'Record Archived'], 200);
     }
+
+    //opac
+    public function opacGetPeriodicals(Request $request, $material_type){
+        if (!in_array($material_type, ['journal', 'magazine', 'newspaper'])) {
+            return response()->json(['error' => 'Page not found'], 404);
+        }
+        
+        $sort = $request->input('sort', 'date_published desc');
+
+        $sort = $this->validateSort($sort);
+
+        $periodicals = Periodical::select('id', 'title', 'date_published', 'authors', 'image_url')
+                                   ->where('material_type', $material_type)
+                                   ->orderBy($sort[0], $sort[1]);
+
+        return $periodicals->paginate(24);
+    }
+
+    public function opacSearchPeriodicals(Request $request, $material_type){
+        if (!in_array($material_type, ['journal', 'magazine', 'newspaper'])) {
+            return response()->json(['error' => 'Page not found'], 404);
+        }
+
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'date_published desc');
+    
+        $periodicals = Periodical::select('id', 'title', 'date_published', 'authors', 'image_url', 'material_type')
+                                   ->where('material_type', $material_type);
+
+        $sort = $this->validateSort($sort);
+
+        $periodicals->where(function ($query) use ($search) {
+            $query->where('title', 'like', '%' . $search . "%")
+                  ->orWhere('authors', 'like', '%' . $search . "%");
+        });
+        
+        $periodicals->orderBy($sort[0], $sort[1]);
+
+        return $periodicals->paginate(24);
+    }
 }

@@ -91,7 +91,7 @@ class AuthController extends Controller
 
                 return response()->json($responseData, 200);
 
-            } else if(in_array($user->role, ['superadmin', 'admin']) && in_array($subsystem, ['cataloging', 'circulation'])) {
+            } else if(in_array($user->role, ['superadmin', 'admin']) && in_array($subsystem, ['cataloging', 'circulation', 'opac'])) {
 
                 $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
 
