@@ -9,30 +9,31 @@ class Reservation extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'user_id',
         'book_id',
-        'start_date',
-        'end_date',
+        'title',
+        'author',
+        'location',
+        'date_requested',
+        'number_of_books',
+        'date_of_expiration',
+        'fine',
         'status'
     ];
 
-    /**
-     * Get the user that owns the reservation.
-     */
+    protected $casts = [
+        'status' => 'boolean',
+        'date_requested' => 'datetime',
+        'date_of_expiration' => 'datetime'
+    ];
+
+    // Define relationships
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the book that the reservation belongs to.
-     */
     public function book()
     {
         return $this->belongsTo(Book::class);

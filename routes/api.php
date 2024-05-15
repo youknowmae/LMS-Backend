@@ -9,6 +9,8 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\PeriodicalController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\AnnouncementController;
+
 
 // logged in user tester
 Route::get('/user', function (Request $request) {
@@ -16,8 +18,11 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // Login Routes
+// Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+// Route::post('/login/{subsystem}', [AuthController::class, 'login']);
 Route::post('/login/{subsystem}', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
 
 // Cataloging Process routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
@@ -72,7 +77,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
 
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
     // Reservation routes
-    Route::post('reservation/{id}', [ReservationController::class, 'reserve']);
+    Route::post('reservations', [ReservationController::class, 'store']); // Changed from 'reservation/{id}' to 'reservations'
     // Reservation Cancel
     Route::delete('/cancel-reservation/{id}', [ReservationController::class, 'cancelReservation']);
     
@@ -96,3 +101,17 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/articles/{materialType}', [ArticleController::class, 'getArticlesByMaterialType']);
 });
   
+});
+
+    Route::get('/periodicals', [PeriodicalController::class, 'index']);
+    Route::post('/periodicals', [PeriodicalController::class, 'store']);
+    Route::get('/periodicals/{material_type}', [PeriodicalController::class, 'getPeriodicalByMaterialType']);
+    Route::put('/periodicals/{id}', [PeriodicalController::class, 'update']);
+    Route::delete('/periodicals/{id}', [PeriodicalController::class, 'destroy']);
+
+
+    Route::get('/announcements', [AnnouncementController::class, 'index']);
+    Route::post('/announcements', [AnnouncementController::class, 'store']);
+    Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
+    Route::put('/announcements/{id}', [AnnouncementController::class, 'update']);
+    Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
