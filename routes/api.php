@@ -51,19 +51,20 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/articles', [ArticleController::class, 'getArticles']);
     Route::get('/projects', [ProjectController::class, 'getProjects']);
 
+
+
     // Get Materials Using ID 
     Route::get('/book/id/{id}', [BookController::class, 'getBook']);
     Route::get('/periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
     Route::get('/article/id/{id}', [ArticleController::class, 'getArticle']);
     Route::get('/project/id/{id}', [ProjectController::class, 'getProject']);
-    // added to get projects with filtered categories per department
-    Route::get('/projects/categories/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);
+
 
     // Get Material Image
     Route::get('/book/image/{id}', [BookController::class, 'image']);
     Route::get('/periodical/image/{id}', [PeriodicalController::class, 'image']);
     Route::get('/project/image/{id}', [ProjectController::class, 'image']);
-
+    
     // Get Periodicals and Projects Using Type
     Route::get('/periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
     Route::get('/projects/type/{type}', [ProjectController::class, 'getByType']);
@@ -81,5 +82,18 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('reservations/{reservation}', [ReservationController::class, 'show']);
     Route::put('reservations/{reservation}', [ReservationController::class, 'update']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
+
     
     });
+
+    // Student Portal
+    Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
+    Route::get('/periodicals/{material_type}', [PeriodicalController::class, 'getPeriodicalByMaterialType']);
+    Route::get('/users/{id}', [AuthController::class, 'getUser']);
+    Route::put('/users/{id}', [AuthController::class, 'updateProfile']);
+    // added to get projects with filtered categories per department
+    Route::get('/projects/categories/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);
+    // Route for retrieving articles by material type
+    Route::get('/articles/{materialType}', [ArticleController::class, 'getArticlesByMaterialType']);
+});
+  

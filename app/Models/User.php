@@ -1,8 +1,6 @@
 <?php
-
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +20,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'main_address',
+        'profile_image',
+        'domain_email',
+        // Add any other fields that need to be mass assignable
     ];
 
     /**
@@ -42,28 +44,30 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            // 'email_verified_at' => 'datetime',
+            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
+    // Define the username field
     public function username()
     {
         return 'username';
     }
 
+    // Find user by username
     public function findForIdentifier($username)
     {
         return $this->where('username', $username)->first();
     }
 
+    // Check if user has a certain role
     public function hasRole($role)
     {
         return $this->role === $role;
     }
 
-    // Relationship with favorites
-    
+    // Define relationship with favorites
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
@@ -89,7 +93,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(FavoriteProject::class);
     }
-
-
 }
- 
