@@ -27,6 +27,13 @@ class BorrowMaterial extends Model
         'position',
         'user_fine',
         'date_of_request',
+        'borrow_date',
+        'borrow_expiration',
+        'fine',
         'due',
         ];
+
+        public function book() {
+            return $this->belongsTo(Book::class, 'book_id');
+        }
 }
