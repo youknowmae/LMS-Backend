@@ -15,27 +15,42 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::factory()->count(1)->create([
-            'privilege' => 0,
+            'role' => 'superadmin',
 
             'department' => 'Library Department',
-            'position' => 'Head'
+            'position' => 'Head',
+            'username' => 'superadmin',
+            'password' => bcrypt('Admin123')
         ]);
 
         User::factory()->count(1)->create([
-            'privilege' => 1,
+            'role' => 'admin',
 
             'department' => 'Library Department',
-            'position' => 'Chief'
+            'position' => 'Chief',
+            'username' => 'admin@gmail.com',
+            'password' => Hash::make('Admin123')
         ]);
 
-        User::factory()->count(3)->create([
-            'privilege' => 2,
+        User::factory()->count(1)->create([
+            'role' => 'staff',
 
+            'department' => 'Library Department',
+            'position' => 'idk',
+            'username' => 'staff',
+            'password' => Hash::make('Admin123')
+        ]);
+
+        User::factory()->count(1)->create([
+            'role' => 'user',
+            'username' => 'user',
+            'password' => Hash::make('User123'),
             'department' => 'CCS Department',
             'position' => 'Teacher'
         ]);
 
         User::factory()->count(3)->create([
+            'role' => 'user',
             'course_id' => fake()->numberBetween(1, 4),
         ]);
     }

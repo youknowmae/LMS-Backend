@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('cataloging_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->references('id')->on('users');
-            $table->string('type');
-            $table->string('details');
+            // $table->foreignId('user_id')->references('id')->on('users');
+            $table->string('action');
+            $table->string('log');
             $table->timestamp('create_date')->useCurrent();
         });
     }

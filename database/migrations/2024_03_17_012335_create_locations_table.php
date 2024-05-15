@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('borrow_articles', function (Blueprint $table) {
+        Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('request_id')->references('id')->on('borrow_materials');
-            $table->foreignId('article_id')->references('id')->on('articles');
+            $table->string('location')->unique();
+            $table->string('full_location')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('borrow_articles');
+        Schema::dropIfExists('categories');
     }
 };

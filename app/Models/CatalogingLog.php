@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class CatalogingLog extends Model
 {
     use HasFactory;
+    public $timestamps = false;
+
+    protected $fillable = ['action', 'log'];
 }
+

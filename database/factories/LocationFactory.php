@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Location>
  */
-class CategoryFactory extends Factory
+class LocationFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,8 +18,8 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => fake()->numberBetween(0, 3),
-            'category' => fake()->word()
+            // 'location' => Str::random(3),
+            // 'full_location' => fake()->words(2, true),
         ];
     }
 }

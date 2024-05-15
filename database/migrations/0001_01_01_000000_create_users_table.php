@@ -11,18 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
+        Schema::create('programs', function (Blueprint $table) {
             $table->id();
-            $table->string('course', 10)->unique();
+            $table->string('program', 10)->unique();
             $table->string('department', 50);
+        });
+
+        Schema::create('patrons', function (Blueprint $table) {
+            $table->id();
+            $table->string('patron')->unique();
+            $table->decimal('fine');
+            $table->text('description');
+            $table->timestamps(1);
         });
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('username')->unique();
-            $table->integer('privilege')->default(3); // 0 -> superadmin, 1 -> admin, 2 -> GC staff, 3 -> student 
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->enum('role', ['superadmin', 'admin', 'staff', 'user'])->default('user');
+            $table->foreignId('patron_id')->references('id')->on('patrons');
             $table->string('password');
             $table->rememberToken();
 

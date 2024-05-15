@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\ReservePeriodical;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ReservePeriodical>
+ * @extends Factory<ReservePeriodical>
  */
 class ReservePeriodicalFactory extends Factory
 {

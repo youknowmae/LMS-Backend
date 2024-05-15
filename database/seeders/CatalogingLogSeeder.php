@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
+use App\Models\CatalogingLog;
 class CatalogingLogSeeder extends Seeder
 {
     /**
@@ -12,6 +12,6 @@ class CatalogingLogSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        CatalogingLog::factory()->count(10)->create();
     }
 }

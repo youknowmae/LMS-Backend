@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reserve_projects', function (Blueprint $table) {
+        Schema::create('patron_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('request_id')->references('id')->on('reservations');
-            $table->foreignId('project_id')->references('id')->on('projects');
+            $table->string('name');
+            $table->decimal('fines_if_overdue', 8, 2);
+            $table->integer('days_allowed');
+            $table->integer('materials_allowed');
+            $table->timestamps();
         });
     }
 
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reserve_projects');
+        Schema::dropIfExists('patron_types');
     }
 };
