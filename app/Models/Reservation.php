@@ -23,7 +23,6 @@ class Reservation extends Model
     ];
 
     protected $casts = [
-        'status' => 'boolean',
         'date_requested' => 'datetime',
         'date_of_expiration' => 'datetime'
     ];

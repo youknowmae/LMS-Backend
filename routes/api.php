@@ -83,8 +83,8 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     
     
     // API resource route for reservations
-    Route::get('reservations', [ReservationController::class, 'index']);
-    Route::get('reservations/{reservation}', [ReservationController::class, 'show']);
+
+   
     Route::put('reservations/{reservation}', [ReservationController::class, 'update']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
 
@@ -99,16 +99,11 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/projects/categories/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);
     // Route for retrieving articles by material type
     Route::get('/articles/{materialType}', [ArticleController::class, 'getArticlesByMaterialType']);
+    Route::post('reservations', [ReservationController::class, 'store']);
+    Route::get('reservations', [ReservationController::class, 'index']);
+    Route::get('reservations/{id}', [ReservationController::class, 'getByUserId']);
 });
   
-});
-
-    Route::get('/periodicals', [PeriodicalController::class, 'index']);
-    Route::post('/periodicals', [PeriodicalController::class, 'store']);
-    Route::get('/periodicals/{material_type}', [PeriodicalController::class, 'getPeriodicalByMaterialType']);
-    Route::put('/periodicals/{id}', [PeriodicalController::class, 'update']);
-    Route::delete('/periodicals/{id}', [PeriodicalController::class, 'destroy']);
-
 
     Route::get('/announcements', [AnnouncementController::class, 'index']);
     Route::post('/announcements', [AnnouncementController::class, 'store']);
