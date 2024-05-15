@@ -55,5 +55,7 @@ class UserSeeder extends Seeder
             'role' => 'user',
             'course_id' => fake()->numberBetween(1, 4),
         ]);
+
+
     }
 }

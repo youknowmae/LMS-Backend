@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\ArticleController,
 App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, App\Http\Controllers\ProjectController,
 App\Http\Controllers\CatalogingReportController, App\Http\Controllers\BorrowBookController,App\Http\Controllers\BorrowMaterialController
-;
+,App\Http\Controllers\ReserveBookController;
 
 
 
@@ -75,15 +75,20 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 
     // get user list from array
     Route::get('/users', [BorrowMaterialController::class, 'userlist']);
+
         
     // borrow list
-    Route::get('/borrow-list', [BorrowMaterialController::class, 'borrowlist']);
+    Route::get('/borrow-list', [BorrowBookController::class, 'borrowlist']);
+
+    //reservebook
+    Route::post('/reserve/book', [ReserveBookController::class, 'reservebook']);
 
     // borrow book 
     Route::post('/borrow/book', [BorrowBookController::class, 'borrowbook']);
 
 });
 
+    
 // Material viewing routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], function () {
 
