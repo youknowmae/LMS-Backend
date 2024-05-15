@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BorrowMaterial extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'request_id',
         'book_id',
@@ -35,5 +36,9 @@ class BorrowMaterial extends Model
 
         public function book() {
             return $this->belongsTo(Book::class, 'book_id');
+        }
+
+        public function user(){
+            return $this->belongsTo(User::class, 'user_id');
         }
 }

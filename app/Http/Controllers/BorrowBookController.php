@@ -117,7 +117,8 @@ class BorrowBookController extends Controller
     }
 
     public function borrowlist(Request $request){
-        //oy yung array data update yan dapat
+        $borrowMaterial = BorrowMaterial::with('user')->get();
+        return response()->json($borrowMaterial); 
     }
 
 }
