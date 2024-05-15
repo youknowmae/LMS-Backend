@@ -90,7 +90,6 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
     Route::get('/periodicals/{material_type}', [PeriodicalController::class, 'getPeriodicalByMaterialType']);
     Route::get('/users/{id}', [AuthController::class, 'getUser']);
-    Route::put('/users/{id}', [AuthController::class, 'updateProfile']);
     // added to get projects with filtered categories per department
     Route::get('/projects/categories/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);
     // Route for retrieving articles by material type
