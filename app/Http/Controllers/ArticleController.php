@@ -108,4 +108,31 @@ class ArticleController extends Controller
 
         return response()->json(['Response' => 'Record Deleted'], 200);
     }
+
+    //opac
+    public function opacGetArticles(Request $request){
+        $sort = $request->input('sort');
+
+        $sort = $this->validateSort($sort);
+        
+        $articles = Article::select('id', 'title', 'date_published', 'authors', 'abstract')
+                           ->orderBy($sort[0], $sort[1]);
+                             
+        return $articles->paginate(24);;
+    }
+
+    public function opacSearchArticles(Request $request){
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'date_published desc');
+
+        $articles = Article::select('id', 'title', 'date_published', 'authors', 'abstract');
+
+        $sort = $this->validateSort($sort);
+
+        $articles->where('title', 'like', '%' . $search . "%")->orWhere('authors', 'like', '%' . $search . "%");
+        
+        $articles->orderBy($sort[0], $sort[1]);
+
+        return $articles->paginate(24);
+    }   
 }

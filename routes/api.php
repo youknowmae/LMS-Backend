@@ -126,3 +126,31 @@ Route::get('test/{text}', function(string $text) {
     else 
         return response()->json(['response' => 'not a match'], 400);
 });
+
+//opac routes
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'opac'], function () {
+    //books
+    Route::get('/books', [BookController::class, 'opacGetBooks']);
+    Route::get('/books/search', [BookController::class, 'opacSearchBooks']);
+    Route::get('/book/{id}', [BookController::class, 'getBook']);
+
+
+    //periodicals
+    Route::prefix('/periodicals')->group(function() { 
+        Route::get('/{material_type}', [PeriodicalController::class, 'opacGetPeriodicals']);
+        Route::get('/{material_type}/search', [PeriodicalController::class, 'opacSearchPeriodicals']);
+    });
+    Route::get('/periodical/{id}', [PeriodicalController::class, 'getPeriodical']);
+
+    //articles
+    Route::get('/articles', [ArticleController::class, 'opacGetArticles']);
+    Route::get('/articles/search', [ArticleController::class, 'opacSearchArticles']);
+    Route::get('/article/{id}', [ArticleController::class, 'getArticle']);
+
+    //projects
+    Route::prefix('/projects')->group(function() { 
+        Route::get('/{category}', [ProjectController::class, 'opacGetProjects']);
+        Route::get('/{category}/search', [ProjectController::class, 'opacSearch']);
+    });
+    Route::get('/project/{id}', [ProjectController::class, 'opacGetProject']);
+});

@@ -236,5 +236,39 @@ class BookController extends Controller
 
         return response()->json(['Response' => $books], 200);
     }
+
+    //opac
+    public function opacGetBooks(Request $request){        
+        $sort = $request->input('sort', 'acquired_date desc'); 
+
+        $sort = $this->validateSort($sort);
+
+        if($sort[0] === 'date_published') {
+            $sort[0] = 'acquired_date';
+        }
+
+        $books = Book::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
+                       ->orderBy($sort[0], $sort[1]);
+        
+        return $books->paginate(24);
+    }
+    
+    public function opacSearchBooks(Request $request){  
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'acquired_date desc');
+
+        $sort = $this->validateSort($sort);
+        
+        if($sort[0] === 'date_published') {
+            $sort[0] = 'acquired_date';
+        }
+
+        $books = Book::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url');
+
+        $books->where('title', 'like', '%' . $search . "%")->orWhere('authors', 'like', '%' . $search . "%")->orWhere('call_number', 'like', '%' . $search . "%")
+              ->orderBy($sort[0], $sort[1]);
+
+        return $books->paginate(24);
+    } 
 }
 
