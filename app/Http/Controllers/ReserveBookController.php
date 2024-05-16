@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BorrowMaterialController;
 use App\Models\Reservation;
+use App\Models\User;
 use App\Models\Book;
 use App\Models\BorrowMaterial; // If you're not using this model in this controller, you can remove this import
 use Exception; // Corrected the typo
@@ -51,27 +52,39 @@ class ReserveBookController extends Controller
 
     public function reservebook(Request $request)
     {
+        $payload=json_decode($request->payload);
+
+
         // Check if the book_id exists in the books table
-        $book = Book::find($request->book_id);
-        
+        $book = Book::find($payload->book_id);
         if (!$book) {
             return response()->json(['error' => 'Book not found'], 404);
         }
-
         // Check if the book is available
         if ($book->available <= 0) {
             return response()->json(['error' => 'Book is not available for reservation'], 400);
         }
 
-        // Create a new BorrowMaterial instance
-        $reservation = new Reservation();
-        // Fill the BorrowMaterial instance with request data excluding 'book_id'
-        $reservation->fill($request->all());
-        
-        // Save the BorrowMaterial instance
-        $reservation->save();
-        
+        // Create Reservation instance
+        $reservation = new reservation();
+        $reservation -> book_id = $payload->book_id;
+        $reservation -> user_id = $payload->user_id;
+        $reservation -> start_date = $payload->start_date;
+        $reservation -> end_date = $payload->end_date;
+        $reservation -> save();
+
         $data = ['Reservation' => $reservation];
         return response()->json($data);
+
+        // // Create a new BorrowMaterial instance
+        // $reservation = new Reservation();
+        // // Fill the BorrowMaterial instance with request data excluding 'book_id'
+        // $reservation->fill($request->all());
+        
+        // // Save the BorrowMaterial instance
+        // $reservation->save();
+        
+        // $data = ['Reservation' => $reservation];
+        // return response()->json($data);
     }
 }

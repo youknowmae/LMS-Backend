@@ -82,6 +82,25 @@ class BorrowMaterialController extends Controller
             return response()->json(['message' => $users], 200);
         }
 
+
+        public function bookBorrowersReport(Request $request)
+{
+    $borrowers = BorrowMaterial::with('user.program')
+        ->select('user_id')
+        ->distinct()
+        ->get();
+
+    $borrowersByDepartment = $borrowers->groupBy('user.program.department');
+    $borrowersByGender = $borrowers->groupBy('user.gender');
+
+    return response()->json([
+        'borrowersByDepartment' => $borrowersByDepartment,
+        'borrowersByGender' => $borrowersByGender
+    ]);
+}
+        
+
+
 }
 
 
