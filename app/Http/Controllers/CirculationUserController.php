@@ -13,6 +13,6 @@ class CirculationUserController extends Controller
         return User::with('program')->findOrFail($id);
     }
     public function getBook(Request $request, int $id) {
-        return Book::with('Book')->findOrFail($id);
+        return Book::with('location')->findOrFail($id);
     }
 }

@@ -20,7 +20,7 @@ class BookFactory extends Factory
         return [
             'call_number' => Str::random(10),
             'title' => fake()->words(3, true),
-            'author' => fake()->name(),
+            //'author' => fake()->name(),
             'location_id' => fake()->numberBetween(1, 4),
             'volume' => fake()->numberBetween(1, 3),
             'edition' => fake()->numberBetween(1, 3),

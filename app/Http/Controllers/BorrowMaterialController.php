@@ -13,9 +13,10 @@ class BorrowMaterialController extends Controller
 {
     public function borrowbook(Request $request)
     {
+        $payload=json_decode($request->payload);
+
         // Check if the book_id exists in the books table
-        $book = Book::find($request->book_id);
-        
+        $book = Book::find($payload->book_id);
         if (!$book) {
             return response()->json(['error' => 'Book not found'], 404);
         }
@@ -31,20 +32,21 @@ class BorrowMaterialController extends Controller
 
         // Create a new BorrowMaterial instance
         $borrowMaterial = new BorrowMaterial();
-        // Fill the BorrowMaterial instance with request data excluding 'book_id'
-        $borrowMaterial->fill($request->all());
-        
-        // Save the BorrowMaterial instance
+        $borrowMaterial->book_id = $payload->book_id;
+        $borrowMaterial->user_id = $payload->user_id;
+        $borrowMaterial->fine = $payload->fine;
+        $borrowMaterial->borrow_expiration = $payload->borrow_expiration;
+        $borrowMaterial->borrow_date = $payload->borrow_date;
         $borrowMaterial->save();
         
         // Check if the BorrowMaterial was saved successfully
-        if (!$borrowMaterial->id) {
-            // Rollback the decrement operation if saving BorrowMaterial failed
-            $book->available += 1;
+        // if (!$borrowMaterial->id) {
+        //     // Rollback the decrement operation if saving BorrowMaterial failed
+            $book->available = 0;
             $book->save();
             
-            return response()->json(['error' => 'Failed to create borrow material'], 500);
-        }
+        //     return response()->json(['error' => 'Failed to create borrow material'], 500);
+        // }
         $data = ['borrow_material' => $borrowMaterial];
         return response()->json($data);
     }

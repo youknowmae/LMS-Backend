@@ -49,14 +49,24 @@ class UserSeeder extends Seeder
             'username' => 'user',
             'gender' => 'Male',
             'password' => Hash::make('123'),
-            'department' => 'CCS Department',
-            'position' => 'Teacher'
+            'program_id' =>fn() => fake()->numberBetween(1, 10),
         ]);
 
-        User::factory()->count(3)->create([
-            'role' => 'user',   
-            'course_id' => fake()->numberBetween(1421, 2053),
+        User::factory()->count(1)->create([
+            'role' => 'user',
+            'username' => 'user1',
+            'gender' => 'Female',
+            'password' => Hash::make('123'),
+            'program_id' =>fn() => fake()->numberBetween(1, 10),
         ]);
+        User::factory()->count(1)->create([
+            'role' => 'user',
+            'username' => 'user2',
+            'gender' => 'Male',
+            'password' => Hash::make('123'),
+            'program_id' =>fn() => fake()->numberBetween(1, 10),
+        ]);
+
 
 
     }

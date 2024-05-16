@@ -15,30 +15,31 @@ class BorrowMaterial extends Model
         'book_id',
         'borrow_date',
         'borrow_expiration',
+        'fine'
 
 
 
 
         
-        'name',
-        'patron_type',
-        'department',
-        'reason',
-        'accession_number',
-        'title',
-        'location',
-        'author',
-        'time',
-        'num_material',
-        'gender',
-        'name_staff',
-        'position',
-        'user_fine',
-        'date_of_request',
+        // 'name',
+        // 'patron_type',
+        // 'department',
+        // 'reason',
+        // 'accession_number',
+        // 'title',
+        // 'location',
+        // 'author',
+        // 'time',
+        // 'num_material',
+        // 'gender',
+        // 'name_staff',
+        // 'position',
+        // 'user_fine',
+        // 'date_of_request',
         
-        'fine',
-        'due',
-        'status',
+        // 'fine',
+        // 'due',
+        // 'status',
 
     ];
 
