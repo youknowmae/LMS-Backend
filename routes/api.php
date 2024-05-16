@@ -78,13 +78,16 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 
         
     // borrow list
-    Route::get('/borrow-list', [BorrowBookController::class, 'borrowlist']);
+    Route::get('/borrow-list', [BorrowMaterialController::class, 'borrowlist']);
+    
+    // borrow-list returning book
+    Route::get('borrow-list/{id}', [BorrowMaterialCOntroller::Class, 'returnbook']);
 
     //reservebook
     Route::post('/reserve/book', [ReserveBookController::class, 'reservebook']);
 
     // borrow book 
-    Route::post('/borrow/book', [BorrowBookController::class, 'borrowbook']);
+    Route::post('/borrow/book', [BorrowMaterialController::class, 'borrowbook']);
 
 });
 

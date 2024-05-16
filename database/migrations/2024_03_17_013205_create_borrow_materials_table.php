@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('borrow_materials', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('book_id')->references('id')->on('books');
             $table->float('fine');
             $table->timestamp('borrow_date')->useCurrent();
             $table->date('borrow_expiration');

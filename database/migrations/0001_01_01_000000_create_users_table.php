@@ -37,6 +37,7 @@ return new class extends Migration
             $table->string('first_name', 30);
             $table->string('middle_name', 30)->nullable();
             $table->string('last_name', 30);
+            $table->string('gender')->nullable();
             $table->string('ext_name', 10)->nullable();
             $table->string('course_id', 10)->nullable();
             $table->string('department', 50)->nullable();

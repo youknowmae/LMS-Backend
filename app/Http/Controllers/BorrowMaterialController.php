@@ -2,37 +2,81 @@
 
 namespace App\Http\Controllers;
 use App\Models\BorrowMaterial;
-use App\Models\BorrowBook;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Book;
+use Exeption;
+use Storage;
 
-use App\Models\User; // Import the User model
 
 class BorrowMaterialController extends Controller
 {
-
-    
-    // user list array data
-    private $users = [
-        ['username' => 'John Doe', 'student_id' => '202110111', 'course_id' => 'CS101', 'department' => 'Computer Science'],
-        ['username' => 'Jane Smith', 'student_id' => '202110123', 'course_id' => 'ENG201', 'department' => 'English Literature'],
-        ['username' => 'Ehdrian Lim', 'student_id' => '202110134', 'course_id' => 'ENG201', 'department' => 'English Literature'],
-    ];
-
-    // check if user exists in the array
-    public function checkUserExists($userId)
+    public function borrowbook(Request $request)
     {
-        foreach ($this->users as $user) {
-            if ($user['student_id'] == $userId) {
-                return true;
-            }
+        // Check if the book_id exists in the books table
+        $book = Book::find($request->book_id);
+        
+        if (!$book) {
+            return response()->json(['error' => 'Book not found'], 404);
         }
-        return false;
+
+        // Check if the book is available
+        if ($book->available <= 0) {
+            return response()->json(['error' => 'Book is not available for borrowing'], 400);
+        }
+
+        // Update the availability of the book
+        $book->available -= 1;
+        $book->save(); // Save the updated book
+
+        // Create a new BorrowMaterial instance
+        $borrowMaterial = new BorrowMaterial();
+        // Fill the BorrowMaterial instance with request data excluding 'book_id'
+        $borrowMaterial->fill($request->all());
+        
+        // Save the BorrowMaterial instance
+        $borrowMaterial->save();
+        
+        // Check if the BorrowMaterial was saved successfully
+        if (!$borrowMaterial->id) {
+            // Rollback the decrement operation if saving BorrowMaterial failed
+            $book->available += 1;
+            $book->save();
+            
+            return response()->json(['error' => 'Failed to create borrow material'], 500);
+        }
+        $data = ['borrow_material' => $borrowMaterial];
+        return response()->json($data);
     }
 
+        //get the borrowed book list
+        public function borrowlist(Request $request){
+            $borrowMaterial = BorrowMaterial::with('user')->get();
+            return response()->json($borrowMaterial); 
+        }
 
-    //get user list
-    public function userlist()
-    {
-        return response()->json($this->users, 200);
-    }
+
+        //return book
+        // public function returnbook(Request $request, $id){
+        //     $borrowMaterial = 
+        // }
+
 }
+
+
+
+
+//edited out
+        // // Create a new BorrowBook instance
+        // $borrowBook = new BorrowBook();
+        // $borrowBook->request_id = $borrowMaterial->id; // Set the request_id
+        // $borrowBook->book_id = $request->book_id; // Save the book_id
+    
+        // // Save the BorrowBook instance
+        // $borrowBook->save();
+    
+        // Check if the BorrowBook was saved successfully
+        // if (!$borrowBook->id) {
+        //     return response()->json(['error' => 'Failed to create borrow book'], 500);
+        // }
+    
