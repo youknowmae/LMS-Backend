@@ -19,8 +19,15 @@ class Announcement extends Model
      *
      * @var array
      */
-    protected $fillable = ['title', 'category', 'date', 'author', 'blurb', 'file_path'];
-
+    protected $fillable = [
+        'title', 
+        'category', 
+        'date', 
+        'author', 
+        'blurb', 
+        'file_path',
+        'content'
+    ];
     /**
      * Automatically set the file path attribute when a file is uploaded.
      *

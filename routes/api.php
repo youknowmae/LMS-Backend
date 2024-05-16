@@ -30,10 +30,6 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// Login Routes
-Route::post('/login/{subsystem}', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-
 // Tester Routes
 Route::get('cataloging/reports/materials', [CatalogingReportController::class, 'count']);
 Route::get('cataloging/reports/pdf', [CatalogingReportController::class, 'generatePdf']);
@@ -104,7 +100,7 @@ Route::get('/test', function( ) {
 });
 
 //Routes for Personnels
-Route::middleware(['auth:sanctum', 'check.access:Personnel'])->group(function () {
+Route::middleware(['auth:sanctum', 'check.access'])->group(function () {
     Route::get('/personnels', [PersonnelController::class, 'index']);
     Route::post('/personnels', [PersonnelController::class, 'store']);
     Route::get('/personnels/{personnel}', [PersonnelController::class, 'show']);
@@ -149,7 +145,7 @@ Route::prefix('cataloging')->group(function () {
 function authenticationRoutes(): void
 {
     Route::post('/login/{subsystem}', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 //Material routes
     Route::middleware(['auth:sanctum'])->group(function () {
@@ -199,7 +195,7 @@ function authenticationRoutes(): void
         Route::get('/announcements', [AnnouncementController::class, 'index']);
         Route::post('/announcements', [AnnouncementController::class, 'store']);
         Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show']);
-        Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update']);
+        Route::post('/announcements/{announcement}', [AnnouncementController::class, 'update']);
         Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
     });
 //Inventory routes

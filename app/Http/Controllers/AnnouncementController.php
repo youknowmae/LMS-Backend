@@ -6,6 +6,7 @@ use App\Models\Announcement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class AnnouncementController extends Controller
 {
@@ -16,7 +17,12 @@ class AnnouncementController extends Controller
      */
     public function index(): JsonResponse
     {
-        $announcements = Announcement::all();
+        $announcements = Announcement::orderby('created_at', 'desc')->get();
+        foreach($announcements as $announcement) {
+            if($announcement->image != null)
+                $announcement->image = 'http://localhost:8000' . Storage::url($announcement->image);
+        }
+
         return response()->json(['announcements' => $announcements]);
     }
 
@@ -26,16 +32,24 @@ class AnnouncementController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        $request->validate([
+        $data = Validator::make($request->all(), [
             'title' => 'required',
             'category' => 'required',
+            'content' => 'required',
             'date' => 'required',
-            'author' => 'required',
-            'blurb' => 'required',
-            'file' => 'file|mimes:jpg,jpeg,png,pdf|max:2048', // Example validation for file upload
+            // 'author' => 'required',
+            // 'blurb' => 'required',
+            'file' => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048', // Example validation for file upload
         ]);
+
+        // $request->user()->id;
+        
+        if ($data->fails()) {
+            return response()->json(['error' => $data->errors()]);
+        }
+
 
         $announcement = new Announcement($request->all());
 
@@ -43,12 +57,13 @@ class AnnouncementController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $path = Storage::disk('public')->put('announcements', $file);
-            $announcement->file_path = $path;
+            
+            $announcement->image = $path;
         }
 
         $announcement->save();
 
-        return response()->json(['message' => 'Announcement created successfully', 'announcement' => $announcement], 201);
+        return response()->json(['message' => 'Announcement created successfully'], 201);
     }
 
     /**
@@ -69,28 +84,35 @@ class AnnouncementController extends Controller
      * @param Announcement $announcement
      * @return JsonResponse
      */
-    public function update(Request $request, Announcement $announcement): JsonResponse
+    public function update(Request $request, Announcement $announcement)
     {
-        $request->validate([
+        $data = Validator::make($request->all(), [
             'title' => 'required',
             'category' => 'required',
+            'content' => 'required',
             'date' => 'required',
-            'author' => 'required',
-            'blurb' => 'required',
-            'file' => 'file|mimes:jpg,jpeg,png,pdf|max:2048', // Example validation for file upload
+            // 'author' => 'required',
+            // 'blurb' => 'required',
+            'file' => 'nullable||mimes:jpg,jpeg,png,pdf|max:2048', // Example validation for file upload
         ]);
 
-        $announcement->update($request->all());
+        // $request->user()->id;
+        
+        if ($data->fails()) {
+            return response()->json(['error' => $data->errors()]);
+        }
+
+        $announcement->update($data->validated());
 
         // Handle file upload
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $path = Storage::disk('public')->put('announcements', $file);
-            $announcement->file_path = $path;
+            $announcement->image = $path;
             $announcement->save();
         }
 
-        return response()->json(['message' => 'Announcement updated successfully', 'announcement' => $announcement]);
+        return response()->json(['message' => 'Announcement updated successfully']);
     }
 
     /**
@@ -99,11 +121,11 @@ class AnnouncementController extends Controller
      * @param Announcement $announcement
      * @return JsonResponse
      */
-    public function destroy(Announcement $announcement): JsonResponse
+    public function destroy(Announcement $announcement)
     {
         // Delete the file associated with the announcement if it exists
-        if ($announcement->file_path) {
-            Storage::disk('public')->delete($announcement->file_path);
+        if ($announcement->image) {
+            Storage::disk('public')->delete($announcement->image);
         }
 
         $announcement->delete();
