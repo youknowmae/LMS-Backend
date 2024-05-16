@@ -10,9 +10,16 @@ class BorrowMaterial extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'request_id',
+        
+        'user_id',
         'book_id',
-        'user_id', 
+        'borrow_date',
+        'borrow_expiration',
+
+
+
+
+        
         'name',
         'patron_type',
         'department',
@@ -28,12 +35,12 @@ class BorrowMaterial extends Model
         'position',
         'user_fine',
         'date_of_request',
-        'borrow_date',
-        'borrow_expiration',
+        
         'fine',
         'due',
         'status',
-        ];
+
+    ];
 
         public function book() {
             return $this->belongsTo(Book::class, 'book_id');

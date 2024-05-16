@@ -18,4 +18,8 @@ class Book extends Model
     {
         return $this->belongsTo(Location::class);
     }
+
+    public function Book(){
+        return $this->belongsTo(Book::class);
+    }
 }

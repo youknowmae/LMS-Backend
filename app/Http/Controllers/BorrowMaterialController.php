@@ -26,8 +26,8 @@ class BorrowMaterialController extends Controller
         }
 
         // Update the availability of the book
-        $book->available -= 1;
-        $book->save(); // Save the updated book
+        // $book->available -= 1;
+        // $book->save(); // Save the updated book
 
         // Create a new BorrowMaterial instance
         $borrowMaterial = new BorrowMaterial();
@@ -74,6 +74,11 @@ class BorrowMaterialController extends Controller
                // return response()->json(['message' => 'Book returned successfully'], 200);
                 return response()->json(['message' => $id], 200);
             }
+
+        public function userlist(Request $request){
+            $users = User::all();
+            return response()->json(['message' => $users], 200);
+        }
 
 }
 

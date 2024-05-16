@@ -12,6 +12,9 @@ App\Http\Controllers\CatalogingReportController, App\Http\Controllers\BorrowBook
 ,App\Http\Controllers\ReserveBookController;
 
 
+use App\Http\Controllers\CirculationUserController;
+
+
 
 use App\Http\Controllers\ReservationController;
 use App\Models\Book;
@@ -89,9 +92,13 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     // borrow book 
     Route::post('/borrow/book', [BorrowMaterialController::class, 'borrowbook']);
 
+    Route::get('circulation/get-user/{id}', [CirculationUserController::class, 'getUser']);
+
+    Route::get('circulation/get-book/{id}', [CirculationUserController::class, 'getBook']);
+
 });
 
-    
+
 // Material viewing routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], function () {
 
@@ -118,10 +125,10 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () {
 
     // ROUTES FOR VIEWING 
-    Route::get('books', [BookController::class, 'viewBooks']);
-    Route::get('periodicals', [PeriodicalController::class, 'viewPeriodicals']);
-    Route::get('articles', [ArticleController::class, 'viewArticles']);
-    Route::get('projects/{department}', [ProjectController::class, 'viewProjectsByDepartment']);
+    // Route::get('books', [BookController::class, 'viewBooks']);
+    // Route::get('periodicals', [PeriodicalController::class, 'viewPeriodicals']);
+    // Route::get('articles', [ArticleController::class, 'viewArticles']);
+    // Route::get('projects/{department}', [ProjectController::class, 'viewProjectsByDepartment']);
 
     // Reservation routes
     Route::post('reservation/{id}', [ReservationController::class, 'reserve']);

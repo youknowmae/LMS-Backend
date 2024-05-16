@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             'position' => 'Chief',
             'first_name' => 'Tony',
             'last_name' => 'Stark',
-            'gender' => 'male',
+            'gender' => 'Male',
             'username' => 'admin',
             'password' => Hash::make('Admin123')
         ]);
@@ -47,7 +47,7 @@ class UserSeeder extends Seeder
         User::factory()->count(1)->create([
             'role' => 'user',
             'username' => 'user',
-            'gender' => 'male',
+            'gender' => 'Male',
             'password' => Hash::make('123'),
             'department' => 'CCS Department',
             'position' => 'Teacher'
