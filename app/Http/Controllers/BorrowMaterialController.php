@@ -56,10 +56,24 @@ class BorrowMaterialController extends Controller
         }
 
 
-        //return book
-        // public function returnbook(Request $request, $id){
-        //     $borrowMaterial = 
-        // }
+            //return book
+            public function returnbook(Request $request, $id){
+                $borrowMaterial = BorrowMaterial::find($id);
+
+                 // Check if the borrowed material exists
+                if(!$borrowMaterial){
+                    return response()->json(['message' => 'Borrowed material not found'], 404);
+                }
+                    $borrowMaterial->status = 0;
+ 
+                    $borrowMaterial->date_returned = now();
+                // Save the changes
+                $borrowMaterial->save();
+
+                // Return a success response
+               // return response()->json(['message' => 'Book returned successfully'], 200);
+                return response()->json(['message' => $id], 200);
+            }
 
 }
 

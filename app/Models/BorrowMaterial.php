@@ -32,6 +32,7 @@ class BorrowMaterial extends Model
         'borrow_expiration',
         'fine',
         'due',
+        'status',
         ];
 
         public function book() {
