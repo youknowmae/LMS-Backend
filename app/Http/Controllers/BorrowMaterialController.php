@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\DB;
 use App\Models\BorrowMaterial;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -149,7 +150,14 @@ class BorrowMaterialController extends Controller
         ]);
     }
 
+    public function mostBorrowed(Request $request){
+        $mostBorrowedBooks = BorrowMaterial::select('book_id', DB::raw('COUNT(*) as borrow_count'))
+            ->groupBy('book_id')
+            ->orderByDesc('borrow_count')
+            ->get();
     
+        return response()->json($mostBorrowedBooks);
+    }
         
 }
 
