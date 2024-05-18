@@ -7,8 +7,7 @@ use App\Http\Controllers\BorrowMaterialController;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Models\Book;
-use App\Models\BorrowMaterial; // If you're not using this model in this controller, you can remove this import
-use Exception; // Corrected the typo
+use Exception;
 use Storage;
 
 class ReserveBookController extends Controller

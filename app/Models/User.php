@@ -71,5 +71,13 @@ class User extends Authenticatable
     public function program() {
         return $this->belongsTo(Program::class);
     }
+
+    public function department(){
+        return $this->belongsTo(Program::class);
+    }
+
+    public function patrons(){
+        return $this->belongsTo(Program::class);
+    }
 }
  

@@ -76,7 +76,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 
     
 
-    // get user list from array
+    // get user list from database
     Route::get('/users', [BorrowMaterialController::class, 'userlist']);
 
         

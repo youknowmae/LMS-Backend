@@ -44,28 +44,23 @@ class UserSeeder extends Seeder
             'password' => Hash::make('Admin123')
         ]);
 
-        User::factory()->count(1)->create([
-            'role' => 'user',
-            'username' => 'user',
-            'gender' => 'Male',
-            'password' => Hash::make('123'),
-            'program_id' =>fn() => fake()->numberBetween(1, 10),
-        ]);
+        $userCount = 15;
+        $currentUsersCount = User::count();
+        $usersToCreate = max(0, $userCount - $currentUsersCount);
+        if ($usersToCreate > 0) {
+            for ($i = 1; $i <= $usersToCreate; $i++) {
+                $username = 'user' . ($currentUsersCount + $i);
+                User::factory()->create([
+                    'role' => 'user',
+                    'username' => $username,
+                    'gender' => $i % 2 === 0 ? 'Male' : 'Female',
+                    'password' => Hash::make('123'),
+                    'program_id' => fn() => fake()->numberBetween(1, 10),
+                ]);
+            }
+        }
+        
 
-        User::factory()->count(1)->create([
-            'role' => 'user',
-            'username' => 'user1',
-            'gender' => 'Female',
-            'password' => Hash::make('123'),
-            'program_id' =>fn() => fake()->numberBetween(1, 10),
-        ]);
-        User::factory()->count(1)->create([
-            'role' => 'user',
-            'username' => 'user2',
-            'gender' => 'Male',
-            'password' => Hash::make('123'),
-            'program_id' =>fn() => fake()->numberBetween(1, 10),
-        ]);
 
 
 

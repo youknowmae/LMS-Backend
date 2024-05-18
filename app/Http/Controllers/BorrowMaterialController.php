@@ -51,10 +51,17 @@ class BorrowMaterialController extends Controller
         return response()->json($data);
     }
 
-        //get the borrowed book list
+        // Get the borrowed book list
         public function borrowlist(Request $request){
-            $borrowMaterial = BorrowMaterial::with('user')->get();
-            return response()->json($borrowMaterial); 
+        $borrowMaterial = BorrowMaterial::with('user.program', 'user.department', 'user.patrons')->get();
+        return response()->json($borrowMaterial); 
+        }
+
+
+        public function userlist(Request $request){
+            $users = User::with('program', 'department', 'patrons')->get();
+
+            return response()->json($users, 200);
         }
 
 
@@ -77,27 +84,24 @@ class BorrowMaterialController extends Controller
                 return response()->json(['message' => $id], 200);
             }
 
-        public function userlist(Request $request){
-            $users = User::all();
-            return response()->json(['message' => $users], 200);
-        }
+        
 
 
         public function bookBorrowersReport(Request $request)
-{
-    $borrowers = BorrowMaterial::with('user.program')
-        ->select('user_id')
-        ->distinct()
-        ->get();
+    {
+        $borrowers = BorrowMaterial::with('user.program')
+            ->select('user_id')
+            ->distinct()
+            ->get();
 
-    $borrowersByDepartment = $borrowers->groupBy('user.program.department');
-    $borrowersByGender = $borrowers->groupBy('user.gender');
+        $borrowersByDepartment = $borrowers->groupBy('user.program.department');
+        $borrowersByGender = $borrowers->groupBy('user.gender');
 
-    return response()->json([
-        'borrowersByDepartment' => $borrowersByDepartment,
-        'borrowersByGender' => $borrowersByGender
-    ]);
-}
+        return response()->json([
+            'borrowersByDepartment' => $borrowersByDepartment,
+            'borrowersByGender' => $borrowersByGender
+        ]);
+    }
         
 
 
