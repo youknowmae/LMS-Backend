@@ -22,7 +22,7 @@ class BorrowMaterialController extends Controller
         }
 
         // Check if the book is available
-        if ($book->available <= 0) {
+        if ($book->available  = 0) {
             return response()->json(['error' => 'Book is not available for borrowing'], 400);
         }
 
@@ -43,51 +43,98 @@ class BorrowMaterialController extends Controller
         return response()->json($data);
     }
 
-        // Get the borrowed book list
-        public function borrowlist(Request $request){
-        $borrowMaterial = BorrowMaterial::with('user.program', 'user.department', 'user.patrons')->get();
+    public function borrowlist(Request $request){
+        $borrowMaterial = BorrowMaterial::with(['user.program', 'user.department', 'user.patrons'])
+                            ->whereHas('user', function($query) {
+                                $query->where('status', 1);
+                            })
+                            ->get();
         return response()->json($borrowMaterial); 
+    }
+
+    public function returnedlist(Request $request){
+        $borrowMaterial = BorrowMaterial::with(['user.program', 'user.department', 'user.patrons'])
+                            ->whereHas('user', function($query){
+                                $query->where('status', 0);
+                            })
+                            ->get();
+        return response()->json($borrowMaterial);
+    }
+
+
+    public function userlist(Request $request){
+        $users = User::with('program', 'department', 'patrons')->get();
+        return response()->json($users, 200);
+    }
+
+
+    //return book
+    public function returnbook(Request $request, $id){
+        $borrowMaterial = BorrowMaterial::find($id);
+        $book = Book::find($id);
+            // Check if the borrowed material exists
+        if(!$borrowMaterial){
+            return response()->json(['message' => 'Borrowed material not found'], 404);
         }
+            $borrowMaterial->status = 0;
+            $book->available = 1;
 
+            $borrowMaterial->date_returned = now();
+        // Save the changes
+        $book->save();
+        $borrowMaterial->save();
 
-        public function userlist(Request $request){
-            $users = User::with('program', 'department', 'patrons')->get();
-            return response()->json($users, 200);
-        }
-
-
-        //return book
-        public function returnbook(Request $request, $id){
-            $borrowMaterial = BorrowMaterial::find($id);
-
-                // Check if the borrowed material exists
-            if(!$borrowMaterial){
-                return response()->json(['message' => 'Borrowed material not found'], 404);
-            }
-                $borrowMaterial->status = 0;
-
-                $borrowMaterial->date_returned = now();
-            // Save the changes
-            $borrowMaterial->save();
-
-            // Return a success response
-            return response()->json(['message' => $id], 200);
-        }
-
-        public function bookBorrowersReport(Request $request){
-        $borrowers = BorrowMaterial::with('user.program')
+        // Return a success response
+        return response()->json(['message' => $id], 200);
+    }
+    public function bookBorrowersReport(Request $request){
+        // Fetch distinct borrowers with their user and program relations
+        $borrowers = BorrowMaterial::with(['user.program'])
             ->select('user_id')
             ->distinct()
             ->get();
-
-        $borrowersByDepartment = $borrowers->groupBy('user.program.department');
-        $borrowersByGender = $borrowers->groupBy('user.gender');
-
+    
+        // Initialize arrays to store counts
+        $borrowersByDepartment = [];
+        $borrowersByGender = [
+            'Male' => 0,
+            'Female' => 0
+        ];
+    
+        // Process each borrower to populate the counts
+        foreach ($borrowers as $borrow) {
+            $user = $borrow->user;
+            $program = $user->program;
+    
+            // Increment count by department
+            if ($program) {
+                $department = $program->department;
+                if (isset($borrowersByDepartment[$department])) {
+                    $borrowersByDepartment[$department]++;
+                } else {
+                    $borrowersByDepartment[$department] = 1;
+                }
+            }
+    
+            // Increment count by gender
+            $gender = $user->gender;
+            if (isset($borrowersByGender[$gender])) {
+                $borrowersByGender[$gender]++;
+            } else {
+                $borrowersByGender[$gender] = 1;
+            }
+        }
+    
+        // Return the response as JSON
         return response()->json([
             'borrowersByDepartment' => $borrowersByDepartment,
             'borrowersByGender' => $borrowersByGender
         ]);
-        }
+    }
+
+
+
+        
 }
 
 
@@ -109,3 +156,19 @@ class BorrowMaterialController extends Controller
         // Update the availability of the book
         // $book->available -= 1;
         // $book->save(); // Save the updated book
+
+        
+        // public function bookBorrowersReport(Request $request){
+        // $borrowers = BorrowMaterial::with('user.program')
+        //     ->select('user_id')
+        //     ->distinct()
+        //     ->get();
+
+        // $borrowersByDepartment = $borrowers->groupBy('user.program.department');
+        // $borrowersByGender = $borrowers->groupBy('user.gender');
+
+        // return response()->json([
+        //     'borrowersByDepartment' => $borrowersByDepartment,
+        //     'borrowersByGender' => $borrowersByGender
+        // ]);
+        // }
