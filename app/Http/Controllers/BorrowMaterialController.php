@@ -22,7 +22,7 @@ class BorrowMaterialController extends Controller
         }
 
         // Check if the book is available
-        if ($book->available  = 0) {
+        if ($book->available  == 0) {
             return response()->json(['error' => 'Book is not available for borrowing'], 400);
         }
 
@@ -60,6 +60,23 @@ class BorrowMaterialController extends Controller
                             ->get();
         return response()->json($borrowMaterial);
     }
+
+    public function borrowEdit(Request $request)
+    {
+        $payload=json_decode($request->payload);
+
+        // Create a new BorrowMaterial instance
+        $borrowMaterial = new BorrowMaterial();
+        $borrowMaterial->book_id = $payload->book_id;
+        $borrowMaterial->user_id = $payload->user_id;
+        $borrowMaterial->fine = $payload->fine;
+        $borrowMaterial->borrow_expiration = $payload->borrow_expiration;
+        $borrowMaterial->borrow_date = $payload->borrow_date;
+        $borrowMaterial->save();
+        $data = ['borrow_material' => $borrowMaterial];
+        return response()->json($data);
+    }
+
 
 
     public function userlist(Request $request){
@@ -132,8 +149,7 @@ class BorrowMaterialController extends Controller
         ]);
     }
 
-
-
+    
         
 }
 
