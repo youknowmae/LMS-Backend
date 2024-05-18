@@ -74,12 +74,9 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 // Circulation Process Routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
 
-    
-
-    // get user list from database
+    // display user list
     Route::get('/users', [BorrowMaterialController::class, 'userlist']);
 
-        
     // borrow list
     Route::get('/borrow-list', [BorrowMaterialController::class, 'borrowlist']);
     
@@ -89,11 +86,12 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     //reservebook
     Route::post('/reserve/book', [ReserveBookController::class, 'reservebook']);
 
+    //reservationlist
+    Route::get('reservation-list', [ReserveBookController::class, 'reservelist']);
+
     // borrow book 
     Route::post('/borrow/book', [BorrowMaterialController::class, 'borrowbook']);
-
     Route::get('circulation/get-user/{id}', [CirculationUserController::class, 'getUser']);
-
     Route::get('circulation/get-book/{id}', [CirculationUserController::class, 'getBook']);
 
     //get report

@@ -12,7 +12,40 @@ use Storage;
 
 class ReserveBookController extends Controller
 {
-    // // Function for reserving books
+    public function reservebook(Request $request){
+        $payload=json_decode($request->payload);
+
+        // Check if the book_id exists in the books table
+        $book = Book::find($payload->book_id);
+        if (!$book) {
+            return response()->json(['error' => 'Book not found'], 404);
+        }
+        // Check if the book is available
+        if ($book->available <= 0) {
+            return response()->json(['error' => 'Book is not available for reservation'], 400);
+        }
+
+        // Create Reservation instance
+        $reservation = new reservation();
+        $reservation -> book_id = $payload->book_id;
+        $reservation -> user_id = $payload->user_id;
+        $reservation -> start_date = $payload->start_date;
+        $reservation -> end_date = $payload->end_date;
+        $reservation -> save();
+
+        $data = ['Reservation' => $reservation];
+        return response()->json($data);
+    }
+
+    public function reservelist(Request $request){
+    $reservelist = Reservation::with('user.program', 'user.department', 'user.patrons')->get();
+    return response()->json($reservelist);
+    }
+}
+
+
+//edited out
+// // Function for reserving books
     // public function reservebook(Request $request)
     // {
     //     // Validate incoming request
@@ -49,33 +82,7 @@ class ReserveBookController extends Controller
     //     return response()->json($reserve);
     // }
 
-    public function reservebook(Request $request)
-    {
-        $payload=json_decode($request->payload);
-
-
-        // Check if the book_id exists in the books table
-        $book = Book::find($payload->book_id);
-        if (!$book) {
-            return response()->json(['error' => 'Book not found'], 404);
-        }
-        // Check if the book is available
-        if ($book->available <= 0) {
-            return response()->json(['error' => 'Book is not available for reservation'], 400);
-        }
-
-        // Create Reservation instance
-        $reservation = new reservation();
-        $reservation -> book_id = $payload->book_id;
-        $reservation -> user_id = $payload->user_id;
-        $reservation -> start_date = $payload->start_date;
-        $reservation -> end_date = $payload->end_date;
-        $reservation -> save();
-
-        $data = ['Reservation' => $reservation];
-        return response()->json($data);
-
-        // // Create a new BorrowMaterial instance
+    // // Create a new BorrowMaterial instance
         // $reservation = new Reservation();
         // // Fill the BorrowMaterial instance with request data excluding 'book_id'
         // $reservation->fill($request->all());
@@ -85,5 +92,3 @@ class ReserveBookController extends Controller
         
         // $data = ['Reservation' => $reservation];
         // return response()->json($data);
-    }
-}

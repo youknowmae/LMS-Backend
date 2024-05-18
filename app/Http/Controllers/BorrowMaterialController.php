@@ -26,10 +26,6 @@ class BorrowMaterialController extends Controller
             return response()->json(['error' => 'Book is not available for borrowing'], 400);
         }
 
-        // Update the availability of the book
-        // $book->available -= 1;
-        // $book->save(); // Save the updated book
-
         // Create a new BorrowMaterial instance
         $borrowMaterial = new BorrowMaterial();
         $borrowMaterial->book_id = $payload->book_id;
@@ -39,14 +35,10 @@ class BorrowMaterialController extends Controller
         $borrowMaterial->borrow_date = $payload->borrow_date;
         $borrowMaterial->save();
         
-        // Check if the BorrowMaterial was saved successfully
-        // if (!$borrowMaterial->id) {
-        //     // Rollback the decrement operation if saving BorrowMaterial failed
-            $book->available = 0;
-            $book->save();
-            
-        //     return response()->json(['error' => 'Failed to create borrow material'], 500);
-        // }
+    
+     // Rollback the decrement operation if saving BorrowMaterial failed
+        $book->available = 0;
+        $book->save();
         $data = ['borrow_material' => $borrowMaterial];
         return response()->json($data);
     }
@@ -60,35 +52,29 @@ class BorrowMaterialController extends Controller
 
         public function userlist(Request $request){
             $users = User::with('program', 'department', 'patrons')->get();
-
             return response()->json($users, 200);
         }
 
 
-            //return book
-            public function returnbook(Request $request, $id){
-                $borrowMaterial = BorrowMaterial::find($id);
+        //return book
+        public function returnbook(Request $request, $id){
+            $borrowMaterial = BorrowMaterial::find($id);
 
-                 // Check if the borrowed material exists
-                if(!$borrowMaterial){
-                    return response()->json(['message' => 'Borrowed material not found'], 404);
-                }
-                    $borrowMaterial->status = 0;
- 
-                    $borrowMaterial->date_returned = now();
-                // Save the changes
-                $borrowMaterial->save();
-
-                // Return a success response
-               // return response()->json(['message' => 'Book returned successfully'], 200);
-                return response()->json(['message' => $id], 200);
+                // Check if the borrowed material exists
+            if(!$borrowMaterial){
+                return response()->json(['message' => 'Borrowed material not found'], 404);
             }
+                $borrowMaterial->status = 0;
 
-        
+                $borrowMaterial->date_returned = now();
+            // Save the changes
+            $borrowMaterial->save();
 
+            // Return a success response
+            return response()->json(['message' => $id], 200);
+        }
 
-        public function bookBorrowersReport(Request $request)
-    {
+        public function bookBorrowersReport(Request $request){
         $borrowers = BorrowMaterial::with('user.program')
             ->select('user_id')
             ->distinct()
@@ -101,13 +87,8 @@ class BorrowMaterialController extends Controller
             'borrowersByDepartment' => $borrowersByDepartment,
             'borrowersByGender' => $borrowersByGender
         ]);
-    }
-        
-
-
+        }
 }
-
-
 
 
 //edited out
@@ -124,3 +105,7 @@ class BorrowMaterialController extends Controller
         //     return response()->json(['error' => 'Failed to create borrow book'], 500);
         // }
     
+
+        // Update the availability of the book
+        // $book->available -= 1;
+        // $book->save(); // Save the updated book
