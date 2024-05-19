@@ -9,14 +9,16 @@ use Exception, DB, Storage, Str;
 
 class ProjectController extends Controller
 {
+    const URL = 'http://192.168.68.124:8000';
     public function getProjects() {
         $projects = Project::with(['program'])->orderByDesc('created_at')->get();
 
         foreach($projects as &$project) {
             if($project->image_url != null)
-                $project->image_url = 'http://localhost:8000' . Storage::url($project->image_url);
+                $project->image_url = self::URL .  Storage::url($project->image_url);
 
             $project->authors = json_decode($project->authors);
+            $project->keywords = json_decode($project->keywords);
         }
         return $projects;
     }
@@ -33,7 +35,7 @@ class ProjectController extends Controller
 
         foreach($projects as $project) {
             if($project->image_url != null)
-                $project->image_url = 'http://localhost:8000' . Storage::url($project->image_url);
+                $project->image_url = self::URL .  Storage::url($project->image_url);
 
             $project->authors = json_decode($project->authors);
         }
@@ -45,20 +47,16 @@ class ProjectController extends Controller
     }
 
     // FOR STUDENT PORTAL
-    public function viewProjectsByDepartment($department) {
-        $projects = Project::with(['program', 'projectAuthors'])->orderByDesc('created_at')->get();
+    public function viewProjectsByDepartment(string $department) {
+        $projects = Project::with(['program'])->orderByDesc('created_at')->get();
 
-        $projects->each(function ($project) {
-            $project->projectAuthors = $project->projectAuthors->sortBy('name')->values();
-        });
-
+        // return response()->json($projects);
         $projects_array = [];
         foreach($projects as $project) {
             if($project->program->department == $department) {
-                
                 $image_url = null;
                 if($project->image_url != null)
-                    $image_url = 'http://localhost:8000' . Storage::url($project->image_url);
+                    $image_url = self::URL .  Storage::url($project->image_url);
 
                 if (isset($projects_array[$project->category])) {
 
@@ -95,7 +93,6 @@ class ProjectController extends Controller
         return $projects_array;
     }
     
-
     public function add(Request $request) {
 
         // VALIDATION
@@ -106,10 +103,14 @@ class ProjectController extends Controller
             'authors' => 'required|string|max:1024',
             'language' => 'required|string|max:25',
             'date_published' => 'required|date',
+            'keywords' => 'required|string|max:1024',
+            // 'abstract' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'abstract' => 'required|string|max:2048',
-            'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image_url' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
+        
 
+        // return 'after validation';
         $model = new Project();
         try {
             $model->fill($request->except('image_url', 'authors'));
@@ -117,20 +118,33 @@ class ProjectController extends Controller
             return response()->json(['Error' => 'Invalid form request. Check values if on correct data format.', 400]);
         }
 
-        if($request->image_url) {
-            $ext = $request->file('image_url')->extension();
+        // ADD COVER
+        $ext = $request->file('image_url')->extension();
 
-            // Check file extension and raise error
-            if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-                return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
-            }
-
-            // Store image and save path
-            $path = $request->file('image_url')->store('public/images/projects');
-
-            $model->image_url = $path;
+        // Check file extension and raise error
+        if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
+            return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
         }
-        
+
+        // Store image and save path
+        $path = $request->file('image_url')->store('public/images/projects/covers');
+
+        $model->image_url = $path;
+
+        // // ADD ABSTRACT IMAGE
+        // $ext = $request->file('abstract')->extension();
+
+        // // Check file extension and raise error
+        // if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
+        //     return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
+        // }
+
+        // // Store image and save path
+        // $path = $request->file('image_url')->store('public/images/projects/abstracts');
+
+        // $model->abstract = $path;
+
+        // ADD AUTHORS
         $authors = json_decode($request->authors, true);
 
         foreach($authors as &$author) {
@@ -162,7 +176,7 @@ class ProjectController extends Controller
             'authors' => 'required|string|max:1024',
             'language' => 'required|string|max:25',
             'date_published' => 'required|date',
-            'abstract' => 'required|string|max:2048',
+            'abstract' => 'nullable|string|max:2048',
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -243,39 +257,62 @@ class ProjectController extends Controller
 
     // PENDING APPROVAL
     
-    // public function getProjectCategoriesByDepartment($department)
-    // {
-    //     // Retrieve projects based on the provided department
-    //     $projects = Project::where('department', $department)->get();
-
-    //     // Group projects by category
-    //     $groupedProjects = $projects->groupBy('category');
-
-    //     // Get the category names
-    //     $categories = $groupedProjects->keys();
-
-    //     // Return an array containing category names and their respective projects
-    //     $projectCategories = [];
-    //     foreach ($categories as $category) {
-    //         $projectCategories[] = [
-    //             'category' => $category,
-    //             'projects' => $groupedProjects[$category],
-    //         ];
-    //     }
-
-    //     return response()->json($projectCategories);
-    // }
-
-    public function opacGetProjects($category){
-        if(!in_array($category, ['thesis', 'Classroom Based Action Research', 'capstone', 'feasibility study', 'research', 'dissertation'])){
-            return response()->json(['error' => 'Page not found'], 404);
+    public function getProjectCategoriesByDepartment($department)
+    {
+        // Retrieve projects based on the provided department
+        $projects = Project::with('program')->get();
+        
+        $newProjects = [];
+        foreach($projects as $project) {
+            if($project->program->department == $department) {
+                array_push($newProjects, $project);
+            }
         }
 
-        $projects =Project::select('id', 'title', 'image_url', 'date_published', 'authors')
-                            ->where('category', $category)
-                            ->orderby('date_published', 'desc');
+        $newProjects = collect($newProjects);
+        
+        // Group projects by category
+        $groupedProjects = $newProjects->groupBy('category');
 
-        return $projects->paginate(24);
+        // Get the category names
+        $categories = $groupedProjects->keys();
+
+        // Return an array containing category names and their respective projects
+        $projectCategories = [];
+        foreach ($categories as $category) {
+            $projectCategories[] = [
+                'category' => $category,
+                'projects' => $groupedProjects[$category],
+            ];
+        }
+
+        return response()->json($projectCategories);
+    }
+
+    public function opacGetProjects($category){
+        // if(!in_array($category, ['thesis', 'Classroom Based Action Research', 'capstone', 'feasibility study', 'research', 'dissertation'])){
+        //     return response()->json(['error' => 'Page not found'], 404);
+        // }
+
+        $projects = Project::select('id', 'title', 'image_url', 'date_published', 'authors')
+                   ->where('category', $category)
+                   ->orderby('date_published', 'desc')
+                   ->paginate(24);
+
+        if ($projects->isEmpty()) {
+            return response()->json(['message' => 'No projects found'], 404);
+        }
+
+        foreach ($projects as $project) {
+            $project->authors = json_decode($project->authors);
+            $project->keywords = json_decode($project->keywords);
+            if ($project->image_url != null) {
+                $project->image_url = self::URL .  Storage::url($project->image_url);
+            }
+        }
+
+        return $projects;
+
     }
 
     public function opacGetProject($id){
@@ -285,6 +322,9 @@ class ProjectController extends Controller
         $project->authors = json_decode($project->authors);
         $project->keywords = json_decode($project->keywords);
 
+        if ($project->image_url != null) {
+            $project->image_url = self::URL .  Storage::url($project->image_url);
+        }
         return $project;
     }
 

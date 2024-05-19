@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article, App\Models\Book, App\Models\Periodical;
+use App\Models\Article, App\Models\Book, App\Models\material;
 use Dompdf\Dompdf, Dompdf\Options;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Storage;
+use App\Models\Periodical, Exception;
+use PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooterDrawing;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+
 
 class CatalogingReportController extends Controller
 {
@@ -18,11 +27,11 @@ class CatalogingReportController extends Controller
         $titles = $books->unique('title')->count();
         $volumes = $books->count();
 
-        // for periodicals
-        $periodicals = Periodical::all();
+        // for materials
+        $materials = Periodical::all();
 
         $p_count = ['journals' => 0, 'magazines' => 0, 'newspapers' => 0];
-        foreach($periodicals as $x){
+        foreach($materials as $x){
             if($x->material_type == 'journal')
                 $p_count['journals'] = $p_count['journals'] + 1;
             elseif($x->material_type == 'magazine')
@@ -92,91 +101,569 @@ class CatalogingReportController extends Controller
         ]);
     }
 
-    public function generatePDF(){
+    public function generatePDF(Request $request, string $type){
 
         $dompdf = new Dompdf();
 
-        $counts = $this->countMaterials();
-        // Render the HTML as PDF
+        if(!in_array($type, ['book', 'journal', 'magazine', 'article', 'newspaper']))
+            return response()->json(['message' => 'Invalid type'], 404);
 
-        $html = view('cataloging.reports', ['counts' => $counts])->render();
+        if($type == 'book') {
+            $materials = Book::with('location')->where('id', '<', 100)->get();
+            foreach($materials as $material) {
+                $material->authors = json_decode($material->authors);
+            }
+
+            // Render the HTML view to a string
+            $html = view('cataloging.books', ['materials' => $materials])->render();
+        } elseif($type == 'journal' || $type == 'magazine' || $type == 'newspaper') {
+            $materials = Periodical::where('material_type', 'journal')->where('id', '<', 50)->get();
+
+            foreach($materials as $material) {
+                $material->authors = json_decode($material->authors);
+            }
+
+            // Render the HTML view to a string
+            $html = view('cataloging.periodicals', ['materials' => $materials])->render();
+        } elseif($type == 'article') {
+            $materials = Article::where('id', '<', 50)->get();
+
+            foreach($materials as $material) {
+                $material->authors = json_decode($material->authors);
+            }
+
+            // Render the HTML view to a string
+            $html = view('cataloging.articles', ['materials' => $materials])->render();
+        } else {
+            return response()->json(['message' => 'Error generating file'], 500);
+        }
+
         $dompdf->loadHtml($html);
 
-        // (Optional) Setup the paper size and orientation
-        $dompdf->setPaper('A4', 'portrait');
+        // Optional: Set up the paper size and orientation
+        $dompdf->setPaper('A4', 'landscape');
 
-        // Render the PDF (DOMPDF will stream it to the browser by default)
+        // Render the PDF
         $dompdf->render();
 
-        // Output the generated PDF to Browser
+        $pdfContent = $dompdf->output();
+
+        
         $date = Carbon::now('Asia/Singapore')->format('Ymd-Hisu');
-        return $dompdf->stream($date);
+        $filename = "Books_{$date}.pdf";
+
+        // Return the PDF as a response
+        return response($pdfContent, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"'
+        ]);
     }
 
-    public function excel(Request $request, string $type) {
+    public function generateExcel(Request $request, string $type) {
+
+        $keys = collect($request->payload);
+        $keys = $keys->keys()->toArray();
+
         $spreadsheet = new Spreadsheet();
 
         $startDateParsed = null;
         $endDateParsed = null;
+        $copyright = null;
 
-        if($request->startDate)
-            $startDateParsed = Carbon::parse($request->startDate);
-        if($request->endDate)
-            $endDateParsed = Carbon::parse($request->endDate);
+        if(in_array('startDate', $keys))
+            $startDateParsed = Carbon::parse($request->payload['startDate'] . ' 00:00:00')->setTimezone('Asia/Manila');
+            
+        if(in_array('endDate', $keys))
+            $endDateParsed = Carbon::parse($request->payload['endDate'] . ' 23:59:59')->setTimezone('Asia/Manila');
 
-        if($startDateParsed) {
-            $materials = Book::
-            where([
-                ['created_at', '>=', $startDateParsed . ' 00:00:00'],
-                ['created_at', '<=', $endDateParsed . ' 23:59:59'],
-                ['copyright', '=', $request->copyright]
-            ])
-            ->get()
-            ->toArray();
+        if(in_array('copyright', $keys))
+            $copyright = $request->payload['copyright'];
+
+        $materials = null;
+
+        // CONDITIONS FOR QUERY
+        $conditions = [
+            ['created_at', '>=', $startDateParsed . ' 00:00:00'],
+            ['created_at', '<=', $endDateParsed . ' 23:59:59'],
+            ['copyright', '=', $copyright],
+            ['material_type', '=', $type]
+        ];
+
+        // Querying to database
+        if($type == 'book') {
+            if($copyright) {
+                if($startDateParsed && $endDateParsed) {
+                    $materials = Book::
+                    where([$conditions[0], $conditions[1], $conditions[2]])
+                    ->get();
+                } elseif($endDateParsed) {
+                    $materials = Book::
+                    where([$conditions[1], $conditions[2]])
+                    ->get();
+                } elseif($startDateParsed) {
+                    $materials = Book::
+                    where([$conditions[0], $conditions[2]])
+                    ->get();
+                }
+            } else {
+                if($startDateParsed && $endDateParsed) {
+                    $materials = Book::
+                    where([$conditions[0], $conditions[1]])
+                    ->get();
+                } elseif($endDateParsed) {
+                    $materials = Book::
+                    where([$conditions[1]])
+                    ->get();
+                } elseif($startDateParsed) {
+                    $materials = Book::
+                    where([$conditions[0]])
+                    ->get();
+                }
+            }
+        } elseif($type == 'journal' || $type == 'magazine' || $type == 'newspaper') {
+            if($copyright) {
+                if($startDateParsed && $endDateParsed) {
+                    $materials = Periodical::
+                    where($conditions)
+                    ->get();
+                } elseif($endDateParsed) {
+                    $materials = Periodical::
+                    where([$conditions[1], $conditions[2], $conditions[3]])
+                    ->get();
+                } elseif($startDateParsed) {
+                    $materials = Periodical::
+                    where([$conditions[0], $conditions[2], $conditions[3]])
+                    ->get();
+                }
+            } else {
+                if($startDateParsed && $endDateParsed) {
+                    $materials = Periodical::
+                    where([$conditions[0], $conditions[1], $conditions[3]])
+                    ->get();
+                } elseif($endDateParsed) {
+                    $materials = Periodical::
+                    where([$conditions[1], $conditions[3]])
+                    ->get();
+                } elseif($startDateParsed) {
+                    $materials = Periodical::
+                    where([$conditions[0], $conditions[3]])
+                    ->get();
+                }
+            } 
+        } elseif($type == 'article') {
+            if($copyright) {
+                if($startDateParsed && $endDateParsed) {
+                    $materials = Article::
+                    where($conditions)
+                    ->get();
+                } elseif($endDateParsed) {
+                    $materials = Article::
+                    where([$conditions[1], $conditions[2]])
+                    ->get();
+                } elseif($startDateParsed) {
+                    $materials = Article::
+                    where([$conditions[0], $conditions[2]])
+                    ->get();
+                }
+            } else {
+                if($startDateParsed && $endDateParsed) {
+                    $materials = Article::
+                    where([$conditions[0], $conditions[1]])
+                    ->get();
+                } elseif($endDateParsed) {
+                    $materials = Article::
+                    where([$conditions[1]])
+                    ->get();
+                } elseif($startDateParsed) {
+                    $materials = Article::
+                    where([$conditions[0]])
+                    ->get();
+                }
+            } 
+        } else if($type == 'projects.all') {
+            if($startDateParsed && $endDateParsed) {
+                $materials = Project::with('program')
+                    ->where([$conditions[0], $conditions[1]])
+                    ->get();
+            } elseif($endDateParsed) {
+                $materials = Project::with('program')
+                    ->where([$conditions[1]])
+                    ->get();
+            } elseif($startDateParsed) {
+                $materials = Project::with('program')
+                    ->where([$conditions[0]])
+                    ->get();
+            }
+        } else if($type == 'projects.ccs') {
+            if($startDateParsed && $endDateParsed) {
+                $materials = Project::with('program')
+                    ->where([$conditions[0], $conditions[1]])
+                    ->get();
+
+            } elseif($endDateParsed) {
+                $materials = Project::
+                    where([$conditions[1]])
+                    ->get();
+            } elseif($startDateParsed) {
+                $materials = Project::
+                    where([$conditions[0]])
+                    ->get();
+            }
+            $materials = $materials->where('program.department', 'CCS');
+        } else if($type == 'projects.cahs') {
+            if($startDateParsed && $endDateParsed) {
+                $materials = Project::with('program')
+                    ->where([$conditions[0], $conditions[1]])
+                    ->get();
+
+            } elseif($endDateParsed) {
+                $materials = Project::
+                    where([$conditions[1]])
+                    ->get();
+            } elseif($startDateParsed) {
+                $materials = Project::
+                    where([$conditions[0]])
+                    ->get();
+            }
+            $materials = $materials->where('program.department', 'CAHS');
+        } else if($type == 'projects.chtm') {
+            if($startDateParsed && $endDateParsed) {
+                $materials = Project::with('program')
+                    ->where([$conditions[0], $conditions[1]])
+                    ->get();
+
+            } elseif($endDateParsed) {
+                $materials = Project::
+                    where([$conditions[1]])
+                    ->get();
+            } elseif($startDateParsed) {
+                $materials = Project::
+                    where([$conditions[0]])
+                    ->get();
+            }
+            $materials = $materials->where('program.department', 'CHTM');
+        } else if($type == 'projects.cba') {
+            if($startDateParsed && $endDateParsed) {
+                $materials = Project::with('program')
+                    ->where([$conditions[0], $conditions[1]])
+                    ->get();
+
+            } elseif($endDateParsed) {
+                $materials = Project::
+                    where([$conditions[1]])
+                    ->get();
+            } elseif($startDateParsed) {
+                $materials = Project::
+                    where([$conditions[0]])
+                    ->get();
+            }
+            $materials = $materials->where('program.department', 'CBA');
+        } else if($type == 'projects.ceas') {
+            if($startDateParsed && $endDateParsed) {
+                $materials = Project::with('program')
+                    ->where([$conditions[0], $conditions[1]])
+                    ->get();
+
+            } elseif($endDateParsed) {
+                $materials = Project::
+                    where([$conditions[1]])
+                    ->get();
+            } elseif($startDateParsed) {
+                $materials = Project::
+                    where([$conditions[0]])
+                    ->get();
+            }
+            $materials = $materials->where('program.department', 'CEAS');
         }
 
         $material_arr = [];
         foreach($materials as $x) {
             $x_date = Carbon::parse($x['copyright']);
-            array_push($material_arr, [
-                $x['id'], $x_date->format('m.d.Y'), $x['call_number'], $x['author'], $x['title'],
-                $x['edition'], $x['pages'], $x['source_of_fund'],
-            ]);
+            $x['authors'] = json_decode($x['authors']);
+            $authors = "";
+
+            for($i = 0; $i < count($x['authors']); $i++) {
+                $authors = $authors . $x['authors'][$i];
+                if($i < count($x['authors'])-1)
+                    $authors = $authors . ",\n";
+            }
+            
+            if($type == 'book') {
+                array_push($material_arr, [
+                    $x['id'], $x_date->format('m.d.Y'), $x['call_number'], $authors, $x['title'],
+                    $x['edition'], $x['pages'], $x['source_of_fund'],
+                ]);
+            } elseif($type == 'journal' || $type == 'magazine' || $type == 'newspaper') {
+                array_push($material_arr, [
+                    $x['accession'], $x['title'], $authors, $x['copyright'], Carbon::parse($x['acquired_date'])->format('m.d.Y'),
+                ]);
+            } elseif($type == 'article') {
+                array_push($material_arr, [
+                    $x['accession'], $x['id'], $x['title'], $authors, Carbon::parse($x['date_published'])->format('m.d.Y'),
+                ]);
+            } elseif($type == 'projects.all') {
+                array_push($material_arr, [
+                    $x['program']['department'], $x['category'], $x['title'], $authors, 
+                    Carbon::parse($x['date_published'])->format('m.d.Y'), Carbon::parse($x['created_at'])->format('m.d.Y')
+                ]);
+            } elseif($type == 'projects.ccs' || $type == 'projects.ceas' || $type == 'projects.cba' || 
+            $type == 'projects.chtm' || $type == 'projects.cahs') {
+                array_push($material_arr, [
+                    $x['category'], $x['title'], $authors, Carbon::parse($x['date_published'])->format('m.d.Y'), 
+                    Carbon::parse($x['created_at'])->format('m.d.Y')
+                ]);
+            }
         }
+
+        $date = Carbon::now('Asia/Singapore')->format('Y-m-d');
+        $title = 'Cataloging Report_' . ($type) . '_' . $date;
+
+        $spreadsheet->getProperties()->setCreator('GC LMS')
+                    ->setLastModifiedBy('GC LMS')
+                    ->setTitle($title)
+                    ->setSubject('LMS Cataloging Report')
+                    ->setDescription('Cataloging report from GC LMS');
 
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->fromArray($material_arr, null, 'A2')
-        ->calculateColumnWidths();
+        $sheet->getPageSetup()->setHorizontalCentered(true);
+        $sheet->getPageSetup()->setVerticalCentered(false);
+        $sheet->getPageSetup()->setFitToWidth(null, false);
 
-        $sheet->setCellValue('A1', "ACC. \nNUMBER")->setCellValue('B1', 'DATE RECEIVED')
-        ->setCellValue('C1', 'CALL NUMBER')->setCellValue('D1', 'AUTHOR')->setCellValue('E1', 'TITLE')
-        ->setCellValue('F1', 'EDITION')->setCellValue('G1', 'PAGES')->setCellValue('H1', 'SOURCE OF FUND');
-        $sheet->fromArray($material_arr, null, 'A2');
+        $sheet->getPageSetup()
+            ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+        $sheet->getPageSetup()
+            ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LEGAL);
+            
+        $sheet->fromArray($material_arr, null, 'A3')
+        ->calculateColumnWidths();
+        
+        if($type == 'book')
+            $sheet->mergeCells('A1:H1');
+        elseif($type == 'journal' || $type == 'magazine' || $type == 'newspaper' || $type == 'article' || 
+                $type == 'projects.ccs' || $type == 'projects.ceas' || $type == 'projects.cba' || $type == 'projects.chtm' || 
+                $type == 'projects.cahs')
+            $sheet->mergeCells('A1:E1');
+        elseif($type == 'projects.all')
+            $sheet->mergeCells('A1:F1');
+
+        $headerStyleArray = [
+            'font' => [
+                'bold' => true,
+                'family' => 'Montserrat',
+                'color' => ['argb' => 'FFFFFFFF'],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['argb' => '31A463'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+
+        // Set data cell style
+        $dataStyleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
+
+        if($type == 'book') {
+            $headers = [
+                "ACC.\nNUMBER", 
+                "DATE RECEIVED", 
+                "CALL\nNUMBER", 
+                "AUTHOR", 
+                "TITLE", 
+                "EDITION", 
+                "PAGES", 
+                "SOURCE OF FUND"
+            ];
+
+            $limit = 'H';
+        } elseif($type == 'journal' || $type == 'magazine' || $type == 'newspaper') {
+            $headers = [
+                "JOURNAL\nACCESSION",
+                "TITLE", 
+                "AUTHOR", 
+                "COPYRIGHT", 
+                "DATE RECEIVED"
+            ];
+
+            $limit = 'E';
+        } elseif($type == 'article') {
+            $headers = [
+                "ARTICLE\nACCESSION",
+                "TITLE", 
+                "AUTHOR/S",
+                "PUBLICATION DATE"
+            ];
+
+            $limit = 'E';
+        } elseif ($type == 'projects.all') {
+            $headers = [
+                "DEPARTMENT",
+                "PROJECT TYPE",
+                "PROJECT TITLE",
+                "AUTHOR/S",
+                "DATE PUBLISHED",
+                "DATE ADDED"
+            ];
+
+            $limit = 'F';
+        } elseif ($type == 'projects.ccs' || $type == 'projects.ceas' || $type == 'projects.cba' || 
+        $type == 'projects.chtm' || $type == 'projects.cahs') {
+            $headers = [
+                "PROJECT TYPE",
+                "PROJECT TITLE",
+                "AUTHOR/S",
+                "DATE PUBLISHED",
+                "DATE ADDED"
+            ];
+
+            $limit = 'E';
+        }
+       
+        // Insert headers into the spreadsheet
+        $sheet->fromArray([$headers], null, 'A2');
+        $sheet->getStyle('A2:'.$limit.'2')->applyFromArray($headerStyleArray);
+
+        // Insert data
+        $sheet->fromArray($material_arr, null, 'A3');
+        $lastRow = count($material_arr) + 2; // Add 2 because the headers are in the second row
+        $sheet->getStyle('A3:'.$limit. $lastRow)->applyFromArray($dataStyleArray);
+
+        $sheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(2, 2);
 
         $dimension = $sheet->calculateWorksheetDimension();
-        $style = $sheet->getStyle($dimension);
-        $font = $style->getFont();
-        $font->setSize(11)->setName('Arial');
         $sheet->getStyle($dimension)->getAlignment()->setWrapText(true);
+        
+        // HEADER
+        $sheet->getStyle('A1')->getAlignment()
+            ->setVertical(Alignment::VERTICAL_CENTER)
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        
+        $sheet->getRowDimension(1)->setRowHeight(130);
+        $sheet->getRowDimension(2)->setRowHeight(40);
 
-        // Widths 
-        $letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-        $widths = [20, 25, 70, 50, 70, 20, 20, 40];
+        $richText = new RichText();
+        $normalText = $richText->createTextRun("Republic of the Philippines\nCity of Olongapo\n");
+        $normalText->getFont()->setSize(12);
+        $boldText = $richText->createTextRun("GORDON COLLEGE\n");
+        $boldText->getFont()->setBold(true)->setSize(12);
+        $smallText = $richText->createTextRun("Olongapo City Sports Complex, Donor St., East Tapinac, Olongapo City\n" .
+        "Tel. No.: (047) 224-2089 loc. 401\n\n");
+        $smallText->getFont()->setSize(10);
+        $boldText = $richText->createTextRun("LIBRARY AND INSTRUCTIONAL MEDIA CENTER\n");
+        $boldText->getFont()->setBold(true)->setSize(12);
+        
+        $sheet->setCellValue('A1', $richText);
 
-        foreach (range(0, 7) as $i) {
-            $sheet->getColumnDimension($letters[$i])->setWidth($widths[$i]);
-            $sheet->getStyle('A1:H1')->getAlignment()->setVertical('center')->setHorizontal('center');
-            if($letters[$i] != 'D' && $letters[$i] != 'E')
-                $sheet->getStyle($letters[$i] . '1:' . $letters[$i] . $sheet->getHighestRow())->getAlignment()->setHorizontal('center');
+        $imagePath = public_path('storage/cataloging assets/GC LIBRARY.png'); // Path to your image file
+        $drawing = new Drawing();
+        $drawing->setName('Image');
+        $drawing->setDescription('Image');
+        $drawing->setPath($imagePath);
+        $drawing->setCoordinates('A1'); // Positioning
+        $drawing->setHeight(130); // Height in pixels
+        $drawing->setWorksheet($sheet);
+
+        $imagePath = public_path('storage/cataloging assets/GC.png'); // Path to your image file
+        $drawing = new Drawing();
+        $drawing->setName('Image');
+        $drawing->setDescription('Image');
+        $drawing->setPath($imagePath);
+        $drawing->setCoordinates($limit.'1'); // Positioning
+        $drawing->setHeight(130); // Height in pixels
+        $drawing->setWorksheet($sheet);
+
+        if($type == 'book') {
+            $drawing->setOffsetX(40);
         }
+        // END OF HEADER 
 
-        $sheet->getRowDimension(1)->setRowHeight(30);
-
-        $date = Carbon::now('Asia/Singapore')->format('Ymd-Hisu');
+        // BOOK TABLE DESIGN
+        if($type == 'book') {
+            $sheet->getColumnDimension('A')->setWidth(15);
+            $sheet->getColumnDimension('B')->setWidth(15);
+            $sheet->getColumnDimension('C')->setWidth(15);
+            $sheet->getColumnDimension('D')->setWidth(20);
+            $sheet->getColumnDimension('E')->setWidth(30);
+            $sheet->getColumnDimension('F')->setWidth(15);
+            $sheet->getColumnDimension('G')->setWidth(15);
+            $sheet->getColumnDimension('H')->setWidth(25);
+            
+            $centeredColumns = ['A', 'B', 'C', 'F', 'G', 'H'];
+            foreach ($centeredColumns as $column) {
+                $sheet->getStyle($column . '3:' . $column . $sheet->getHighestDataRow())
+                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+        } elseif($type == 'journal' || $type == 'magazine' || $type == 'newspaper') {
+            $sheet->getColumnDimension('A')->setWidth(15);
+            $sheet->getColumnDimension('B')->setWidth(30);
+            $sheet->getColumnDimension('C')->setWidth(30);
+            $sheet->getColumnDimension('D')->setWidth(15);
+            $sheet->getColumnDimension('E')->setWidth(15);
+            
+            $centeredColumns = ['A', 'D', 'E'];
+            foreach ($centeredColumns as $column) {
+                $sheet->getStyle($column . '3:' . $column . $sheet->getHighestDataRow())
+                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+        } elseif($type == 'article') {
+            $sheet->getColumnDimension('A')->setWidth(15);
+            $sheet->getColumnDimension('B')->setWidth(15);
+            $sheet->getColumnDimension('C')->setWidth(30);
+            $sheet->getColumnDimension('D')->setWidth(30);
+            $sheet->getColumnDimension('E')->setWidth(15);
+            
+            $centeredColumns = ['A', 'B'];
+            foreach ($centeredColumns as $column) {
+                $sheet->getStyle($column . '3:' . $column . $sheet->getHighestDataRow())
+                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+        } elseif($type == 'projects.all') {
+            $sheet->getColumnDimension('A')->setWidth(15);
+            $sheet->getColumnDimension('B')->setWidth(15);
+            $sheet->getColumnDimension('C')->setWidth(30);
+            $sheet->getColumnDimension('D')->setWidth(30);
+            $sheet->getColumnDimension('E')->setWidth(15);
+            $sheet->getColumnDimension('F')->setWidth(15);
+            
+            $centeredColumns = ['A', 'B', 'D', 'E', 'F'];
+            foreach ($centeredColumns as $column) {
+                $sheet->getStyle($column . '3:' . $column . $sheet->getHighestDataRow())
+                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+        } elseif($type == 'projects.ccs' || $type == 'projects.ceas' || $type == 'projects.cba' || 
+            $type == 'projects.chtm' || $type == 'projects.cahs') {
+            $sheet->getColumnDimension('A')->setWidth(15);
+            $sheet->getColumnDimension('B')->setWidth(30);
+            $sheet->getColumnDimension('C')->setWidth(30);
+            $sheet->getColumnDimension('D')->setWidth(15);
+            $sheet->getColumnDimension('E')->setWidth(15);
+            
+            $centeredColumns = ['A', 'D', 'E'];
+            foreach ($centeredColumns as $column) {
+                $sheet->getStyle($column . '3:' . $column . $sheet->getHighestDataRow())
+                    ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            }
+        }
+        
         $writer = new Xlsx($spreadsheet);
-        $writer->save($date . '.xlsx');
+        $writer->save($title . '.xlsx');
 
-        return response()->download($date . '.xlsx')->deleteFileAfterSend(true);
+        return response()->download($title . '.xlsx')->deleteFileAfterSend(true);
     }
 }

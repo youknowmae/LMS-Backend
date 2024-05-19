@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Article;
-use Exception;
+use Exception, Str;
 
 class ArticleController extends Controller
 {
+    const URL = 'http://192.168.68.124:8000';
     public function getArticles() {
-        $articles = Article::all()->orderByDesc('updated_at');
+        $articles = Article::orderByDesc('updated_at')->get();
         
         foreach($articles as $article) {
             $article->authors = json_decode($article->authors);
@@ -35,9 +36,13 @@ class ArticleController extends Controller
     // FOR STUDENT PORTAL
     public function viewArticles() {
         $articles = Article::
-        select(['material_type', 'title', 'author', 'language', 'subject', 'date_published', 
+        select(['material_type', 'title', 'authors', 'language', 'subject', 'date_published', 
         'publisher', 'volume', 'issue', 'abstract'])
         ->orderByDesc('created_at')->get();
+        
+        foreach($articles as $article) {
+            $article->authors = json_decode($article->authors);
+        }
         
         return $articles;
     }
@@ -49,8 +54,9 @@ class ArticleController extends Controller
         $request->validate([
             'material_type' => 'required|string|max:15',
             'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'abstract' => 'required|string|max:2048',
+            'authors' => 'required|string|max:255',
+            // 'abstract' => 'required|mimes:jpeg,jpg,png|max:2048',
+            'abstract' => 'required|string|max: 2048',
             'language' => 'required|string|max:15',
             'issue' => 'required|integer',
             'subject' => 'required|string|max:255',
@@ -61,9 +67,35 @@ class ArticleController extends Controller
             'remarks' => 'nullable|string|max:255'
         ]);
 
+        // return response()->json(['res' => 'nearly there'], 200);
         $model = new Article();
 
-        $model->fill($request->all());
+        $model->fill($request->except(['abstract']));
+
+        if($request->image_url != null) {
+            // foreach($request->abstract)
+            $ext = $request->file('abstract')->extension();
+
+            // Check file extension and raise error
+            if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
+                return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
+            }
+
+            // Store image and save path
+            $path = $request->file('abstract')->store('public/images/articles');
+
+            $model->image_url = $path;
+        } 
+
+        $model->title = Str::title($request->title);
+        $authors = json_decode($request->authors, true);
+
+        foreach($authors as &$author) {
+            $author = Str::title($author);
+        }
+
+        $model->authors = json_encode($authors);
+
         $model->save();
 
         $log = new CatalogingLogController();

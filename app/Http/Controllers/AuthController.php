@@ -85,7 +85,7 @@ class AuthController extends Controller
                 $responseData = [
                     'token' => $token,
                     'id' => $user->id,
-                    'displayName' => $user->first_name + $user->last_name,
+                    'displayName' => $user->first_name . ' ' . $user->last_name,
                     'role' => $user->role
                 ];
 

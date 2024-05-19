@@ -27,8 +27,8 @@ class LocationSeeder extends Seeder
             'full_location' => 'Medical'
         ],
         [
-            'location' => 'EWAN',
-            'full_location' => 'Bahala na kayo'
+            'location' => 'COM',
+            'full_location' => 'Computer'
         ]
     ]);
     }

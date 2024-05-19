@@ -10,6 +10,7 @@ use Storage, Str;
 
 class BookController extends Controller
 {
+    const URL = 'http://192.168.68.124:8000';
     public function getLocations() {
         return Location::all();
     }
@@ -19,7 +20,7 @@ class BookController extends Controller
         
         foreach($books as $book) {
             if($book->image_url != null)
-                $book->image_url = 'http://localhost:8000' . Storage::url($book->image_url);
+                $book->image_url = self::URL . Storage::url($book->image_url);
 
             $book->authors = json_decode($book->authors);
         }
@@ -29,6 +30,8 @@ class BookController extends Controller
     public function getBook($id) {
         $book = Book::with('location')->findOrFail($id);
         $book->authors = json_decode($book->authors);
+        if($book->image_url != null)
+            $book->image_url = self::URL . Storage::url($book->image_url);
 
         return $book;
     }
@@ -41,7 +44,7 @@ class BookController extends Controller
         foreach($books as $book) {
             $image_url = null;
             if($book->image_url != null)
-                $image_url = 'http://localhost:8000' . Storage::url($book->image_url);
+                $image_url = self::URL .  Storage::url($book->image_url);
 
             array_push($books_array, [
                 'id' => $book->id,
@@ -49,7 +52,7 @@ class BookController extends Controller
                 'location' => $book->location->location,
                 'full_location' => $book->location->full_location,
                 'title' => $book->title,
-                'author' => json_decode($book->author),
+                'authors' => json_decode($book->author),
                 'volume' => $book->volume,
                 'edition' => $book->edition,
                 'available' => $book->available,
@@ -69,7 +72,7 @@ class BookController extends Controller
             'authors' => 'required|string|max:255',
             'copyright' => 'required|integer|min:1900|max:'.date('Y'),
             'volume' => 'nullable|integer',
-            'edition' => 'nullable|integer',
+            'edition' => 'nullable|string',
             'pages' => 'required|integer',
             'acquired_date' => 'required|date',
             'source_of_fund' => 'required|string',
@@ -89,7 +92,7 @@ class BookController extends Controller
                 $model = new Book();
                 try {
                     
-                    $model->fill($request->except(['id', 'image_url', 'title']));
+                    $model->fill($request->except(['id', 'image_url']));
 
                     // get id if request has an id
                     if($i > 0 && $request->id != null) {
@@ -120,7 +123,7 @@ class BookController extends Controller
             }
         }
 
-        $model->title = Str::title($request->title);
+        // $model->title = Str::title($request->title);
         $authors = json_decode($request->authors, true);
 
         foreach($authors as &$author) {
@@ -238,20 +241,29 @@ class BookController extends Controller
     }
 
     //opac
-    public function opacGetBooks(Request $request){        
+    public function opacGetBooks(Request $request) {        
         $sort = $request->input('sort', 'acquired_date desc'); 
-
+    
         $sort = $this->validateSort($sort);
-
-        if($sort[0] === 'date_published') {
+        
+        if ($sort[0] === 'date_published') {
             $sort[0] = 'acquired_date';
         }
-
+    
         $books = Book::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
-                       ->orderBy($sort[0], $sort[1]);
+                     ->orderBy($sort[0], $sort[1])
+                     ->paginate(24);
+    
+        foreach ($books as $book) {
+            $book->authors = json_decode($book->authors);
+            if ($book->image_url != null) {
+                $book->image_url = self::URL . Storage::url($book->image_url);
+            }
+        }
         
-        return $books->paginate(24);
+        return $books;
     }
+    
     
     public function opacSearchBooks(Request $request){  
         $search = $request->input('search');

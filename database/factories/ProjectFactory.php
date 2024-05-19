@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
@@ -17,6 +18,7 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
+            'accession' => Str::random(5),
             'title' => fake()->words(3, true),
             'date_published' => fake()->date(), 
             'language' => fake()->randomElement(['FIL', 'FOR']),

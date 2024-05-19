@@ -10,7 +10,7 @@ class Periodical extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['id', 'material_type', 'title', 'authors', 'image_location', 'language',
+    protected $fillable = ['accession', 'material_type', 'title', 'authors', 'image_location', 'language',
                             'publisher', 'copyright', 'volume', 'issue', 'receive_date',
                             'pages', 'content', 'remarks', 'date_published'];
 }

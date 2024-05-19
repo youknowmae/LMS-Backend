@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('periodicals', function (Blueprint $table) {
             $table->id();
+            $table->string('accession')->unique();
             $table->string('material_type');
             $table->string('title');
             $table->string('authors');

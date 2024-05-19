@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Periodical>
@@ -17,6 +18,7 @@ class PeriodicalFactory extends Factory
     public function definition(): array
     {
         return [
+            'accession' => Str::random(5),
             'material_type' => fake()->randomElement(['journal', 'magazine', 'newspaper']),
             'title' => fake()->words(3, true),
             'authors' => fake()->name(),

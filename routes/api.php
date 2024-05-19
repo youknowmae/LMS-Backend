@@ -41,7 +41,8 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 
     // View Reports
     Route::get('cataloging/reports/material-counts', [CatalogingReportController::class, 'getCount']);
-    Route::get('cataloging/reports/pdf', [CatalogingReportController::class, 'generatePdf']);
+    Route::get('cataloging/reports/pdf/{type}', [CatalogingReportController::class, 'generatePdf']);
+    Route::post('cataloging/reports/excel/{type}', [CatalogingReportController::class, 'generateExcel']);
 
     // View locations
     Route::get('books/locations', [BookController::class, 'getLocations']);
@@ -88,13 +89,14 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
 });
 
 /* STUDENT ROUTES */
-Route::group(['middleware' => ['studentauth']], function () {
+// Route::group(['middleware' => ['studentauth']], function () {
+Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () { 
 
     // ROUTES FOR VIEWING 
     Route::get('student/books', [BookController::class, 'viewBooks']);
     Route::get('student/periodicals', [PeriodicalController::class, 'viewPeriodicals']);
     Route::get('student/articles', [ArticleController::class, 'viewArticles']);
-    Route::get('student/projects/{department}', [ProjectController::class, 'viewProjectsByDepartment']);
+    Route::get('student/projects/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);//'viewProjectsByDepartment']);
 
     // Reservation routes
     Route::post('reservation/{id}', [ReservationController::class, 'reserve']);
@@ -116,21 +118,10 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('images/delete/all/{type}', [ImageController::class, 'deleteAll']);
 });
 
-Route::post('cataloging/reports/excel/{type}', [CatalogingReportController::class, 'excel']);
-
-Route::get('test/{text}', function(string $text) {
-    $pass = Hash::make('password');
-    return response()->json(['text' => Hash::check($text, $pass)], 200);
-    if(Hash::make($text) == Hash::make('password'))
-        return response()->json(['response' => 'match'], 200);
-    else 
-        return response()->json(['response' => 'not a match'], 400);
-});
-
 //opac routes
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'opac'], function () {
     //books
-    Route::get('/books', [BookController::class, 'opacGetBooks']);
+    Route::get('books', [BookController::class, 'opacGetBooks']);
     Route::get('/books/search', [BookController::class, 'opacSearchBooks']);
     Route::get('/book/{id}', [BookController::class, 'getBook']);
 

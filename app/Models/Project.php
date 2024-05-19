@@ -10,7 +10,7 @@ class Project extends Model
 {
     use HasFactory, SoftDeletes;
     
-    protected $fillable = ['id', 'category', 'authors', 'title', 'program_id', 'image_location', 'date_published',
+    protected $fillable = ['accession', 'category', 'authors', 'title', 'program_id', 'image_location', 'date_published',
                            'keywords', 'language', 'abstract'];
 
     public function program(){

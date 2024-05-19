@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
+            $table->string('accession')->unique();
             $table->enum('material_type', ['journal', 'magazine', 'newspaper']);
             $table->string('title');
             $table->string('authors');

@@ -9,12 +9,13 @@ use Storage, Str;
 
 class PeriodicalController extends Controller
 {
+    const URL = 'http://192.168.68.124:8000';
     public function getPeriodicals() {
         $periodicals = Periodical::orderByDesc('updated_at')->get();
 
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
-                $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
+                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
             
             $periodical->authors = json_decode($periodical->authors);
         }
@@ -27,7 +28,7 @@ class PeriodicalController extends Controller
 
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
-                $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
+                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
 
             $periodical->authors = json_decode($periodical->authors);
         }
@@ -42,12 +43,12 @@ class PeriodicalController extends Controller
     // FOR STUDENT PORTAL
     public function viewPeriodicals() {
         $periodicals = Periodical::
-        select(['title', 'author', 'material_type', 'image_url', 'language', 'volume', 'issue', 'copyright'])
+        select(['title', 'authors', 'material_type', 'image_url', 'language', 'volume', 'issue', 'copyright'])
         ->orderByDesc('updated_at')->get();
 
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
-                $periodical->image_url = 'http://localhost:8000' . Storage::url($periodical->image_url);
+                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
 
             $periodical->authors = json_decode($periodical->authors);
         }

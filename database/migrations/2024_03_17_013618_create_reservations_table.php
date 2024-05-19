@@ -14,6 +14,7 @@ class CreateReservationsTable extends Migration
             $table->foreignId('book_id')->constrained()->onDelete('cascade');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
+            $table->boolean('is_online')->default(false);
             $table->boolean('status')->default(true); // True for active reservation, False for completed/canceled
             $table->timestamps();
         });

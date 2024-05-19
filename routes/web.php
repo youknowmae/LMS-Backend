@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Book;
+use App\Models\Periodical;
 use Illuminate\Support\Facades\Route;
 
 // default view
