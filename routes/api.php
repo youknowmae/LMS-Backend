@@ -17,6 +17,8 @@ Route::post('/studentlogin', [AuthController::class, 'studentLogin']);
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
 });
+use App\Http\Controllers\AnnouncementController;
+
 
 // logged in user tester
 Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
@@ -99,17 +101,16 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('student/projects/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);//'viewProjectsByDepartment']);
 
     // Reservation routes
-    Route::post('reservation/{id}', [ReservationController::class, 'reserve']);
+    Route::post('reservations', [ReservationController::class, 'store']); // Changed from 'reservation/{id}' to 'reservations'
     // Reservation Cancel
     Route::delete('/cancel-reservation/{id}', [ReservationController::class, 'cancelReservation']);
     
     
     // API resource route for reservations
-    Route::get('reservations', [ReservationController::class, 'index']);
-    Route::get('reservations/{reservation}', [ReservationController::class, 'show']);
+
+   
     Route::put('reservations/{reservation}', [ReservationController::class, 'update']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
-    
 });
 
 // RED ZONE 

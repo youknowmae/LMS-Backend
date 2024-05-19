@@ -237,3 +237,4 @@ class PeriodicalController extends Controller
         return $periodicals->paginate(24);
     }
 }
+

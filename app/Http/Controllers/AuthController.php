@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Exception;
 use Auth;
 use DB, Http, Str, Hash;
@@ -120,6 +122,7 @@ class AuthController extends Controller
                     'role' => $user->role,
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
+                    'middle_name' => $user->middle_name,
                     'domain_account' => $user->domain_email,
                     'main_address' => $user->main_address,
                     'profile_picture' => $user->profile_image,
@@ -160,5 +163,14 @@ class AuthController extends Controller
         } catch(Exception $e) {
             return response()->json(['Error' => $e->getMessage()], 400);
         }
+    }
+
+
+
+    
+    public function getUser($id)
+    {
+        $user = User::findOrFail($id);
+        return response()->json(['user' => $user], 200);
     }
 }

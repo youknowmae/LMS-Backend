@@ -1,22 +1,31 @@
 <?php
-
 namespace Database\Factories;
 
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
- */
 class ProjectFactory extends Factory
 {
     /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Project::class;
+
+    /**
      * Define the model's default state.
      *
-     * @return array<string, mixed>
+     * @return array
      */
-    public function definition(): array
+    public function definition()
     {
+        $categories = ['thesis', 'dissertation', 'capstone', 'feasibility study'];
+        $departments = ['CCS', 'CBA', 'CEAS', 'CHTM', 'CAHS'];
+        $courses = ['BSIT', 'BSCS',  'BSEMC', 'ACT', 'BSA', 'BSCA', 'BSBA-FM', 'BSBA-HRM', 'BSBA-MKT', 'BSN', 'BSM', 'GM', 'BSHM', 'BSTM', 'BEEd', 'BECEd', 'BSEd-E', 'BSEd-FIL', 'BSEd-M', 'BSEd-SCI', 'BSEd-SOC', 'BPEd', 'BCAEd', 'BACOM', 'TCP'];
+        $languages = ['FIL', 'FOR'];
+
         return [
             'accession' => Str::random(5),
             'title' => fake()->words(3, true),
