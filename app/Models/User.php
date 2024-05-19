@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Program;
 
 class User extends Authenticatable
 {
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'profile_image',
         'domain_email',
         // Add any other fields that need to be mass assignable
+        'gender',
     ];
 
     /**
@@ -69,5 +71,17 @@ class User extends Authenticatable
 
     public function logs() {
         return $this->hasMany(CatalogingLog::class);
+    }
+
+    public function program() {
+        return $this->belongsTo(Program::class);
+    }
+
+    public function department(){
+        return $this->belongsTo(Program::class);
+    }
+
+    public function patrons(){
+        return $this->belongsTo(Program::class);
     }
 }

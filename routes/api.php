@@ -8,7 +8,13 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\ArticleController,
 App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, App\Http\Controllers\ProjectController,
-App\Http\Controllers\CatalogingReportController;
+App\Http\Controllers\CatalogingReportController, App\Http\Controllers\BorrowBookController,App\Http\Controllers\BorrowMaterialController
+,App\Http\Controllers\ReserveBookController;
+
+
+use App\Http\Controllers\CirculationUserController;
+
+
 
 use App\Http\Controllers\ReservationController;
 use App\Models\Book;
@@ -67,6 +73,43 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     Route::delete('articles/process/{id}', [ArticleController::class, 'delete']);
     Route::delete('projects/process/{id}', [ProjectController::class, 'delete']);
 });
+
+
+// Circulation Process Routes
+Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
+
+    // display user list
+    Route::get('/users', [BorrowMaterialController::class, 'userlist']);
+
+    // borrow list
+    Route::get('/borrow-list', [BorrowMaterialController::class, 'borrowlist']);
+
+    // update borrow list
+    Route::put('borrow-edit/{id}',[BorrowMaterialController:: class, 'borrowEdit']);
+    
+    // borrow-list returning book
+    Route::put('return-book/{id}', [BorrowMaterialController::Class, 'returnbook']);
+
+    //returned book list
+    Route::get('returned-list',[BorrowMaterialController::class,'returnedlist']);
+
+    //reservebook
+    Route::post('/reserve/book', [ReserveBookController::class, 'reservebook']);
+
+    //reservationlist
+    Route::get('reservation-list', [ReserveBookController::class, 'reservelist']);
+
+    // borrow book 
+    Route::post('/borrow/book', [BorrowMaterialController::class, 'borrowbook']);
+    Route::get('circulation/get-user/{id}', [CirculationUserController::class, 'getUser']);
+    Route::get('circulation/get-book/{id}', [CirculationUserController::class, 'getBook']);
+
+    //get report
+    Route::get('report', [BorrowMaterialController::class, 'bookBorrowersReport']);
+    Route::get('topborrowers', [BorrowMaterialController::class, 'topborrowers']);
+    Route::get('mostborrowed', [BorrowMaterialCOntroller::class, 'mostborrowed']);
+});
+
 
 // Material viewing routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], function () {
