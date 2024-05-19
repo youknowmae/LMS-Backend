@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Exception;
 use Auth;
-use DB, Http, Str, Hash;
+use DB, Http, Str;
 
 class AuthController extends Controller
 {
@@ -115,10 +115,11 @@ class AuthController extends Controller
                 
                 $token = $user->createToken('token-name', ['materials:view'])->plainTextToken;
 
+                $student = User::with('program')->find($user->id);
                 $responseData = [
                     'token' => $token,
                     'id' => $user->id,
-                    'department' => $user->department,
+                    'department' => $student->program->department,
                     'role' => $user->role,
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,

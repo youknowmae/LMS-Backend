@@ -52,7 +52,7 @@ class BookController extends Controller
                 'location' => $book->location->location,
                 'full_location' => $book->location->full_location,
                 'title' => $book->title,
-                'authors' => json_decode($book->author),
+                'authors' => json_decode($book->authors),
                 'volume' => $book->volume,
                 'edition' => $book->edition,
                 'available' => $book->available,
@@ -60,6 +60,15 @@ class BookController extends Controller
             ]);
         }
         return $books_array;
+    }
+
+    public function viewBook(int $id) {
+        $book = Book::find($id, ['available', 'title', 'id', 'call_number', 'copyright', 'authors',
+        'volume', 'pages', 'edition', 'remarks', 'image_url']);
+
+        $book->authors = json_decode($book->authors);
+        $book->image_url = self::URL . Storage::url($book->image_url);
+        return $book;
     }
 
     /* PROCESSING OF DATA */
@@ -120,19 +129,19 @@ class BookController extends Controller
 
                     $model->image_url = $path;
                 } 
+                
+                $authors = json_decode($request->authors, true);
+
+                foreach($authors as &$author) {
+                    $author = Str::title($author);
+                }
+
+                $model->authors = json_encode($authors);
+                
+                $model->save();
             }
         }
 
-        // $model->title = Str::title($request->title);
-        $authors = json_decode($request->authors, true);
-
-        foreach($authors as &$author) {
-            $author = Str::title($author);
-        }
-
-        $model->authors = json_encode($authors);
-        
-        $model->save();
 
         $location = Location::where('id', $model->location_id)->value('location');
 

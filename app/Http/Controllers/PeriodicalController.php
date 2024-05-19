@@ -61,6 +61,7 @@ class PeriodicalController extends Controller
     public function add(Request $request) {
         
         $request->validate([
+            'accession' => 'required|string|max:255',
             'material_type' => 'required|string|max:15',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:155',

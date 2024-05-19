@@ -32,7 +32,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'program_id' => fake()->numberBetween(1, 10),
             'remember_token' => Str::random(10),
-            'main_address' => fake()->email(),
+            'main_address' => fake()->address(),
             'domain_email' => fake()->safeEmailDomain(),
             'profile_image' => fake()->imageUrl($width = 200, $height = 200, 'people') // Generates a fake image URL
         ];

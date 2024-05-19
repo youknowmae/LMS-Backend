@@ -47,11 +47,32 @@ class ArticleController extends Controller
         return $articles;
     }
 
+    public function viewArticle(int $id) {
+        $article = Article::find($id, ['material_type', 'title', 'authors', 'language', 'subject', 'date_published', 
+        'publisher', 'volume', 'issue', 'abstract']);
+        
+        $article->authors = json_decode($article->authors);
+        
+        return $article;
+    }
+
+    public function viewArticlesByType($type) {
+        $articles = Article::where('material_type', $type)->orderByDesc('updated_at')->get();
+        
+        foreach($articles as $article) {
+            $article->authors = json_decode($article->authors);
+        }
+
+        return $articles;
+    }
+
+
     /* FOR PROCESSING */
 
     public function add(Request $request) {
 
         $request->validate([
+            'accession' => 'required|string|max:255',
             'material_type' => 'required|string|max:15',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:255',

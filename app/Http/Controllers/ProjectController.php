@@ -97,6 +97,7 @@ class ProjectController extends Controller
 
         // VALIDATION
         $request->validate([
+            'accession' => 'required|string|max:255',
             'program_id' => 'required|integer|max:255',
             'category' => 'required|string|max:125',
             'title' => 'required|string|max:255',

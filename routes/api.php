@@ -141,7 +141,18 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('student/books', [BookController::class, 'viewBooks']);
     Route::get('student/periodicals', [PeriodicalController::class, 'viewPeriodicals']);
     Route::get('student/articles', [ArticleController::class, 'viewArticles']);
-    Route::get('student/projects/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);//'viewProjectsByDepartment']);
+    Route::get('student/projects/department/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);//'viewProjectsByDepartment']);
+
+    // FOR SINGLE RECORD
+    Route::get('student/book/id/{id}', [BookController::class, 'viewBook']);
+    Route::get('student/periodical/id/{id}', [PeriodicalController::class, 'viewPeriodical']);
+    Route::get('student/article/id/{id}', [ArticleController::class, 'viewArticle']);
+    Route::get('student/project/id/{id}', [ProjectController::class, 'viewProject']);//'viewProjectsByDepartment']);
+
+    // FOR FILTERING MATERIAL TYPE
+    Route::get('student/periodicals/type/{type}', [PeriodicalController::class, 'viewPeriodicalByType']);
+    Route::get('student/articles/type/{type}', [ArticleController::class, 'viewArticlesByType']);
+    Route::get('student/projects/type/{type}', [ProjectController::class, 'viewProjectByType']);//'viewP
 
     // Reservation routes
     Route::post('reservations', [ReservationController::class, 'store']); // Changed from 'reservation/{id}' to 'reservations'
@@ -150,9 +161,8 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     
     
     // API resource route for reservations
-
    
-    Route::put('reservations/{reservation}', [ReservationController::class, 'update']);
+    Route::get('reservations/{id}', [ReservationController::class, 'getUserById']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
 });
 

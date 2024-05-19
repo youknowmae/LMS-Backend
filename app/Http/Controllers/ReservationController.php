@@ -24,7 +24,8 @@ class ReservationController extends Controller
         'author' => 'required',
         'location' => 'required',
         'date_requested' => 'required|date',
-        'number_of_books' => 'required|integer|min:1',
+        // '
+        // ' => 'required|integer|min:1',
         'date_of_expiration' => 'required|date|after_or_equal:date_requested',
         'fine' => 'nullable|numeric|min:0',
     ]);
@@ -36,9 +37,9 @@ class ReservationController extends Controller
     $reservations = Reservation::create($validatedData);
     return response()->json($reservations, 201);
 }
-    public function getByUserId($userId)
+    public function getByUserId($id)
     {
-        $reservations = Reservation::where('user_id', $userId)->with('book')->get();
+        $reservations = Reservation::where('user_id', $id)->with('book')->get();
         return response()->json($reservations);
     }
     
