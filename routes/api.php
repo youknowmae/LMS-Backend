@@ -60,7 +60,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
 
     // Get Materials Using ID 
     Route::get('/book/id/{id}', [BookController::class, 'getBook']);
-    Route::get('/periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
+    Route::get('/periodical/{id}', [PeriodicalController::class, 'getPeriodical']);
     Route::get('/article/id/{id}', [ArticleController::class, 'getArticle']);
     Route::get('/project/id/{id}', [ProjectController::class, 'getProject']);
 

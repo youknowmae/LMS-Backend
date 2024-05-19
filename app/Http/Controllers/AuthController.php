@@ -25,6 +25,7 @@ class AuthController extends Controller
                     'role' => $user->role,
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
+                    'middle_name' => $user->middle_name,
                     'domain_account' => $user->domain_email,
                     'main_address' => $user->main_address,
                     'profile_picture' => $user->profile_image,

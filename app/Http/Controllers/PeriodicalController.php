@@ -18,4 +18,9 @@ class PeriodicalController extends Controller
 
         return response()->json($filteredPeriodical);
     }
+    public function getPeriodical($id)
+    {
+        return Periodical::findOrFail($id);
+    }
 }
+
