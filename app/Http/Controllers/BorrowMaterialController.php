@@ -188,8 +188,23 @@ class BorrowMaterialController extends Controller
     
         return response()->json($mostBorrowedBooks);
     }
-        
+
+public function topborrowers(Request $request){
+    $topBorrowers = BorrowMaterial::select(
+        'user_id',
+        DB::raw('COUNT(*) as borrow_count'),
+        'users.last_name' // Select the username from the users table
+    )
+    ->join('users', 'borrow_materials.user_id', '=', 'users.id') // Join with the users table
+    ->groupBy('borrow_materials.user_id', 'users.last_name') // Group by user_id and username
+    ->orderByDesc('borrow_count')
+    ->get();
+
+    return response()->json($topBorrowers, 200);
 }
+}
+    
+    
 
 
 //edited out

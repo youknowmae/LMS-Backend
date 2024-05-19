@@ -104,6 +104,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     Route::get('report', [BorrowMaterialController::class, 'bookBorrowersReport']);
     Route::get('topborrowers', [BorrowMaterialController::class, 'topborrowers']);
     Route::get('mostborrowed', [BorrowMaterialCOntroller::class, 'mostborrowed']);
+    Route::get('topborrowers', [BorrowMaterialCOntroller::class, 'topborrowers']);
 });
 
 
