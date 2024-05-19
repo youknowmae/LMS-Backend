@@ -34,12 +34,12 @@ class BorrowMaterialController extends Controller
         $borrowMaterial->fine = $payload->fine;
         $borrowMaterial->borrow_expiration = $payload->borrow_expiration;
         $borrowMaterial->borrow_date = $payload->borrow_date;
-        $borrowMaterial->save();
         
     
      // Rollback the decrement operation if saving BorrowMaterial failed
         $book->available = 0;
         $book->save();
+        $borrowMaterial->save();
         $data = ['borrow_material' => $borrowMaterial];
         return response()->json($data);
     }
@@ -87,24 +87,54 @@ class BorrowMaterialController extends Controller
 
 
     //return book
-    public function returnbook(Request $request, $id){
-        $borrowMaterial = BorrowMaterial::find($id);
-        $book = Book::find($id);
+
+    public function returnbook(Request $request, $id)
+    {
+        // Start a database transaction
+        DB::beginTransaction();
+    
+        try {
+            // Find the BorrowMaterial by its ID
+            $borrowMaterial = BorrowMaterial::find($id);
+            
             // Check if the borrowed material exists
-        if(!$borrowMaterial){
-            return response()->json(['message' => 'Borrowed material not found'], 404);
-        }
-            $borrowMaterial->status = 0;
+            if (!$borrowMaterial) {
+                // Rollback the transaction if the borrowed material is not found
+                DB::rollback();
+                return response()->json(['message' => 'Borrowed material not found'], 404);
+            }
+    
+            // Find the Book by the book_id associated with the BorrowMaterial
+            $book = Book::find($borrowMaterial->book_id);
+            
+            // Set book availability to 1 (available)
             $book->available = 1;
-
+    
+            // Save the changes to the Book
+            $book->save();
+    
+            // Update BorrowMaterial status and return date
+            $borrowMaterial->status = 0;
             $borrowMaterial->date_returned = now();
-        // Save the changes
-        $book->save();
-        $borrowMaterial->save();
-
-        // Return a success response
-        return response()->json(['message' => $id], 200);
+            
+            // Save the changes to the BorrowMaterial
+            $borrowMaterial->save();
+    
+            // Commit the transaction if all operations succeed
+            DB::commit();
+    
+            // Return a success response
+            return response()->json(['message' => 'Book returned successfully'], 200);
+        } catch (\Exception $e) {
+            // Rollback the transaction if any operation fails
+            DB::rollback();
+    
+            // Handle the exception, e.g., log the error or return an error response
+            return response()->json(['message' => 'An error occurred while returning the book'], 500);
+        }
     }
+    
+
     public function bookBorrowersReport(Request $request){
         // Fetch distinct borrowers with their user and program relations
         $borrowers = BorrowMaterial::with(['user.program'])
