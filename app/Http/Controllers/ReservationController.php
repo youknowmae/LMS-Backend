@@ -37,7 +37,7 @@ class ReservationController extends Controller
     $reservations = Reservation::create($validatedData);
     return response()->json($reservations, 201);
 }
-    public function getByUserId($id)
+    public function getUserById($id)
     {
         $reservations = Reservation::where('user_id', $id)->with('book')->get();
         return response()->json($reservations);

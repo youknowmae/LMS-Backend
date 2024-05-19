@@ -21,16 +21,17 @@ class ReserveBookController extends Controller
             return response()->json(['error' => 'Book not found'], 404);
         }
         // Check if the book is available
-        if ($book->available <= 0) {
-            return response()->json(['error' => 'Book is not available for reservation'], 400);
-        }
-
+        // if ($book->available <= 0) {
+        //     return response()->json(['error' => 'Book is not available for reservation'], 400);
+        // }
+        // if book is available (1), make reserve status (1)
         // Create Reservation instance
         $reservation = new reservation();
         $reservation -> book_id = $payload->book_id;
         $reservation -> user_id = $payload->user_id;
-        $reservation -> start_date = $payload->start_date;
-        $reservation -> end_date = $payload->end_date;
+        // $reservation -> start_date = $payload->start_date;
+        // $reservation -> end_date = $payload->end_date;
+        $reservation -> date_of_expiration= $payload->date_of_expiration;
         $reservation -> save();
 
         $data = ['Reservation' => $reservation];
