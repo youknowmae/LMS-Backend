@@ -166,9 +166,9 @@ class CatalogingReportController extends Controller
 
         $spreadsheet = new Spreadsheet();
 
-        $startDateParsed = null;
-        $endDateParsed = null;
-        $copyright = null;
+        $startDateParsed = '';
+        $endDateParsed = '';
+        $copyright = '';
 
         if(in_array('startDate', $keys))
             $startDateParsed = Carbon::parse($request->payload['startDate'] . ' 00:00:00')->setTimezone('Asia/Manila');

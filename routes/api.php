@@ -97,7 +97,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     Route::post('/reserve/book', [ReserveBookController::class, 'reservebook']);
 
     //reservationlist
-    Route::get('reservation-list', [ReserveBookController::class, 'reservelist']);
+    Route::get('reservation-list/{type}', [ReserveBookController::class, 'reservelist']);
 
     //get queue data
     Route::get('queue', [ReserveBookController::class, 'queue']);

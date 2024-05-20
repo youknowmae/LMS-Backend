@@ -13,13 +13,8 @@ class Reservation extends Model
     protected $fillable = [
         'user_id',
         'book_id',
-        'title',
-        'author',
-        'location',
         'start_date',
         'end_date',
-        'number_of_books',
-        'date_of_expiration',
         'fine',
         'status'
     ];

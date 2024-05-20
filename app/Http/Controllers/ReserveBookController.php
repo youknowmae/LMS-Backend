@@ -29,9 +29,9 @@ class ReserveBookController extends Controller
         $reservation = new reservation();
         $reservation -> book_id = $payload->book_id;
         $reservation -> user_id = $payload->user_id;
-         $reservation -> start_date = $payload->start_date;
-         $reservation -> end_date = $payload->end_date;
-        //$reservation -> date_of_expiration= $payload->date_of_expiration;
+        $reservation -> start_date = $payload->start_date;
+        $reservation -> end_date = $payload->end_date;
+        // $reservation -> date_of_expiration= $payload->date_of_expiration;
         $reservation -> save();
 
         $data = ['Reservation' => $reservation];

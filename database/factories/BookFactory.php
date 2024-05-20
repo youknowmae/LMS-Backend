@@ -17,10 +17,16 @@ class BookFactory extends Factory
      */
     public function definition(): array
     {
+        $authors = [ 
+            fake()->name(),
+            fake()->name(),
+            fake()->name()
+        ];
+
         return [
             'call_number' => Str::random(10),
-            'title' => fake()->words(3, true),
-            'authors' => fake()->name(),
+            'title' => Str::title(fake()->words(3, true)), 
+            'authors' => json_encode($authors),
             'location_id' => fake()->numberBetween(1, 4),
             'volume' => fake()->numberBetween(1, 3),
             'edition' => fake()->numberBetween(1, 3),

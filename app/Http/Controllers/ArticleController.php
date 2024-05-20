@@ -8,7 +8,7 @@ use Exception, Str;
 
 class ArticleController extends Controller
 {
-    const URL = 'http://192.168.68.124:8000';
+    const URL = 'http://192.168.10.122:8000';
     public function getArticles() {
         $articles = Article::orderByDesc('updated_at')->get();
         
@@ -130,7 +130,7 @@ class ArticleController extends Controller
         $request->validate([
             'material_type' => 'nullable|string|max:15',
             'title' => 'nullable|string|max:255',
-            'author' => 'nullable|string|max:255',
+            'authors' => 'nullable|string|max:255',
             'abstract' => 'nullable|string|max:2048',
             'language' => 'nullable|string|max:15',
             'issue' => 'nullable|integer',
@@ -144,6 +144,16 @@ class ArticleController extends Controller
 
         $model = Article::findOrFail($id);
         $model->update($request->all());
+
+        $model->title = Str::title($request->title);
+        $authors = json_decode($request->authors, true);
+
+        foreach($authors as &$author) {
+            $author = Str::title($author);
+        }
+
+        $model->authors = json_encode($authors);
+
         $model->save();
 
         $log = new CatalogingLogController();
