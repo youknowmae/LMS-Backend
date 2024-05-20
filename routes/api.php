@@ -21,6 +21,7 @@ use App\Http\Controllers\AcademicProjectController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PatronController;
 
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
@@ -200,10 +201,10 @@ function authenticationRoutes(): void
         Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
 
         
-        //circulation 
-        // Route::get('/patrons', [PatronController::class, 'index']);
-        // Route::get('/patrons/{id}', [PatronController::class, 'edit']);
-        // Route::post('/patrons/{id}', [PatronController::class, 'update']);
+        // circulation 
+        Route::get('/patrons', [PatronController::class, 'index']);
+        Route::get('/patrons/{id}', [PatronController::class, 'edit']);
+        Route::post('/patrons/{id}', [PatronController::class, 'update']);
 
         //cataloging
         Route::get('/locations', [LocationController::class, 'getLocations']);
