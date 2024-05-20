@@ -29,9 +29,9 @@ class ReserveBookController extends Controller
         $reservation = new reservation();
         $reservation -> book_id = $payload->book_id;
         $reservation -> user_id = $payload->user_id;
-        // $reservation -> start_date = $payload->start_date;
-        // $reservation -> end_date = $payload->end_date;
-        $reservation -> date_of_expiration= $payload->date_of_expiration;
+         $reservation -> start_date = $payload->start_date;
+         $reservation -> end_date = $payload->end_date;
+        //$reservation -> date_of_expiration= $payload->date_of_expiration;
         $reservation -> save();
 
         $data = ['Reservation' => $reservation];
@@ -39,9 +39,19 @@ class ReserveBookController extends Controller
     }
 
     public function reservelist(Request $request){
-    $reservelist = Reservation::with('user.program', 'user.department', 'user.patrons')->get();
-    return response()->json($reservelist);
+        $reservelist = Reservation::with('user.program', 'user.department', 'user.patrons')->get();
+        return response()->json($reservelist);
     }
+
+    public function queue(Request $request){
+       // Fetch all queue data from the reservations table
+            $queueData = Reservation::orderBy('book_id')
+            ->orderBy('start_date', 'asc')
+            ->get(['user_id', 'book_id', 'start_date']); // Adjust the fields as necessary
+
+            // Return the data as JSON (or any other format required by the front end)
+            return response()->json($queueData);
+        }
 }
 
 

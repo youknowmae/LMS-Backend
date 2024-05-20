@@ -62,29 +62,28 @@ class BorrowMaterialController extends Controller
         return response()->json($borrowMaterial);
     }
 
-    public function borrowEdit(Request $request)
-{
-    $payload = json_decode($request->payload);
+    public function borrowEdit(Request $request){
+        $payload = json_decode($request->payload);
   
-    $borrowMaterial = BorrowMaterial::find($payload->id);
+        $borrowMaterial = BorrowMaterial::find($payload->id);
     
-    if (!$borrowMaterial) {
-        return response()->json(['error' => 'Borrow material not found'], 404);
-    }
+        if (!$borrowMaterial) {
+            return response()->json(['error' => 'Borrow material not found'], 404);
+        }
 
-    $borrowMaterial->book_id = $payload->book_id;
-    $borrowMaterial->user_id = $payload->user_id;
-    $borrowMaterial->fine = $payload->fine;
-    $borrowMaterial->borrow_expiration = $payload->borrow_expiration;
-    $borrowMaterial->borrow_date = $payload->borrow_date;
+        $borrowMaterial->book_id = $payload->book_id;
+        $borrowMaterial->user_id = $payload->user_id;
+        $borrowMaterial->fine = $payload->fine;
+        $borrowMaterial->borrow_expiration = $payload->borrow_expiration;
+        $borrowMaterial->borrow_date = $payload->borrow_date;
 
-    // Save the updated record
-    $borrowMaterial->save();
+        // Save the updated record
+        $borrowMaterial->save();
 
-    // Return the updated record as a response
-    $data = ['borrow_material' => $borrowMaterial];
-    return response()->json($data);
-}
+        // Return the updated record as a response
+        $data = ['borrow_material' => $borrowMaterial];
+        return response()->json($data);
+    }   
 
     public function userlist(Request $request){
         $users = User::with('program', 'department', 'patrons')->get();

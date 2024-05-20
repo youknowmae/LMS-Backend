@@ -99,6 +99,9 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     //reservationlist
     Route::get('reservation-list', [ReserveBookController::class, 'reservelist']);
 
+    //get queue data
+    Route::get('queue', [ReserveBookController::class, 'queue']);
+
     // borrow book 
     Route::post('/borrow/book', [BorrowMaterialController::class, 'borrowbook']);
     Route::get('circulation/get-user/{id}', [CirculationUserController::class, 'getUser']);
