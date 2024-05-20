@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class ProgramSeeder extends Seeder
 {
@@ -14,49 +14,130 @@ class ProgramSeeder extends Seeder
     public function run(): void
     {
         DB::table('programs')->insert([
+
+            // CCS
             [
                 'program' => 'BSIT',
-                'department' => 'CCS'
+                'department' => 'CCS',
+                'category' => 'Capstone'
             ],
             [
                 'program' => 'BSCS',
-                'department' => 'CCS'
+                'department' => 'CCS',
+                'category' => 'Thesis'
             ],
             [
                 'program' => 'BSEMC',
-                'department' => 'CCS'
+                'department' => 'CCS',
+                'category' => 'Thesis'
             ],
             [
                 'program' => 'ACT',
-                'department' => 'CCS'
+                'department' => 'CCS',
+                'category' => 'Thesis'
             ],
+
+            // CBA
             [
                 'program' => 'BSA',
-                'department' => 'CBA'
+                'department' => 'CBA',
+                'category' => 'Research'
             ],
             [
-                'program' => 'BSBA',
-                'department' => 'CBA'
+                'program' => 'BSCA',
+                'department' => 'CBA',
+                'category' => 'Research'
             ],
+            [
+                'program' => 'BSBA-FM',
+                'department' => 'CBA',
+                'category' => 'Research'
+            ],
+            [
+                'program' => 'BSBA-MKT',
+                'department' => 'CBA',
+                'category' => 'Research'
+            ],
+            [
+                'program' => 'BSBA-HRM',
+                'department' => 'CBA',
+                'category' => 'Research'
+            ],
+
+            // CAHS
             [
                 'program' => 'BSN',
-                'department' => 'CAHS'
+                'department' => 'CAHS',
+                'category' => 'Research'
             ],
             [
                 'program' => 'BSM',
-                'department' => 'CAHS'
+                'department' => 'CAHS',
+                'category' => 'Research'
+            ],
+
+            // BSED
+            [
+                'program' => 'BACOMM',
+                'department' => 'CEAS',
+                'category' => 'Thesis'
             ],
             [
-                'program' => 'BSED',
-                'department' => 'CEAS'
+                'program' => 'BEED',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BSHRM',
-                'department' => 'CHTM'
+                'program' => 'BPED',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BST',
-                'department' => 'CHTM'
+                'program' => 'BCAED',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
+            ],
+            [
+                'program' => 'BECED',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
+            ],
+            [
+                'program' => 'BSED-ENG',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
+            ],
+            [
+                'program' => 'BSED-FIL',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
+            ],
+            [
+                'program' => 'BSED-MATH',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
+            ],
+            [
+                'program' => 'BSED-SCI',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
+            ],
+            [
+                'program' => 'BSED-SOC',
+                'department' => 'CEAS',
+                'category' => 'Classroom Based Action Research'
+            ],
+
+            // CHTM
+            [
+                'program' => 'BSHM',
+                'department' => 'CHTM',
+                'category' => 'Research'
+            ],
+            [
+                'program' => 'BSTM',
+                'department' => 'CHTM',
+                'category' => 'Research'
             ],
         ]);
     }
