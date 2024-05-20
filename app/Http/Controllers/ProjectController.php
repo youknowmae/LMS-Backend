@@ -11,14 +11,18 @@ class ProjectController extends Controller
 {
     const URL = 'http://192.168.10.122:8000';
     public function getProjects() {
-        $projects = Project::with(['program'])->orderByDesc('created_at')->get();
+        $projects = Project::with(['program.department'])->orderByDesc('created_at')->get();
 
-        foreach($projects as &$project) {
+        foreach($projects as $project) {
             if($project->image_url != null)
                 $project->image_url = self::URL .  Storage::url($project->image_url);
 
             $project->authors = json_decode($project->authors);
             $project->keywords = json_decode($project->keywords);
+            $project->program = [
+                'department' => 'test'
+            ];
+            
         }
         return $projects;
     }

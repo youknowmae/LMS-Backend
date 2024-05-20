@@ -10,13 +10,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('departments', function (Blueprint $table) {
+            $table->id();
+            $table->string('department', 10)->unique();
+            $table->string('full_department', 100);
+            $table->timestamps();
+        });
+
         Schema::create('programs', function (Blueprint $table) {
             $table->id();
             $table->string('program', 10)->unique();
-            $table->string('department', 50);
-            $table->string('full_program');
-            $table->string('full_department');
+            $table->string('full_program', 100);
+            $table->foreignId('department_id')->references('id')->on('departments');
             $table->string('category');
+            $table->timestamps();
         });
 
         Schema::create('patrons', function (Blueprint $table) {
