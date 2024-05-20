@@ -101,6 +101,8 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 
     //get queue data
     Route::get('queue', [ReserveBookController::class, 'queue']);
+    Route::get('queue-pos/{id}', [ReserveBookController::class, 'getQueuePosition']);
+    
 
     // borrow book 
     Route::post('/borrow/book', [BorrowMaterialController::class, 'borrowbook']);

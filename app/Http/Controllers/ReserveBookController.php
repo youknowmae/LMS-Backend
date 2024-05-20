@@ -13,6 +13,7 @@ use Storage;
 class ReserveBookController extends Controller
 {
     public function reservebook(Request $request){
+        
         $payload=json_decode($request->payload);
 
         // Check if the book_id exists in the books table
@@ -20,11 +21,7 @@ class ReserveBookController extends Controller
         if (!$book) {
             return response()->json(['error' => 'Book not found'], 404);
         }
-        // Check if the book is available
-        // if ($book->available <= 0) {
-        //     return response()->json(['error' => 'Book is not available for reservation'], 400);
-        // }
-        // if book is available (1), make reserve status (1)
+    
         // Create Reservation instance
         $reservation = new reservation();
         $reservation -> book_id = $payload->book_id;
@@ -51,7 +48,38 @@ class ReserveBookController extends Controller
 
             // Return the data as JSON (or any other format required by the front end)
             return response()->json($queueData);
-        }
+    }
+
+    public function getQueuePosition(Request $request, $id)
+{
+    // Fetch all reservations for the user's books with a status other than 0
+    $userReservations = Reservation::where('user_id', $id)
+                        ->where('status', '!=', 0) // Exclude reservations with status 0
+                        ->orderBy('start_date')
+                        ->get(['book_id', 'start_date']);
+
+    // Initialize the queue positions
+    $queuePositions = [];
+
+    // Process the user's reservations and determine the queue position for each book
+    foreach ($userReservations as $userReservation) {
+        $bookId = $userReservation->book_id;
+        
+        // Count the number of reservations with earlier start dates for the same book
+        $position = Reservation::where('book_id', $bookId)
+                        ->where('start_date', '<', $userReservation->start_date)
+                        ->where('status', '!=', 0) // Exclude reservations with status 0
+                        ->count() + 1; // Add 1 to start positions from 1
+
+        // Assign the queue position for the book
+        $queuePositions[$bookId] = $position;
+    }
+
+    return response()->json($queuePositions);
+}
+
+
+
 }
 
 
