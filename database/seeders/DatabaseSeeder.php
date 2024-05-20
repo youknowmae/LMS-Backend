@@ -62,6 +62,6 @@ class DatabaseSeeder extends Seeder
             ArticleSeeder::class,
             ProjectSeeder::class,
             AnnouncementSeeder::class
-          ]);
+        ]);
     }
 }
