@@ -20,6 +20,7 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AcademicProjectController;
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\LocationController;
 
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
@@ -190,13 +191,23 @@ function authenticationRoutes(): void
         Route::delete('/{academicProject}', [AcademicProjectController::class, 'destroy']);
     });
 
-    //Announcement routes
     Route::middleware(['auth:sanctum'])->group(function () {
+        //Announcement routes
         Route::get('/announcements', [AnnouncementController::class, 'index']);
         Route::post('/announcements', [AnnouncementController::class, 'store']);
         Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show']);
         Route::post('/announcements/{announcement}', [AnnouncementController::class, 'update']);
         Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
+
+        
+        //circulation 
+        // Route::get('/patrons', [PatronController::class, 'index']);
+        // Route::get('/patrons/{id}', [PatronController::class, 'edit']);
+        // Route::post('/patrons/{id}', [PatronController::class, 'update']);
+
+        //cataloging
+        Route::get('/locations', [LocationController::class, 'getLocations']);
+        Route::post('/locations', [LocationController::class, 'create']);
     });
 //Inventory routes
     Route::prefix('inventory')->group(function () {
