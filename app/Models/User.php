@@ -48,6 +48,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'access' => 'array',
+        'roles' => 'array',
     ];
 
     /**
@@ -77,8 +78,12 @@ class User extends Authenticatable
      * @param string $role
      * @return bool
      */
-    public function hasRole(string $role): bool
+    public function hasRole(string $role)
     {
         return $this->role === $role;
+    }
+    public function getRolesAttribute($value)
+    {
+        return json_decode($value, true);
     }
 }

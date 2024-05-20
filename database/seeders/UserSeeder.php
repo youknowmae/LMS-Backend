@@ -2,56 +2,56 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Hash, Str;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
-    public function run(): void
+    public function run()
     {
-        User::factory()->count(1)->create([
+        User::factory()->create([
             'role' => 'superadmin',
-
             'department' => 'Library Department',
             'position' => 'Head',
             'username' => 'superadmin',
-            'password' => bcrypt('Admin123')
+            'password' => Hash::make('Admin123')
         ]);
 
-        User::factory()->count(1)->create([
+        User::factory()->create([
             'role' => 'admin',
-
             'department' => 'Library Department',
             'position' => 'Chief',
-            'username' => 'admin@gmail.com',
+            'username' => 'admin@gmail.com', // Hardcoded username
             'password' => Hash::make('Admin123')
         ]);
 
-        User::factory()->count(1)->create([
+        User::factory()->create([
             'role' => 'staff',
-
             'department' => 'Library Department',
             'position' => 'idk',
-            'username' => 'staff',
+            'username' => 'staff', // Hardcoded username
             'password' => Hash::make('Admin123')
         ]);
 
-        User::factory()->count(1)->create([
+        User::factory()->create([
             'role' => 'user',
-            'username' => 'user',
+            'username' => 'user', // Hardcoded username
             'password' => Hash::make('User123'),
             'department' => 'CCS Department',
             'position' => 'Teacher'
         ]);
 
-        User::factory()->count(3)->create([
+        // Generate 3 additional users with random usernames
+        User::factory(3)->create([
             'role' => 'user',
-            'course_id' => fake()->numberBetween(1, 4),
+            'department' => 'CCS Department',
+            'position' => 'Student'
         ]);
     }
 }

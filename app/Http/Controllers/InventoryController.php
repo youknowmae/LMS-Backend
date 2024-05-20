@@ -5,27 +5,24 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Inventory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class InventoryController extends Controller
 {
-    /**
-     * Enter barcode.
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
+    public function index()
+    {
+        $inventoryItems = Inventory::all();
+        return response()->json($inventoryItems);
+//        return Inventory::all();
+//        $inventories = Inventory::all();
+//        return response()->json($inventories);
+    }
     public function enterBarcode(Request $request): JsonResponse
     {
-        // Validate request data
-        $request->validate([
-            'barcode' => 'required|unique:inventories, barcode',
-            'accession_number' => 'required|unique:inventories,accession_number',
-            'title' => 'required',
-            'author' => 'required',
-            'location' => 'required',
-            'status' => 'required|in:available,unavailable,missing',
-        ]);
+
+
+
 
         // Create new inventory item
         $inventoryItem = new Inventory();

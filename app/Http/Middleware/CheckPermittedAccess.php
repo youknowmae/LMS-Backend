@@ -11,7 +11,7 @@ class CheckPermittedAccess
     {
         // Check if the user has the required access
         $user = $request->user();
-        if (!$user || !in_array($user->permitted_access, $access)) {
+        if (!$user || !array_intersect($user->access, $access)) {
             return abort(403, 'Unauthorized access.');
         }
 

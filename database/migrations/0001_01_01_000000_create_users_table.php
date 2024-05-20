@@ -20,10 +20,8 @@ return new class extends Migration
         Schema::create('patrons', function (Blueprint $table) {
             $table->id();
             $table->string('patron')->unique();
-            $table->decimal('fines_if_overdue', 8, 2);
-            $table->integer('days_allowed');
-            $table->integer('hours_allowed');
-            $table->integer('materials_allowed');
+            $table->decimal('fine');
+            $table->text('description');
             $table->timestamps(1);
         });
 

@@ -102,12 +102,12 @@ Route::get('/test', function( ) {
 });
 
 //Routes for Personnels
-Route::middleware(['auth:sanctum', 'check.access'])->group(function () {
-    Route::get('/personnels', [PersonnelController::class, 'index']);
-    Route::post('/personnels', [PersonnelController::class, 'store']);
-    Route::get('/personnels/{personnel}', [PersonnelController::class, 'show']);
-    Route::put('/personnels/{personnel}', [PersonnelController::class, 'update']);
-    Route::delete('/personnels/{personnel}', [PersonnelController::class, 'destroy']);
+Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function () {
+    Route::get('/personnels', [UserController::class, 'index']);
+    Route::post('/personnels', [UserController::class, 'store']);
+    Route::get('/personnels/{personnel}', [UserController::class, 'show']);
+    Route::post('/personnels/{personnel}', [UserController::class, 'update']);
+    Route::delete('/personnels/{personnel}', [UserController::class, 'destroy']);
 });
 
 //Routes for Circulation
@@ -200,8 +200,8 @@ function authenticationRoutes(): void
         Route::post('/announcements/{announcement}', [AnnouncementController::class, 'update']);
         Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
 
-        
-        // circulation 
+
+        // circulation
         Route::get('/patrons', [PatronController::class, 'index']);
         Route::get('/patrons/{id}', [PatronController::class, 'edit']);
         Route::post('/patrons/{id}', [PatronController::class, 'update']);
@@ -212,6 +212,7 @@ function authenticationRoutes(): void
     });
 //Inventory routes
     Route::prefix('inventory')->group(function () {
+        Route::get('/', [InventoryController::class, 'index']);
         Route::post('/enter', [InventoryController::class, 'enterBarcode']);
         Route::post('/scan', [InventoryController::class, 'scanBarcode']);
         Route::post('/clear', [InventoryController::class, 'clearHistory']);
