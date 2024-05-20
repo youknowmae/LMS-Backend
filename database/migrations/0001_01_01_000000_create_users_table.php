@@ -14,6 +14,8 @@ return new class extends Migration
             $table->id();
             $table->string('program', 10)->unique();
             $table->string('department', 50);
+            $table->string('full_program');
+            $table->string('full_department');
             $table->string('category');
         });
 

@@ -99,7 +99,7 @@ class AuthController extends Controller
 
                 // sets expiry time
                 $tokenModel = $user->tokens->last();
-                $expiryTime = now()->addHour();
+                $expiryTime = now()->addHours(6);
                 $tokenModel->update(['expires_at' => $expiryTime]);
                 
                 $responseData = [

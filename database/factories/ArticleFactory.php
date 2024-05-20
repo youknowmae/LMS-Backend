@@ -17,11 +17,17 @@ class ArticleFactory extends Factory
      */
     public function definition(): array
     {
+        $authors = [ 
+            fake()->name(),
+            fake()->name(),
+            fake()->name()
+        ];
+
         return [
             'accession' => Str::random(5),
             'material_type' => fake()->randomElement(['journal', 'magazine', 'newspaper']),
-            'title' => fake()->words(3, true),
-            'authors' => fake()->name(),
+            'title' => Str::title(fake()->words(3, true)), 
+            'authors' => json_encode($authors),
             'language' => fake()->randomElement(['english', 'tagalog']),
             'subject' => fake()->sentences(2, true),
             'date_published' => fake()->date(),

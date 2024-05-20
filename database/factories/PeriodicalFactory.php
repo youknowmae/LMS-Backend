@@ -15,13 +15,19 @@ class PeriodicalFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition(): array
+    public function definition(): array 
     {
+        $authors = [ 
+            fake()->name(),
+            fake()->name(),
+            fake()->name()
+        ];
+
         return [
             'accession' => Str::random(5),
             'material_type' => fake()->randomElement(['journal', 'magazine', 'newspaper']),
-            'title' => fake()->words(3, true),
-            'authors' => fake()->name(),
+            'title' => Str::title(fake()->words(3, true)), 
+            'authors' => json_encode($authors),
             'language' => fake()->randomElement(['english', 'tagalog']),
             'receive_date' => fake()->date(),   
             'publisher' => fake()->company(),

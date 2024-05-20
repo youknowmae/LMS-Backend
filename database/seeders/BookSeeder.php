@@ -13,8 +13,6 @@ class BookSeeder extends Seeder
      */
     public function run(): void
     {
-        Book::factory()->count(500)->create([
-            'authors' => '["Ubaldo, Jay-vee", "Rizal, Jose"]'
-        ]);
+        Book::factory()->count(500)->create();
     }
 }

@@ -17,25 +17,25 @@ class ReservationController extends Controller
     public function store(Request $request)
 {
     // Validation
-    $validatedData = $request->validate([
-        'user_id' => 'required',
-        'book_id' => 'required',
-        'title' => 'required',
-        'author' => 'required',
-        'location' => 'required',
-        'date_requested' => 'required|date',
-        // '
-        // ' => 'required|integer|min:1',
-        'date_of_expiration' => 'required|date|after_or_equal:date_requested',
-        'fine' => 'nullable|numeric|min:0',
+    // $request->validate([
+    //     'user_id' => 'required|exists:user,id',
+    //     'book_id' => 'required|exists:book,id',
+    //     'start_date' => 'required|date',
+    //     'end_date' => 'required|date|after_or_equal:start_date',
+    //     'fine' => 'nullable|numeric',
+    //     'status' => 'boolean'
+    // ]);
+
+    $reservation = Reservation::create([
+        'user_id' => $request->user_id,
+        'book_id' => $request->book_id,
+        'start_date' => $request->start_date,
+        'end_date' => $request->end_date,
+        'fine' => $request->fine,
+        'status' => $request->status ?? true,
     ]);
 
-    // Set status as pending
-    $validatedData['status'] = 'pending';
-
-    // Create reservation
-    $reservations = Reservation::create($validatedData);
-    return response()->json($reservations, 201);
+    return response()->json($reservation, 201);
 }
     public function getUserById($id)
     {

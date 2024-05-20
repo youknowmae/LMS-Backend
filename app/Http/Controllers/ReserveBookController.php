@@ -29,18 +29,18 @@ class ReserveBookController extends Controller
         $reservation = new reservation();
         $reservation -> book_id = $payload->book_id;
         $reservation -> user_id = $payload->user_id;
-        // $reservation -> start_date = $payload->start_date;
-        // $reservation -> end_date = $payload->end_date;
-        $reservation -> date_of_expiration= $payload->date_of_expiration;
+        $reservation -> start_date = $payload->start_date;
+        $reservation -> end_date = $payload->end_date;
+        // $reservation -> date_of_expiration= $payload->date_of_expiration;
         $reservation -> save();
 
         $data = ['Reservation' => $reservation];
         return response()->json($data);
     }
 
-    public function reservelist(Request $request){
-    $reservelist = Reservation::with('user.program', 'user.department', 'user.patrons')->get();
-    return response()->json($reservelist);
+    public function reservelist(Request $request, $type){
+        $reservelist = Reservation::with('user.program', 'user.department', 'user.patrons')->where('type', $type)->get();
+        return response()->json($reservelist);
     }
 }
 

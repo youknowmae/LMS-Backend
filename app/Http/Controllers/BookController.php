@@ -10,7 +10,7 @@ use Storage, Str;
 
 class BookController extends Controller
 {
-    const URL = 'http://192.168.68.124:8000';
+    const URL = 'http://192.168.10.122:8000';
     public function getLocations() {
         return Location::all();
     }
