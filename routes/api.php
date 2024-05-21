@@ -15,7 +15,7 @@ use App\Http\Controllers\LockersLogController;
 
 use App\Http\Controllers\CirculationUserController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\CollegeController;
 
 
 use App\Http\Controllers\ReservationController;
@@ -145,7 +145,13 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
     Route::get('articles/type/{type}', [ArticleController::class, 'getByType']);
     Route::get('projects/department/{type}', [ProjectController::class, 'getByDepartment']);
 
-    Route::get('programs', [ProgramController::class, 'get']);
+    //Add Programs
+    Route::get('/programs', [ProgramController::class, 'get']);
+    Route::post('/programs', [ProgramController::class, 'store']);
+    
+    //Add Departments
+    Route::get('/colleges', [CollegeController::class, 'index']);
+    Route::post('/colleges', [CollegeController::class, 'store']);
 });
 
 /* STUDENT ROUTES */
@@ -308,14 +314,3 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/projects/type/{type}', [ProjectController::class, 'getByType']);
 });
 
-//ayusin ko nalang pag na-merge na
-
-use App\Http\Controllers\ProgramController;
-
-Route::get('/programs', [ProgramController::class, 'get']);
-Route::post('/programs', [ProgramController::class, 'store']);
-
-use App\Http\Controllers\CollegeController;
-
-Route::get('/colleges', [CollegeController::class, 'index']);
-Route::post('/colleges', [CollegeController::class, 'store']);
