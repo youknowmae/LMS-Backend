@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Models\BorrowMaterial;
+use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Book;
@@ -26,7 +27,7 @@ class BorrowMaterialController extends Controller
         if ($book->available  == 0) {
             return response()->json(['error' => 'Book is not available for borrowing'], 400);
         }
-
+        
         // Create a new BorrowMaterial instance
         $borrowMaterial = new BorrowMaterial();
         $borrowMaterial->book_id = $payload->book_id;
@@ -43,6 +44,40 @@ class BorrowMaterialController extends Controller
         $data = ['borrow_material' => $borrowMaterial];
         return response()->json($data);
     }
+
+    public function fromreservation(Request $request, $id)
+    {
+        $payload=json_decode($request->payload);
+
+        // Check if the book_id exists in the books table
+        $book = Book::find($payload->book_id);
+        if (!$book) {
+            return response()->json(['error' => 'Book not found'], 404);
+        }
+
+        // Check if the book is available
+        if ($book->available  == 0) {
+            return response()->json(['error' => 'Book is not available for borrowing'], 400);
+        }
+
+        $reservation = Reservation::find($id);
+
+        // Create a new BorrowMaterial instance
+        $borrowMaterial = new BorrowMaterial();
+        $borrowMaterial->book_id = $payload->book_id;
+        $borrowMaterial->user_id = $payload->user_id;
+        $borrowMaterial->borrow_expiration = $payload->end_date;
+        $borrowMaterial->borrow_date = $payload->start_date;
+       
+        $reservation->status = 0;
+        $book->available = 0;
+        $reservation->save();
+        $book->save();
+        $borrowMaterial->save();
+        $data = ['borrow_material' => $borrowMaterial];
+        return response()->json($data);
+    }
+
 
     public function borrowlist(Request $request){
         $borrowMaterial = BorrowMaterial::with(['user.program', 'user.department', 'user.patrons'])

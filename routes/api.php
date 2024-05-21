@@ -106,6 +106,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 
     // borrow book 
     Route::post('/borrow/book', [BorrowMaterialController::class, 'borrowbook']);
+    Route::post('/fromreserve/book/{id}', [BorrowMaterialController::class, 'fromreservation']);
     Route::get('circulation/get-user/{id}', [CirculationUserController::class, 'getUser']);
     Route::get('circulation/get-book/{id}', [CirculationUserController::class, 'getBook']);
 

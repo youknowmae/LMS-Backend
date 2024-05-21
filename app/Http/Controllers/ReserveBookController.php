@@ -28,6 +28,7 @@ class ReserveBookController extends Controller
         $reservation -> user_id = $payload->user_id;
         $reservation -> start_date = $payload->start_date;
         $reservation -> end_date = $payload->end_date;
+        $reservation -> type = "walk-in";
         // $reservation -> date_of_expiration= $payload->date_of_expiration;
         $reservation -> save();
 
@@ -36,7 +37,11 @@ class ReserveBookController extends Controller
     }
 
     public function reservelist(Request $request){
-        $reservelist = Reservation::with('user.program', 'user.department', 'user.patrons')->get();
+        $reservelist = Reservation::with(['user.program', 'user.department', 'user.patrons'])
+                        ->whereHas('user', function($query){
+                            $query->where('status', 1);
+                        })
+                        ->get();
         return response()->json($reservelist);
     }
 
@@ -52,6 +57,8 @@ class ReserveBookController extends Controller
 
     public function getQueuePosition(Request $request, $id)
 {
+    // Get the authenticated user's ID
+    $id = $request->user()->id;
     // Fetch all reservations for the user's books with a status other than 0
     $userReservations = Reservation::where('user_id', $id)
                         ->where('status', '!=', 0) // Exclude reservations with status 0
