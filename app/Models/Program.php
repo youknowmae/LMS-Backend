@@ -9,9 +9,17 @@ class Program extends Model
 {
     use HasFactory;
 
-    public function projects()
+    protected $table = 'cataloging_programs';
+
+    protected $fillable = [
+        'program',
+        'department_id',
+        'category',
+    ];
+
+    public function department()
     {
-        return $this->hasMany(Project::class);
+        return $this->belongsTo(Department::class, 'department_id');
     }
 
     public function users()

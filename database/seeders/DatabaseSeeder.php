@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\Article;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use CatalogingDepartmentsTableSeeder;
+use CatalogingProgramsTableSeeder;
 use Illuminate\Database\Seeder;
 use DB;
 
@@ -61,7 +63,9 @@ class DatabaseSeeder extends Seeder
             PeriodicalSeeder::class,
             ArticleSeeder::class,
             ProjectSeeder::class,
-            AnnouncementSeeder::class
+            AnnouncementSeeder::class,
+            CatalogingDepartmentsTableSeeder::class,
+            CatalogingProgramsTableSeeder::class,
         ]);
     }
 }
