@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\CirculationLog;
 
 class CirculationLogSeeder extends Seeder
 {
@@ -13,6 +12,6 @@ class CirculationLogSeeder extends Seeder
      */
     public function run(): void
     {
-        CirculationLog::factory()->count(10)->create();
+        //
     }
 }

@@ -2,29 +2,30 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Hash, Str;
 
 class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
-        User::factory()->create([
+        User::factory()->count(1)->create([
             'role' => 'superadmin',
+
             'department' => 'Library Department',
             'position' => 'Head',
             'username' => 'superadmin',
-            'password' => Hash::make('Admin123')
+            'password' => bcrypt('Admin123')
         ]);
 
-        User::factory()->create([
+        User::factory()->count(1)->create([
             'role' => 'admin',
+
             'department' => 'Library Department',
             'position' => 'Chief',
             'first_name' => 'Tony',
@@ -34,15 +35,16 @@ class UserSeeder extends Seeder
             'password' => Hash::make('Admin123')
         ]);
 
-        User::factory()->create([
+        User::factory()->count(1)->create([
             'role' => 'staff',
+
             'department' => 'Library Department',
             'position' => 'idk',
-            'username' => 'staff', // Hardcoded username
+            'username' => 'staff',
             'password' => Hash::make('Admin123')
         ]);
 
-        User::factory()->create([
+        User::factory()->count(1)->create([
             'role' => 'user',
             'program_id' => 1,
             'username' => 'user',

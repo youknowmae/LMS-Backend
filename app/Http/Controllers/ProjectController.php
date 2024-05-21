@@ -79,52 +79,51 @@ class ProjectController extends Controller
     }
 
     // FOR STUDENT PORTAL
-    // public function viewProjectsByDepartment(string $department) {
-    //     $projects = Project::with(['program.department'])->orderByDesc('created_at')->get();
+    public function viewProjectsByDepartment(string $department) {
+        $projects = Project::with(['program'])->orderByDesc('created_at')->get();
 
-    //     return $projects;
-    //     // return response()->json($projects);
-    //     $projects_array = [];
-    //     foreach($projects as $project) {
-    //         if($project->program->department->department == $department) {
-    //             $image_url = null;
-    //             if($project->image_url != null)
-    //                 $image_url = self::URL .  Storage::url($project->image_url);
+        // return response()->json($projects);
+        $projects_array = [];
+        foreach($projects as $project) {
+            if($project->program->department == $department) {
+                $image_url = null;
+                if($project->image_url != null)
+                    $image_url = self::URL .  Storage::url($project->image_url);
 
-    //             if (isset($projects_array[$project->category])) {
+                if (isset($projects_array[$project->category])) {
 
-    //                 // there is a match
-    //                 $projects_array[$project->category][] = [
-    //                     'authors' => json_decode($project->authors),
-    //                     'title' => $project->title, 
-    //                     'category' => $project->category,
-    //                     'program' => $project->program->program,
-    //                     'image_url' => $image_url,
-    //                     'date_published' => $project->date_published,
-    //                     'language' => $project->language,
-    //                     'abstract' => $project->abstract
-    //                 ];
-    //             } else {
+                    // there is a match
+                    $projects_array[$project->category][] = [
+                        'authors' => json_decode($project->authors),
+                        'title' => $project->title, 
+                        'category' => $project->category,
+                        'program' => $project->program->program,
+                        'image_url' => $image_url,
+                        'date_published' => $project->date_published,
+                        'language' => $project->language,
+                        'abstract' => $project->abstract
+                    ];
+                } else {
                     
-    //                 // there is no match
-    //                 $projects_array[$project->category] = [
-    //                     [
-    //                         'authors' => json_decode($project->authors),
-    //                         'title' => $project->title, 
-    //                         'category' => $project->category,
-    //                         'program' => $project->program->program,
-    //                         'image_url' => $image_url,
-    //                         'date_published' => $project->date_published,
-    //                         'language' => $project->language,
-    //                         'abstract' => $project->abstract
-    //                     ]
-    //                 ];
-    //             }
-    //         }
-    //     }
+                    // there is no match
+                    $projects_array[$project->category] = [
+                        [
+                            'authors' => json_decode($project->authors),
+                            'title' => $project->title, 
+                            'category' => $project->category,
+                            'program' => $project->program->program,
+                            'image_url' => $image_url,
+                            'date_published' => $project->date_published,
+                            'language' => $project->language,
+                            'abstract' => $project->abstract
+                        ]
+                    ];
+                }
+            }
+        }
 
-    //     return $projects_array;
-    // }
+        return $projects_array;
+    }
     
     public function add(Request $request) {
 
@@ -289,16 +288,16 @@ class ProjectController extends Controller
         return response()->json(['Response' => 'Record Archived'], 200);
     }
 
-    // STUDENT ROUTE
+    // PENDING APPROVAL
     
     public function getProjectCategoriesByDepartment($department)
     {
         // Retrieve projects based on the provided department
-        $projects = Project::with('program.department')->get();
+        $projects = Project::with('program')->get();
         
         $newProjects = [];
         foreach($projects as $project) {
-            if($project->program->department->department == $department) {
+            if($project->program->department == $department) {
                 array_push($newProjects, $project);
             }
         }

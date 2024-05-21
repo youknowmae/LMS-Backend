@@ -243,19 +243,6 @@ class BorrowMaterialController extends Controller
         return response()->json($topborrowers,200);
     }
 
-    public function getByUserId(Request $request, $userId)
-    {
-        // Fetch borrow records for the given user ID
-        $borrowMaterial = BorrowMaterial::where('user_id', $userId)->get();
-
-        // Check if any borrow records are found
-        if ($borrowMaterial->isEmpty()) {
-            return response()->json(['message' => 'No borrow records found for the user'], 404);
-        }
-
-        // Return the borrow records as JSON response
-        return response()->json($borrowMaterial, 200);
-    }
 }
 
 

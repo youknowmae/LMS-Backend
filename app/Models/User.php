@@ -15,27 +15,23 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
-        'username',
-        'patron_id',
-        'role',
-        'department',
-        'position',
+        'name',
+        'email',
         'password',
-        'first_name',
-        'middle_name',
-        'last_name',
-        'ext_name',
-        'access',
-        'program_id'
+        'main_address',
+        'profile_image',
+        'domain_email',
+        // Add any other fields that need to be mass assignable
+        'gender',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -43,21 +39,20 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array
+     * @return array<string, string>
      */
-    protected $casts = [
-        'access' => 'array',
-        'roles' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 
-    /**
-     * Retrieve the username column name.
-     *
-     * @return string
-     */
-    public function username(): string
+    // Define the username field
+    public function username()
     {
         return 'username';
     }
@@ -88,9 +83,5 @@ class User extends Authenticatable
 
     public function patrons(){
         return $this->belongsTo(Program::class);
-    }
-    public function getRolesAttribute($value)
-    {
-        return json_decode($value, true);
     }
 }

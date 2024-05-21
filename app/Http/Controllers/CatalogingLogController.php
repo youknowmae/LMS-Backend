@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\CatalogingLog;
 use Illuminate\Http\Request;
-use App\Models\AcademicProject;
-use App\Models\FilterCategory;
 
 class CatalogingLogController extends Controller
 {
@@ -25,7 +23,7 @@ class CatalogingLogController extends Controller
         } else if (in_array($type, ['thesis', 'feasibility study', 'capstone', 'research'])){
             $log = $action . ' \'' . $title . '\'' . $type . ' of program ' . $location;
         } else {
-            $log = "$action '$title' $type";
+            $log = $action . ' \'' . $title . '\' ' . $type;
         }
 
         $model = CatalogingLog::create([

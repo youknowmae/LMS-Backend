@@ -2,28 +2,22 @@
 
 namespace Database\Factories;
 
-use App\Models\MaintenanceLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MaintenanceLog>
+ */
 class MaintenanceLogFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = MaintenanceLog::class;
-
-    /**
      * Define the model's default state.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
         return [
-            'activity' => $this->faker->sentence(),
-            'description' => $this->faker->paragraph(),
+            //
         ];
     }
 }

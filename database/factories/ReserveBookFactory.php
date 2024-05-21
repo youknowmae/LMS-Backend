@@ -1,12 +1,11 @@
 <?php
 
 namespace Database\Factories;
-
 use App\Models\ReserveBook;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<ReserveBook>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ReserveBook>
  */
 class ReserveBookFactory extends Factory
 {

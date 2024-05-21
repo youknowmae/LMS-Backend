@@ -37,7 +37,7 @@ class UserFactory extends Factory
             'profile_image' => fake()->imageUrl($width = 200, $height = 200, 'people') // Generates a fake image URL
         ];
     }
-
+    
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
