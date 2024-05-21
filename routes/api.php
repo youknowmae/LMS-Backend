@@ -15,7 +15,9 @@ use App\Http\Controllers\LockersLogController;
 
 use App\Http\Controllers\CirculationUserController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CollegeController;
+use App\Http\Controllers\PatronController;
+use App\Http\Controllers\CollegeController; 
+
 
 
 use App\Http\Controllers\ReservationController;
@@ -46,6 +48,11 @@ Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function (
     Route::get('/personnels/{personnel}', [UserController::class, 'show']);
     Route::post('/personnels/{personnel}', [UserController::class, 'update']);
     Route::delete('/personnels/{personnel}', [UserController::class, 'destroy']);
+
+    //circulation 
+    Route::get('/patrons', [PatronController::class, 'index']);
+    Route::get('/patrons/{id}', [PatronController::class, 'edit']);
+    Route::post('/patrons/{id}', [PatronController::class, 'update']);
 });
 
 
@@ -313,4 +320,9 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::get('/periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
     Route::get('/projects/type/{type}', [ProjectController::class, 'getByType']);
 });
+
+//circulation 
+Route::get('/patrons', [PatronController::class, 'index']);
+Route::get('/patrons/{id}', [PatronController::class, 'edit']);
+Route::post('/patrons/{id}', [PatronController::class, 'update']);
 
