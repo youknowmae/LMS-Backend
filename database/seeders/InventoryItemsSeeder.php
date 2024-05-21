@@ -8,6 +8,11 @@ use Database\Factories\InventoryItemFactory;
 
 class InventoryItemsSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
         InventoryItemFactory::new()->create([
