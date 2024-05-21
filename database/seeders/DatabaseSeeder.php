@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\Article;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use CatalogingDepartmentsTableSeeder;
+use CatalogingProgramsTableSeeder;
 use Illuminate\Database\Seeder;
 use DB;
 
@@ -22,17 +24,36 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        DB::table('patrons')->insert([[
-            'patron' => 'student',
-            'fine' => 500.00,
-            'description' => 'GC students'
-        ],
-        [
-            'patron' => 'faculty',
-            'fine' => 250.00,
-            'description' => 'GC faculty members'
-        ]
-    ]);
+        DB::table('patrons')->insert([
+            [
+                'patron' => 'admin',
+                'fines_if_overdue' => 15,
+                'days_allowed' => 3,
+                'hours_allowed' => 12,
+                'materials_allowed' => 5
+            ],
+            [
+                'patron' => 'Student (Online)',
+                'fines_if_overdue' => 100,
+                'days_allowed' => 7,
+                'hours_allowed' => 0,
+                'materials_allowed' => 3
+            ],
+            [
+                'patron' => 'Student (Face to Face)',
+                'fines_if_overdue' => 50,
+                'days_allowed' => 0,
+                'hours_allowed' => 3,
+                'materials_allowed' => 3
+            ],
+            [
+                'patron' => 'Faculty',
+                'fines_if_overdue' => 25,
+                'days_allowed' => 7,
+                'hours_allowed' => 0,
+                'materials_allowed' => 5
+            ],
+        ]);
 
         $this->call([
             ProgramSeeder::class,
@@ -42,7 +63,7 @@ class DatabaseSeeder extends Seeder
             PeriodicalSeeder::class,
             ArticleSeeder::class,
             ProjectSeeder::class,
-            AnnouncementSeeder::class
-          ]);
+            AnnouncementSeeder::class,
+        ]);
     }
 }

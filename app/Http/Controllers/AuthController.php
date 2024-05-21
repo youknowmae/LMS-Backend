@@ -68,6 +68,44 @@ class AuthController extends Controller
         return $request->user();
     }
 
+    // public function login(Request $request, string $subsystem)
+    // {
+    //     $credentials = $request->only('username', 'password');
+    //     if (Auth::attempt($credentials)) {
+
+    //         $user = Auth::user();
+
+    //         $access = [];
+    //         if ($user->role == 'superadmin' && $subsystem == 'maintenance') {
+    //             $access = ['superadmin', 'admin', 'staff', 'user'];
+                
+    //         } elseif (in_array($user->role, ['superadmin', 'admin']) && in_array($subsystem, ['cataloging', 'circulation'])) {
+    //             $access = ['superadmin', 'admin'];
+    //         } elseif ($user->role == 'user' && $subsystem == 'student') {
+    //             $access = ['user'];
+    //         } else {
+    //             return response()->json(['message' => 'Unauthorized'], 401);
+    //         }
+
+    //         // Update user's access
+    //         $user->access = $access;
+    //         $user->save();
+
+    //         // Generate token with permissions
+    //         $permissions = [];
+    //         if (in_array('superadmin', $access) || in_array('admin', $access)) {
+    //             $permissions = ['materials:edit', 'materials:view'];
+    //         } elseif (in_array('user', $access)) {
+    //             $permissions = ['materials:view'];
+    //         }
+
+    //         $token = $user->createToken('token-name', $permissions)->plainTextToken;
+    //         return response()->json(['token' => $token], 200);
+    //     } else {
+    //         return response()->json(['message' => 'Invalid credentials'], 401);
+    //     }
+    // }
+
     public function login(Request $request, string $subsystem) {
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
 
@@ -81,7 +119,7 @@ class AuthController extends Controller
 
             // Generate token for superadmin and admin only
             if($user->role == 'superadmin' && $subsystem == 'maintenance') {
-
+                $access = ['superadmin', 'admin', 'staff', 'user'];
                 $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
                 
                 $responseData = [
@@ -95,6 +133,7 @@ class AuthController extends Controller
 
             } else if(in_array($user->role, ['superadmin', 'admin']) && in_array($subsystem, ['cataloging', 'circulation', 'opac'])) {
 
+                $access = ['superadmin', 'admin'];
                 $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
 
                 // sets expiry time
@@ -108,11 +147,11 @@ class AuthController extends Controller
                     'displayName' => $user->first_name . ' ' . $user->last_name,
                     'role' => $user->role
                 ];
-
+                
                 return response()->json($responseData, 200);
 
             } else if(in_array($user->role, ['user']) && in_array($subsystem, ['student'])) {
-                
+                $access = ['user'];
                 $token = $user->createToken('token-name', ['materials:view'])->plainTextToken;
 
                 $student = User::with('program')->find($user->id);
@@ -127,19 +166,17 @@ class AuthController extends Controller
                     'domain_account' => $user->domain_email,
                     'main_address' => $user->main_address,
                     'profile_picture' => $user->profile_image,
-
-
                 ];
 
                 return response()->json($responseData, 200);
 
             } else {
-                return response()->json(['message' => 'Unauthorized'], 403);
+                return response()->json(['message' => 'Invalid credentials'], 401);
             }
-        } else {
-            return response()->json(['message' => 'Invalid credentials'], 401);
         }
     }
+    
+
 
     public function refreshToken(Request $request) {
         $user = $request->user();
@@ -165,9 +202,6 @@ class AuthController extends Controller
             return response()->json(['Error' => $e->getMessage()], 400);
         }
     }
-
-
-
     
     public function getUser($id)
     {

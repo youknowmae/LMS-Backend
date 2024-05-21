@@ -9,6 +9,8 @@ class Department extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['department', 'full_department'];
+    
     public function project()
     {
         return $this->hasMany(Project::class);

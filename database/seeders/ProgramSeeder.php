@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class ProgramSeeder extends Seeder
 {
@@ -44,6 +44,8 @@ class ProgramSeeder extends Seeder
         DB::table('programs')->insert([
 
             // CCS
+
+            // CCS
             [
                 'program' => 'BSIT',
                 'full_program' => 'Bachelor of Science in Information Technology',
@@ -68,6 +70,8 @@ class ProgramSeeder extends Seeder
                 'department_id' => 1,
                 'category' => 'Thesis'
             ],
+
+            // CBA
 
             // CBA
             [
@@ -152,6 +156,8 @@ class ProgramSeeder extends Seeder
                 'department_id' => 3,
                 'category' => 'Classroom Based Action Research'
             ],
+
+            // BSED
             [
                 'program' => 'BSED-FIL',
                 'full_program' => 'Bachelor of Secondary Education - Major in Filipino',

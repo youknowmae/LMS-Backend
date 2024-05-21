@@ -29,8 +29,10 @@ return new class extends Migration
         Schema::create('patrons', function (Blueprint $table) {
             $table->id();
             $table->string('patron')->unique();
-            $table->decimal('fine');
-            $table->text('description');
+            $table->decimal('fines_if_overdue', 8, 2);
+            $table->integer('days_allowed');
+            $table->integer('hours_allowed');
+            $table->integer('materials_allowed');
             $table->timestamps(1);
         });
 
@@ -38,7 +40,7 @@ return new class extends Migration
             $table->id();
             $table->string('username')->unique();
             $table->enum('role', ['superadmin', 'admin', 'staff', 'user'])->default('user');
-            $table->foreignId('patron_id')->references('id')->on('patrons');
+            $table->foreignId('patron_id')->nullable()->references('id')->on('patrons'); 
             $table->string('password');
             $table->rememberToken();
         
@@ -48,7 +50,7 @@ return new class extends Migration
             $table->string('last_name', 30);
             $table->string('gender')->nullable();
             $table->string('ext_name', 10)->nullable();
-            $table->foreignId('program_id')->references('id')->on('programs');
+            $table->foreignId('program_id')->references('id')->on('programs'); 
             $table->string('course_id', 10)->nullable();
             $table->string('department', 50)->nullable();
             $table->string('position', 50)->nullable(); 

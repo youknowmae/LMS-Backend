@@ -17,7 +17,10 @@ class CatalogingLogFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => $this->faker->sentence(),
+            'author' => $this->faker->name(),
+            'category' => $this->faker->word(),
+            'location' => $this->faker->word(),
         ];
     }
 }
