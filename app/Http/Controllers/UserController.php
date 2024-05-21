@@ -30,7 +30,7 @@ class UserController extends Controller
             // 'position' => 'required',
             'password' => 'required',
             'first_name' => 'required',
-            'middle_name' => 'required',
+            'middle_name' => 'nullable',
             'last_name' => 'required',
             'ext_name' => 'nullable',
             'access' => 'required|string'
@@ -70,7 +70,7 @@ class UserController extends Controller
             // 'position' => 'required',
             'password' => 'nullable',
             'first_name' => 'required',
-            'middle_name' => 'required',
+            'middle_name' => 'nullable',
             'last_name' => 'required',
             'ext_name' => 'nullable',
             'access' => 'required'

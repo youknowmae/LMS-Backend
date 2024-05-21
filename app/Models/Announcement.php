@@ -19,7 +19,7 @@ class Announcement extends Model
      *
      * @var array
      */
-    protected $fillable = [
+    protected $fillable = [a
         'title', 
         'category', 
         'date', 
