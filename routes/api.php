@@ -14,6 +14,7 @@ use App\Http\Controllers\LockerController;
 use App\Http\Controllers\LockersLogController;
 
 use App\Http\Controllers\CirculationUserController;
+use App\Http\Controllers\UserController;
 
 
 
@@ -38,7 +39,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-// Tester Routes
+// Personnels Routes
+Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function () {
+    Route::get('/personnels', [UserController::class, 'index']);
+    Route::post('/personnels', [UserController::class, 'store']);
+    Route::get('/personnels/{personnel}', [UserController::class, 'show']);
+    Route::post('/personnels/{personnel}', [UserController::class, 'update']);
+    Route::delete('/personnels/{personnel}', [UserController::class, 'destroy']);
+});
 
 
 // Cataloging Process routes

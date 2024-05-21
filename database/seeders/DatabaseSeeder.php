@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
             ProgramSeeder::class,
             UserSeeder::class,
             LocationSeeder::class,
-            BookSeeder::class,
+            // BookSeeder::class,
             PeriodicalSeeder::class,
             ArticleSeeder::class,
             ProjectSeeder::class,

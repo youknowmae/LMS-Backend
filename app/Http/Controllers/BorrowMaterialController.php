@@ -121,7 +121,7 @@ class BorrowMaterialController extends Controller
     }   
 
     public function userlist(Request $request){
-        $users = User::with('program', 'department', 'patrons')->get();
+        $users = User::with('program.department', 'patrons')->where('role', 'user')->get();
         return response()->json($users, 200);
     }
 
