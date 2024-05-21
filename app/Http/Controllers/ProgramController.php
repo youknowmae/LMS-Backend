@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class ProgramController extends Controller
 {
     public function get() {
-        return Program::all();
+        return Program::with('department')->get();
     }
 }

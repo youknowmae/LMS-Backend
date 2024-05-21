@@ -296,7 +296,7 @@ class CatalogingReportController extends Controller
             }
         } else if($type == 'projects.ccs') {
             if($startDateParsed && $endDateParsed) {
-                $materials = Project::with('program')
+                $materials = Project::with('program.department')
                     ->where([$conditions[0], $conditions[1]])
                     ->get();
 
@@ -309,10 +309,10 @@ class CatalogingReportController extends Controller
                     where([$conditions[0]])
                     ->get();
             }
-            $materials = $materials->where('program.department', 'CCS');
+            $materials = $materials->where('program.department.department', 'CCS');
         } else if($type == 'projects.cahs') {
             if($startDateParsed && $endDateParsed) {
-                $materials = Project::with('program')
+                $materials = Project::with('program.department')
                     ->where([$conditions[0], $conditions[1]])
                     ->get();
 
@@ -325,10 +325,10 @@ class CatalogingReportController extends Controller
                     where([$conditions[0]])
                     ->get();
             }
-            $materials = $materials->where('program.department', 'CAHS');
+            $materials = $materials->where('program.department.department', 'CAHS');
         } else if($type == 'projects.chtm') {
             if($startDateParsed && $endDateParsed) {
-                $materials = Project::with('program')
+                $materials = Project::with('program.department')
                     ->where([$conditions[0], $conditions[1]])
                     ->get();
 
@@ -341,7 +341,7 @@ class CatalogingReportController extends Controller
                     where([$conditions[0]])
                     ->get();
             }
-            $materials = $materials->where('program.department', 'CHTM');
+            $materials = $materials->where('program.department.department', 'CHTM');
         } else if($type == 'projects.cba') {
             if($startDateParsed && $endDateParsed) {
                 $materials = Project::with('program')
@@ -357,10 +357,10 @@ class CatalogingReportController extends Controller
                     where([$conditions[0]])
                     ->get();
             }
-            $materials = $materials->where('program.department', 'CBA');
+            $materials = $materials->where('program.department.department', 'CBA');
         } else if($type == 'projects.ceas') {
             if($startDateParsed && $endDateParsed) {
-                $materials = Project::with('program')
+                $materials = Project::with('program.department')
                     ->where([$conditions[0], $conditions[1]])
                     ->get();
 
@@ -373,7 +373,7 @@ class CatalogingReportController extends Controller
                     where([$conditions[0]])
                     ->get();
             }
-            $materials = $materials->where('program.department', 'CEAS');
+            $materials = $materials->where('program.department.department', 'CEAS');
         }
 
         $material_arr = [];
@@ -403,7 +403,7 @@ class CatalogingReportController extends Controller
                 ]);
             } elseif($type == 'projects.all') {
                 array_push($material_arr, [
-                    $x['program']['department'], $x['category'], $x['title'], $authors, 
+                    $x['program']['department']['department'], $x['category'], $x['title'], $authors, 
                     Carbon::parse($x['date_published'])->format('m.d.Y'), Carbon::parse($x['created_at'])->format('m.d.Y')
                 ]);
             } elseif($type == 'projects.ccs' || $type == 'projects.ceas' || $type == 'projects.cba' || 

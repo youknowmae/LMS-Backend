@@ -131,7 +131,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:read']], funct
     // Get Periodicals and Projects Using Type
     Route::get('periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
     Route::get('articles/type/{type}', [ArticleController::class, 'getByType']);
-    Route::get('projects/type/{type}', [ProjectController::class, 'getByType']);
+    Route::get('projects/department/{type}', [ProjectController::class, 'getByDepartment']);
 
     Route::get('programs', [ProgramController::class, 'get']);
 });

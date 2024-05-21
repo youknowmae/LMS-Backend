@@ -13,21 +13,47 @@ class ProjectController extends Controller
     public function getProjects() {
         $projects = Project::with(['program.department'])->orderByDesc('created_at')->get();
 
-        foreach($projects as $project) {
+        foreach($projects as &$project) {
             if($project->image_url != null)
                 $project->image_url = self::URL .  Storage::url($project->image_url);
 
             $project->authors = json_decode($project->authors);
             $project->keywords = json_decode($project->keywords);
-            $project->program = [
-                'department' => 'test'
-            ];
-            
         }
         return $projects;
     }
 
     public function getByDepartment($department) {
+        $all_projects = Project::with('program.department')->get();
+
+        $projects = [];
+        foreach($all_projects as $project) {
+            if($project->program->department->department == $department) {
+                array_push($projects, $project);
+            }
+        }
+        return $projects;
+    }
+
+    public function getCounts($department) {
+        $projects = Project::with('program.department')->get();
+
+        $keys = [];
+        foreach($projects as $project) {
+            if(!in_array($project->category, $keys)) {
+                foreach($keys as $key) {
+                    if($key == $project->program->category) {
+                        $keys[$key]++;
+                        break;
+                    }
+                }
+            };
+
+        }
+    }
+
+    // STUDENT
+    public function getByType($department) {
         // for getting by departments -> student portal
         $projects = Project::with(['program'])->orderByDesc('created_at')->get();
 
@@ -42,7 +68,9 @@ class ProjectController extends Controller
                 $project->image_url = self::URL .  Storage::url($project->image_url);
 
             $project->authors = json_decode($project->authors);
+            $project->keywords = json_decode($project->keywords);
         }
+
         return $projects;
     }
     
