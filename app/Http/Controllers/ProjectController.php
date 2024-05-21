@@ -32,6 +32,7 @@ class ProjectController extends Controller
                 array_push($projects, $project);
             }
         }
+
         return $projects;
     }
 
