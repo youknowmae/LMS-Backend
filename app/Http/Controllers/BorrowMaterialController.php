@@ -80,7 +80,7 @@ class BorrowMaterialController extends Controller
 
 
     public function borrowlist(Request $request){
-        $borrowMaterial = BorrowMaterial::with(['user.program', 'user.department', 'user.patrons'])
+        $borrowMaterial = BorrowMaterial::with('user.program.department', 'user.patrons')
                             ->whereHas('user', function($query) {
                                 $query->where('status', 1);
                             })

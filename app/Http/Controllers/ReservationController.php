@@ -33,6 +33,7 @@ class ReservationController extends Controller
         'end_date' => $request->end_date,
         'fine' => $request->fine,
         'status' => $request->status ?? true,
+        'type'=> $request->type,
     ]);
 
     return response()->json($reservation, 201);

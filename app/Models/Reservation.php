@@ -16,12 +16,13 @@ class Reservation extends Model
         'start_date',
         'end_date',
         'fine',
-        'status'
+        'status',
+        'type'
     ];
 
     protected $casts = [
-        'date_requested' => 'datetime',
-        'date_of_expiration' => 'datetime'
+        'start_date' => 'datetime',
+        'end_date' => 'datetime'
     ];
 
     // Define relationships
