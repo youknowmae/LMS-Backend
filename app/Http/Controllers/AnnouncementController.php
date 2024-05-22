@@ -4,42 +4,96 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Announcement;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
-    // Method to fetch all announcements
+    const URL = 'http://localhost:8000';
+
     public function index()
     {
-        $announcements = Announcement::all();
-        return response()->json($announcements);
+        $announcements = Announcement::orderby('created_at', 'desc')->get();
+        foreach($announcements as $announcement) {
+            if($announcement->image != null)
+                $announcement->image = self::URL . Storage::url($announcement->image);
+        }
+
+        return $announcements;
     }
 
-    // Method to create a new announcement
     public function store(Request $request)
     {
-        $announcement = Announcement::create($request->all());
-        return response()->json($announcement, 201);
+        $data = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'category' => 'required|string',
+            'text' => 'required|string',
+            'file' => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048', // Example validation for file upload
+        ]);
+
+        $user_id =  $request->user()->id;
+        
+        if ($data->fails()) {
+            return response()->json(['error' => $data->errors()]);
+        }
+
+        $announcement = new Announcement($data->validated());
+        $announcement->author_id = $user_id;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = Storage::disk('public')->put('announcements', $file);
+            
+            $announcement->image = $path;
+        }
+
+        $announcement->save();
+
+        return response()->json(['message' => 'Announcement created successfully'], 201);
     }
 
-    // Method to fetch a single announcement by ID
-    public function show($id)
+    public function show(Announcement $announcement)
     {
-        $announcement = Announcement::findOrFail($id);
-        return response()->json($announcement);
+        return $announcement;
     }
 
-    // Method to update an announcement
-    public function update(Request $request, $id)
+    public function update(Request $request, Announcement $announcement)
     {
-        $announcement = Announcement::findOrFail($id);
-        $announcement->update($request->all());
-        return response()->json($announcement, 200);
+        $data = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'category' => 'required|string',
+            'text' => 'required|string',
+            'file' => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048', // Example validation for file upload
+        ]);
+
+        // $request->user()->id;
+        
+        if ($data->fails()) {
+            return response()->json(['error' => $data->errors()]);
+        }
+
+        $announcement->update($data->validated());
+
+        // Handle file upload
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = Storage::disk('public')->put('announcements', $file);
+            $announcement->image = $path;
+            $announcement->save();
+        }
+
+        return response()->json(['message' => 'Announcement updated successfully']);
     }
 
-    // Method to delete an announcement
-    public function destroy($id)
+    public function destroy(Announcement $announcement)
     {
-        Announcement::findOrFail($id)->delete();
-        return response()->json(null, 204);
+        // Delete the file associated with the announcement if it exists
+        if ($announcement->image) {
+            Storage::disk('public')->delete($announcement->image);
+        }
+
+        $announcement->delete();
+
+        return response()->json(['message' => 'Announcement deleted successfully']);
     }
 }
