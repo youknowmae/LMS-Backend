@@ -18,6 +18,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PatronController;
 use App\Http\Controllers\CollegeController; 
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\LocationController;
 
 
 
@@ -42,7 +43,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-// Personnels Routes
+// Maintenance route
 Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function () {
     Route::get('/personnels', [UserController::class, 'index']);
     Route::post('/personnels', [UserController::class, 'store']);
@@ -59,9 +60,20 @@ Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function (
     });
 
     //circulation 
-    // Route::get('/patrons', [PatronController::class, 'index']);
-    // Route::get('/patrons/{id}', [PatronController::class, 'edit']);
-    // Route::post('/patrons/{id}', [PatronController::class, 'update']);
+    Route::get('/patrons', [PatronController::class, 'index']);
+    Route::get('/patrons/{id}', [PatronController::class, 'edit']);
+    Route::post('/patrons/{id}', [PatronController::class, 'update']);
+
+    //announcements
+    Route::get('/announcements', [AnnouncementController::class, 'index']);
+    Route::post('/announcements', [AnnouncementController::class, 'store']);
+    Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show']);
+    Route::post('/announcements/{announcement}', [AnnouncementController::class, 'update']);
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
+
+    //cataloging
+    Route::get('/locations', [LocationController::class, 'getLocations']);
+    Route::post('/locations', [LocationController::class, 'create']);
 });
 
 
@@ -113,7 +125,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     Route::put('borrow-edit/{id}',[BorrowMaterialController:: class, 'borrowEdit']);
     
     // borrow-list returning book
-    Route::put('return-book/{id}', [BorrowMaterialController::Class, 'returnbook']);
+    Route::put('return-book/{id}', [BorrowMaterialController::class, 'returnbook']);
 
     //returned book list
     Route::get('returned-list',[BorrowMaterialController::class,'returnedlist']);
