@@ -209,10 +209,18 @@ class PeriodicalController extends Controller
         $sort = $this->validateSort($sort);
 
         $periodicals = Periodical::select('id', 'title', 'date_published', 'authors', 'image_url')
-                                   ->where('material_type', $material_type)
-                                   ->orderBy($sort[0], $sort[1]);
+                                    ->where('material_type', $material_type)
+                                    ->orderBy($sort[0], $sort[1])
+                                    ->paginate(24);
+        
+        foreach($periodicals as $periodical) {
+            if($periodical->image_url != null)
+                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
+            
+            $periodical->authors = json_decode($periodical->authors);
+        }
 
-        return $periodicals->paginate(24);
+        return $periodicals;
     }
 
     public function opacSearchPeriodicals(Request $request, $material_type){
@@ -222,20 +230,30 @@ class PeriodicalController extends Controller
 
         $search = $request->input('search');
         $sort = $request->input('sort', 'date_published desc');
-    
-        $periodicals = Periodical::select('id', 'title', 'date_published', 'authors', 'image_url', 'material_type')
-                                   ->where('material_type', $material_type);
 
         $sort = $this->validateSort($sort);
 
-        $periodicals->where(function ($query) use ($search) {
-            $query->where('title', 'like', '%' . $search . "%")
-                  ->orWhere('authors', 'like', '%' . $search . "%");
-        });
-        
-        $periodicals->orderBy($sort[0], $sort[1]);
+        $periodicals = Periodical::select('id', 'title', 'date_published', 'authors', 'image_url', 'material_type')
+                        ->where('material_type', $material_type)
+                        ->where(function ($query) use ($search) {
+                            $query->where('title', 'like', '%' . $search . "%")
+                                ->orWhere('authors', 'like', '%' . $search . "%");
+                        })
+                        ->orderBy($sort[0], $sort[1])
+                        ->paginate(24);
 
-        return $periodicals->paginate(24);
+        if ($periodicals->isEmpty()) {
+            return $periodicals;
+        }
+
+        foreach($periodicals as $periodical) {
+            if($periodical->image_url != null)
+                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
+            
+            $periodical->authors = json_decode($periodical->authors);
+        }
+
+        return $periodicals;
     }
 }
 

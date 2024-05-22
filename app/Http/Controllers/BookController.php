@@ -284,12 +284,25 @@ class BookController extends Controller
             $sort[0] = 'acquired_date';
         }
 
-        $books = Book::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url');
+        $books = Book::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
+                    ->where('title', 'like', '%' . $search . "%")
+                    ->orWhere('authors', 'like', '%' . $search . "%")
+                    ->orWhere('call_number', 'like', '%' . $search . "%")
+                    ->orderBy($sort[0], $sort[1])
+                    ->paginate(24);
 
-        $books->where('title', 'like', '%' . $search . "%")->orWhere('authors', 'like', '%' . $search . "%")->orWhere('call_number', 'like', '%' . $search . "%")
-              ->orderBy($sort[0], $sort[1]);
+        if ($books->isEmpty()) {
+            return $books;
+        }
+        
+        foreach($books as $book) {
+            if($book->image_url != null)
+                $book->image_url = self::URL . Storage::url($book->image_url);
 
-        return $books->paginate(24);
+            $book->authors = json_decode($book->authors);
+        }
+
+        return $books;
     } 
 }
 

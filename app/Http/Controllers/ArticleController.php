@@ -179,23 +179,36 @@ class ArticleController extends Controller
         $sort = $this->validateSort($sort);
         
         $articles = Article::select('id', 'title', 'date_published', 'authors', 'abstract')
-                           ->orderBy($sort[0], $sort[1]);
+                           ->orderBy($sort[0], $sort[1])
+                           ->paginate(24);
                              
-        return $articles->paginate(24);;
+        foreach($articles as $article) {
+            $article->authors = json_decode($article->authors);
+        }
+
+        return $articles;
     }
 
     public function opacSearchArticles(Request $request){
         $search = $request->input('search');
         $sort = $request->input('sort', 'date_published desc');
 
-        $articles = Article::select('id', 'title', 'date_published', 'authors', 'abstract');
-
         $sort = $this->validateSort($sort);
 
-        $articles->where('title', 'like', '%' . $search . "%")->orWhere('authors', 'like', '%' . $search . "%");
-        
-        $articles->orderBy($sort[0], $sort[1]);
+        $articles = Article::select('id', 'title', 'date_published', 'authors', 'abstract')
+                ->where('title', 'like', '%' . $search . "%")
+                ->orWhere('authors', 'like', '%' . $search . "%")
+                ->orderBy($sort[0], $sort[1])
+                ->paginate(24);
 
-        return $articles->paginate(24);
+        if ($articles->isEmpty()) {
+            return $articles;
+        }
+
+        foreach($articles as $article) {
+            $article->authors = json_decode($article->authors);
+        }
+
+        return $articles;
     }   
 }
