@@ -17,6 +17,7 @@ use App\Http\Controllers\CirculationUserController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PatronController;
 use App\Http\Controllers\CollegeController; 
+use App\Http\Controllers\InventoryController;
 
 
 
@@ -49,10 +50,18 @@ Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function (
     Route::post('/personnels/{personnel}', [UserController::class, 'update']);
     Route::delete('/personnels/{personnel}', [UserController::class, 'destroy']);
 
+    //Inventory routes
+    Route::prefix('inventory')->group(function () {
+        Route::get('/', [InventoryController::class, 'index']);
+        Route::post('/enter', [InventoryController::class, 'enterBarcode']);
+        Route::post('/scan', [InventoryController::class, 'scanBarcode']);
+        Route::post('/clear', [InventoryController::class, 'clearHistory']);
+    });
+
     //circulation 
-    Route::get('/patrons', [PatronController::class, 'index']);
-    Route::get('/patrons/{id}', [PatronController::class, 'edit']);
-    Route::post('/patrons/{id}', [PatronController::class, 'update']);
+    // Route::get('/patrons', [PatronController::class, 'index']);
+    // Route::get('/patrons/{id}', [PatronController::class, 'edit']);
+    // Route::post('/patrons/{id}', [PatronController::class, 'update']);
 });
 
 
