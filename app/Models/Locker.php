@@ -9,6 +9,11 @@ class Locker extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'lockerNumber',
+        'remarks',
+        'status'
+    ];
 
     public function locker()
     {

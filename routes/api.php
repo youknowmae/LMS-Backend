@@ -74,6 +74,18 @@ Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function (
     //cataloging
     Route::get('/locations', [LocationController::class, 'getLocations']);
     Route::post('/locations', [LocationController::class, 'create']);
+
+    Route::prefix('lockers')->group(function () {
+        Route::get('/', [LockerController::class, 'index']);
+        Route::post('/', [LockerController::class, 'store']);
+        Route::get('/latest', [LockerController::class, 'getStartingLockerNumber']);
+        Route::get('/{locker}', [LockerController::class, 'show']);
+        Route::post('/{locker}', [LockerController::class, 'update']);
+        Route::get('/delete/{locker}', [LockerController::class, 'destroy']);   //get muna ayaw gumana ng delete na method. method not allowed daw
+    
+        // Locker history routes
+        // Route::get('/history', [LockersLogController::class, 'index']);  //wala pa eto kalma
+    });
 });
 
 
