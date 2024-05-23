@@ -85,9 +85,12 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     Route::get('books/locations', [BookController::class, 'getLocations']);
 
     // View Reports
-    Route::get('cataloging/reports/material-counts', [CatalogingReportController::class, 'getCount']);
-    Route::get('cataloging/reports/pdf/{type}', [CatalogingReportController::class, 'generatePdf']);
-    Route::post('cataloging/reports/excel/{type}', [CatalogingReportController::class, 'generateExcel']);
+    Route::group(['prefix' => 'cataloging'], function() {
+        Route::get('reports/material-counts', [CatalogingReportController::class, 'getCount']);
+        Route::get('reports/pdf/{type}', [CatalogingReportController::class, 'generatePdf']);
+        Route::post('reports/excel/{type}', [CatalogingReportController::class, 'generateExcel']);
+        Route::get('logs', [CatalogingLogController::class, 'get']);
+    });    
 
     // View locations
     Route::get('books/locations', [BookController::class, 'getLocations']);

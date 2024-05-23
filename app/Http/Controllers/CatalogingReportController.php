@@ -399,7 +399,7 @@ class CatalogingReportController extends Controller
                 ]);
             } elseif($type == 'article') {
                 array_push($material_arr, [
-                    $x['accession'], $x['id'], $x['title'], $authors, Carbon::parse($x['date_published'])->format('m.d.Y'),
+                    $x['accession'], $x['title'], $authors, Carbon::parse($x['date_published'])->format('m.d.Y'),
                 ]);
             } elseif($type == 'projects.all') {
                 array_push($material_arr, [
@@ -440,9 +440,10 @@ class CatalogingReportController extends Controller
         
         if($type == 'book')
             $sheet->mergeCells('A1:H1');
-        elseif($type == 'journal' || $type == 'magazine' || $type == 'newspaper' || $type == 'article' || 
-                $type == 'projects.ccs' || $type == 'projects.ceas' || $type == 'projects.cba' || $type == 'projects.chtm' || 
-                $type == 'projects.cahs')
+        elseif($type == 'article')
+            $sheet->mergeCells('A1:D1');
+        elseif($type == 'journal' || $type == 'magazine' || $type == 'newspaper' || $type == 'projects.ccs' || 
+                $type == 'projects.ceas' || $type == 'projects.cba' || $type == 'projects.chtm' || $type == 'projects.cahs')
             $sheet->mergeCells('A1:E1');
         elseif($type == 'projects.all')
             $sheet->mergeCells('A1:F1');
@@ -510,7 +511,7 @@ class CatalogingReportController extends Controller
                 "PUBLICATION DATE"
             ];
 
-            $limit = 'E';
+            $limit = 'D';
         } elseif ($type == 'projects.all') {
             $headers = [
                 "DEPARTMENT",
@@ -623,12 +624,11 @@ class CatalogingReportController extends Controller
             }
         } elseif($type == 'article') {
             $sheet->getColumnDimension('A')->setWidth(15);
-            $sheet->getColumnDimension('B')->setWidth(15);
+            $sheet->getColumnDimension('B')->setWidth(40);
             $sheet->getColumnDimension('C')->setWidth(30);
-            $sheet->getColumnDimension('D')->setWidth(30);
-            $sheet->getColumnDimension('E')->setWidth(15);
+            $sheet->getColumnDimension('D')->setWidth(17);
             
-            $centeredColumns = ['A', 'B'];
+            $centeredColumns = ['A', 'D'];
             foreach ($centeredColumns as $column) {
                 $sheet->getStyle($column . '3:' . $column . $sheet->getHighestDataRow())
                     ->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
