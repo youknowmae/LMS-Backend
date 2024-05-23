@@ -27,6 +27,15 @@ class BorrowMaterialController extends Controller
         if ($book->available  == 0) {
             return response()->json(['error' => 'Book is not available for borrowing'], 400);
         }
+
+        // Check if the user has 3 active borrows
+        $activeBorrowsCount = BorrowMaterial::where('user_id', $payload->user_id)
+        ->where('status', 1) // Assuming status 1 means active
+        ->count();
+
+        if ($activeBorrowsCount >= 3) {
+        return response()->json(['error' => 'User already has 3 active borrows'], 400);
+}
         
         // Create a new BorrowMaterial instance
         $borrowMaterial = new BorrowMaterial();
@@ -79,7 +88,8 @@ class BorrowMaterialController extends Controller
     }
 
 
-    public function borrowlist(Request $request){
+    public function borrowlist(Request $request)
+    {
         $borrowMaterial = BorrowMaterial::with('user.program.department', 'user.patrons')
                             ->whereHas('user', function($query) {
                                 $query->where('status', 1);
@@ -88,7 +98,8 @@ class BorrowMaterialController extends Controller
         return response()->json($borrowMaterial); 
     }
 
-    public function returnedlist(Request $request){
+    public function returnedlist(Request $request)
+    {
         $borrowMaterial = BorrowMaterial::with(['user.program', 'user.department', 'user.patrons'])
                             ->whereHas('user', function($query){
                                 $query->where('status', 0);
@@ -125,8 +136,37 @@ class BorrowMaterialController extends Controller
         return response()->json($users, 200);
     }
 
+    public function deleteuserlist(Request $request)
+    {
+        try {
+            // Find the user by ID
+            $user = User::find($id);
 
-    //return book
+            // Check if the user exists
+            if (!$user) {
+                return response()->json(['error' => 'User not found'], 404);
+            }
+
+            // Optionally, check if the user has any active borrowings or reservations
+            $activeBorrowings = BorrowMaterial::where('user_id', $id)->where('status', 1)->exists();
+            $activeReservations = Reservation::where('user_id', $id)->where('status', '!=', 0)->exists();
+
+            if ($activeBorrowings || $activeReservations) {
+                return response()->json(['error' => 'User has active borrowings or reservations'], 400);
+            }
+
+            // Delete the user
+            $user->delete();
+
+            // Return a success response
+            return response()->json(['message' => 'User deleted successfully']);
+        } catch (Exception $e) {
+            // Handle any errors
+            return response()->json(['error' => 'An error occurred while deleting the user', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    //return book process routes
 
     public function returnbook(Request $request, $id)
     {
@@ -174,6 +214,7 @@ class BorrowMaterialController extends Controller
         }
     }
     
+    //report routes
 
     public function bookBorrowersReport(Request $request){
         // Fetch distinct borrowers with their user and program relations

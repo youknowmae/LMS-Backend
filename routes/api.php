@@ -118,6 +118,9 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     // display user list
     Route::get('/users', [BorrowMaterialController::class, 'userlist']);
 
+    //delete user data from user list
+    Route::delete('delete-user/{id}', [BorrowMaterialController::class,'deleteuserlist']);
+
     // borrow list
     Route::get('/borrow-list', [BorrowMaterialController::class, 'borrowlist']);
 
