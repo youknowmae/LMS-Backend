@@ -69,8 +69,9 @@ class AuthController extends Controller
     }
 
     public function login(Request $request, string $subsystem) {
-        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+        $credentials = $request->only('username', 'password');
 
+        if (Auth::attempt($credentials)) {
             /* 
             NOTE:
                 Roles should be in ['superadmin', 'admin', 'staff', 'user']
@@ -82,7 +83,7 @@ class AuthController extends Controller
             // Generate token for superadmin and admin only
             if($user->role == 'superadmin' && $subsystem == 'maintenance') {
 
-                $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
+                $token = $user->createToken('token-name', ['materials-edit', 'materials-read'])->plainTextToken;
                 
                 $responseData = [
                     'token' => $token,
@@ -93,20 +94,30 @@ class AuthController extends Controller
 
                 return response()->json($responseData, 200);
 
-            } else if(in_array($user->role, ['superadmin', 'admin']) && in_array($subsystem, ['cataloging', 'circulation', 'opac','locker'])) {
-
-                $token = $user->createToken('token-name', ['materials:edit', 'materials:read'])->plainTextToken;
+            } else if(in_array($user->role, ['superadmin', 'cataloging', 'frontdesk', 'opac']) && in_array($subsystem, ['cataloging', 'circulation', 'opac','locker'])) {
+                
+                if($user->role == 'cataloging') {
+                    $token = $user->createToken('token-name', ['cataloging', 'materials-read'])->plainTextToken;
+                }
+                    
+                else if($user->role == 'frontdesk')
+                    $token = $user->createToken('token-name', ['materials:read', 'system:circulation'])->plainTextToken;
+                else if($user->role == 'opac')
+                    $token = $user->createToken('token-name', ['system:opac'])->plainTextToken;
+                else {
+                    return response()->json(['message' => 'Unauthorized'], 403);
+                }
 
                 // sets expiry time
                 $tokenModel = $user->tokens->last();
-                $expiryTime = now()->addHours(6);
+                $expiryTime = now()->addHour();
                 $tokenModel->update(['expires_at' => $expiryTime]);
                 
                 $responseData = [
                     'token' => $token,
                     'id' => $user->id,
                     'displayName' => $user->first_name . ' ' . $user->last_name,
-                    'role' => $user->role
+                    'role' => $user->position
                 ];
 
                 return response()->json($responseData, 200);

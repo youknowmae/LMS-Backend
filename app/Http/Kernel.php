@@ -31,10 +31,10 @@ class Kernel extends HttpKernel
         // Other middleware...
     ];
 
-    protected $routeMiddleware = [
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        'check.access' => \App\Http\Middleware\CheckAccess::class,
-        'authorizeToAddLockers' => \App\Http\Middleware\AuthorizeToAddLockers::class,
+    // protected $routeMiddleware = [
+    //     'auth' => \App\Http\Middleware\Authenticate::class,
+    //     'check.access' => \App\Http\Middleware\CheckAccess::class,
+    //     'authorizeToAddLockers' => \App\Http\Middleware\AuthorizeToAddLockers::class,
 
-    ];
+    // ];
 }

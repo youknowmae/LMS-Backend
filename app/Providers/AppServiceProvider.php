@@ -19,8 +19,4 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
-    {
-        Route::aliasMiddleware('check.access', CheckAccess::class);
-    }
 }

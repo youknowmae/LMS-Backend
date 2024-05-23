@@ -15,12 +15,6 @@ class Locker extends Model
         return $this->belongsTo(user::class);
     }
 
-    // public function user()
-    // {
-    //     // Assuming your foreign key field is 'user_id'
-    //     return $this->belongsTo(User::class, 'user_id');
-    // }
-
     public function user()
 {
     return $this->belongsTo(User::class);

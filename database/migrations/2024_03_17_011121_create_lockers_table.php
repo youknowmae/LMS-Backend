@@ -22,6 +22,7 @@ return new class extends Migration
             $table->foreignId('user_id')->unique()->nullable()->references('id')->on('users');
             $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
             $table->enum('status', ['Occupied', 'Available', 'Unavailable'])->default('Available');
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }
