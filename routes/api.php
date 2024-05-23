@@ -113,7 +113,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
 
 
 // Circulation Process Routes
-Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
+//Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
 
     // display user list
     Route::get('/users', [BorrowMaterialController::class, 'userlist']);
@@ -154,7 +154,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], funct
     Route::get('report', [BorrowMaterialController::class, 'bookBorrowersReport']);
     Route::get('topborrowers', [BorrowMaterialController::class, 'topborrowers']);
     Route::get('mostborrowed', [BorrowMaterialCOntroller::class, 'mostborrowed']);
-});
+//});
 
 
 // Material viewing routes
