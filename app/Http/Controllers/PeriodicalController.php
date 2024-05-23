@@ -43,7 +43,7 @@ class PeriodicalController extends Controller
     // FOR STUDENT PORTAL
     public function viewPeriodicals() {
         $periodicals = Periodical::
-        select(['title', 'authors', 'material_type', 'image_url', 'language', 'volume', 'issue', 'copyright'])
+        select(['id', 'title', 'authors', 'material_type', 'image_url', 'language', 'volume', 'issue', 'copyright', 'remarks'])
         ->orderByDesc('updated_at')->get();
 
         foreach($periodicals as $periodical) {

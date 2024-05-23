@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\ArticleController,
 App\Http\Controllers\BookController, App\Http\Controllers\PeriodicalController, App\Http\Controllers\ProjectController,
-App\Http\Controllers\CatalogingReportController, App\Http\Controllers\BorrowBookController,App\Http\Controllers\BorrowMaterialController,
-App\Http\Controllers\ReserveBookController;
+App\Http\Controllers\CatalogingReportController, App\Http\Controllers\BorrowBookController,App\Http\Controllers\BorrowMaterialController
+,App\Http\Controllers\ReserveBookController;
 use App\Http\Controllers\LockerController;
 use App\Http\Controllers\LockersLogController;
 
@@ -19,26 +19,24 @@ use App\Http\Controllers\PatronController;
 use App\Http\Controllers\CollegeController; 
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LocationController;
+
+
+
 use App\Http\Controllers\ReservationController;
 use App\Models\Book;
 
-// STUDENT LOGIN FROM OTHER API
 Route::post('/studentlogin', [AuthController::class, 'studentLogin']);
 Route::get('/', function (Request $request) {
     return response()->json(['Response' => 'API routes are available']);
 });
 use App\Http\Controllers\AnnouncementController;
 
-Route::middleware(['auth:sanctum'])->get('/checkability', function (Request $request) {
-    $token = $request->user()->currentAccessToken();
-    return response()->json($token->abilities);
-});
 
-// GET LOGGED IN CREDENTIALS
+// logged in user tester
 Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
 
 // Auth Routes
-Route::post('/login/{subsystem}', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/refresh', [AuthController::class, 'refreshToken']);
@@ -46,7 +44,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 // Maintenance route
-Route::middleware(['auth:sanctum', 'ability:system:maintenance'])->group(function () {
+Route::middleware(['auth:sanctum', 'ability:maintenance'])->group(function () {
     Route::get('/personnels', [UserController::class, 'index']);
     Route::post('/personnels', [UserController::class, 'store']);
     Route::get('/personnels/{personnel}', [UserController::class, 'show']);
@@ -61,21 +59,41 @@ Route::middleware(['auth:sanctum', 'ability:system:maintenance'])->group(functio
         Route::post('/clear', [InventoryController::class, 'clearHistory']);
     });
 
-        //circula~st('/colleges', [CollegeController::class, 'store']);
+    //circulation 
+    Route::get('/patrons', [PatronController::class, 'index']);
+    Route::get('/patrons/{id}', [PatronController::class, 'edit']);
+    Route::post('/patrons/{id}', [PatronController::class, 'update']);
+
+    //announcements
+    Route::get('/announcements', [AnnouncementController::class, 'index']);
+    Route::post('/announcements', [AnnouncementController::class, 'store']);
+    Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show']);
+    Route::post('/announcements/{announcement}', [AnnouncementController::class, 'update']);
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy']);
+
+    //cataloging
+    Route::get('/locations', [LocationController::class, 'getLocations']);
+    Route::post('/locations', [LocationController::class, 'create']);
 });
 
 
-// CATALOGING EDITING OF MATERIALS
+// Cataloging Process routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function () {
     
+    // View cataloging logs
+    Route::get('cataloging/logs', [CatalogingLogController::class, 'get']);
+    Route::get('books/locations', [BookController::class, 'getLocations']);
+
     // View Reports
-    Route::get('cataloging/reports/material-counts', [CatalogingReportController::class, 'getCount']);
-    Route::get('cataloging/reports/pdf/{type}', [CatalogingReportController::class, 'generatePdf']);
-    Route::post('cataloging/reports/excel/{type}', [CatalogingReportController::class, 'generateExcel']);
+    Route::group(['prefix' => 'cataloging'], function() {
+        Route::get('reports/material-counts', [CatalogingReportController::class, 'getCount']);
+        Route::get('reports/pdf/{type}', [CatalogingReportController::class, 'generatePdf']);
+        Route::post('reports/excel/{type}', [CatalogingReportController::class, 'generateExcel']);
+        Route::get('logs', [CatalogingLogController::class, 'get']);
+    });    
 
     // View locations
     Route::get('books/locations', [BookController::class, 'getLocations']);
-    Route::get('programs', [ProgramController::class, 'get']);
     
     // Add Materials
     Route::post('books/process', [BookController::class, 'add']);
@@ -96,37 +114,15 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
     Route::delete('projects/process/{id}', [ProjectController::class, 'delete']);
 });
 
-// FOR MATERIAL VIEWING WITH COMPLETE DETAILS
-Route::group(['middleware' => ['auth:sanctum', 'ability:materials-read']], function () {
-    Route::get('/books', [BookController::class, 'getBooks']);
-    Route::get('/periodicals', [PeriodicalController::class, 'getPeriodicals']);
-    Route::get('/articles', [ArticleController::class, 'getArticles']);
-    Route::get('/projects', [ProjectController::class, 'getProjects']);
 
-    // Get Materials Using ID
-    Route::get('/book/id/{id}', [BookController::class, 'getBook']);
-    Route::get('/periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
-    Route::get('/article/id/{id}', [ArticleController::class, 'getArticle']);
-    Route::get('/project/id/{id}', [ProjectController::class, 'getProject']);
-
-    // Get Material Image
-    Route::get('/book/image/{id}', [BookController::class, 'image']);
-    Route::get('/periodical/image/{id}', [PeriodicalController::class, 'image']);
-    Route::get('/project/image/{id}', [ProjectController::class, 'image']);
-
-    // Get Periodicals and Projects Using Type
-    Route::get('/periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
-    Route::get('/projects/type/{type}', [ProjectController::class, 'getByType']);
-    
-    Route::get('/projects/department/{department}', [ProjectController::class, 'getByDepartment']);
-});
-
-
-// CIRCULATION ROUTES
-Route::group(['middleware' => ['auth:sanctum', 'ability:system:circulation']], function () {
+// Circulation Process Routes
+//Route::group(['middleware' => ['auth:sanctum', 'ability:materials:edit']], function () {
 
     // display user list
     Route::get('/users', [BorrowMaterialController::class, 'userlist']);
+
+    //delete user data from user list
+    Route::delete('delete-user/{id}', [BorrowMaterialController::class,'deleteuserlist']);
 
     // borrow list
     Route::get('/borrow-list', [BorrowMaterialController::class, 'borrowlist']);
@@ -161,12 +157,40 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:system:circulation']], f
     Route::get('report', [BorrowMaterialController::class, 'bookBorrowersReport']);
     Route::get('topborrowers', [BorrowMaterialController::class, 'topborrowers']);
     Route::get('mostborrowed', [BorrowMaterialCOntroller::class, 'mostborrowed']);
+//});
 
+
+// Material viewing routes
+Route::group(['middleware' => ['auth:sanctum', 'ability:materials-read']], function () {
+
+    Route::get('books', [BookController::class, 'getBooks']);
+    Route::get('periodicals', [PeriodicalController::class, 'getPeriodicals']);
+    Route::get('articles', [ArticleController::class, 'getArticles']);
+    Route::get('projects', [ProjectController::class, 'getProjects']);
+
+    // Get Materials Using ID 
+    Route::get('book/id/{id}', [BookController::class, 'getBook']);
+    Route::get('periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
+    Route::get('article/id/{id}', [ArticleController::class, 'getArticle']);
+    Route::get('project/id/{id}', [ProjectController::class, 'getProject']);
+
+    // Get Periodicals and Projects Using Type
+    Route::get('periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
+    Route::get('articles/type/{type}', [ArticleController::class, 'getByType']);
+    Route::get('projects/department/{type}', [ProjectController::class, 'getByDepartment']);
+
+    //Add Programs
+    Route::get('/programs', [ProgramController::class, 'get']);
+    Route::post('/programs', [ProgramController::class, 'store']);
+    
+    //Add Departments
+    Route::get('/colleges', [CollegeController::class, 'index']);
+    Route::post('/colleges', [CollegeController::class, 'store']);
 });
 
 /* STUDENT ROUTES */
-// Route::group(['middleware' => ['studentauth']], function () { // open once api from gc is obtained
-Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], function () { 
+// Route::group(['middleware' => ['studentauth']], function () {
+Route::group(['middleware' => ['auth:sanctum', 'ability:opac']], function () { 
 
     // ROUTES FOR VIEWING 
     Route::get('student/books', [BookController::class, 'viewBooks']);
@@ -197,8 +221,14 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:materials:view']], funct
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
 });
 
-// OPAC ROUTES
-Route::group(['middleware' => ['auth:sanctum', 'ability:system:opac'], 'prefix' => 'opac'], function () {
+// RED ZONE 
+Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function () {
+    Route::get('images/delete/single', [ImageController::class, 'delete'])->name('images.delete');
+    Route::get('images/delete/all/{type}', [ImageController::class, 'deleteAll']);
+});
+
+//opac routes
+Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'opac'], function () {
     //books
     Route::get('books', [BookController::class, 'opacGetBooks']);
     Route::get('/books/search', [BookController::class, 'opacSearchBooks']);
@@ -225,13 +255,13 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:system:opac'], 'prefix' 
     Route::get('/project/{id}', [ProjectController::class, 'opacGetProject']);
 });
 
-// locker routes
+// // locker routes
 
 // Route::get('/lockers-log', [LockersLogController::class, 'getLockerLogs']);
 // Route::get('/lockers-logs-with-users', [LockersLogController::class, 'fetchLockersLogsWithUsers']);
 
 
-//LOCKER MAINTENANCE
+// //LOCKER MAINTENANCE
 // Route::post('/locker', [LockerController::class, 'locker']);
 // Route::get('/getlocker', [LockerController::class, 'getlocker']);
 
@@ -255,5 +285,3 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:system:opac'], 'prefix' 
 
 // Route::get('/college-program-counts', [LockerController::class, 'getcollegeProgramCounts']);
 // Route::post('/locker/{lockerId}/scan', [LockerController::class, 'scanLockerQRCode']);
-
-

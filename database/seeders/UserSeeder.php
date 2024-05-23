@@ -16,28 +16,28 @@ class UserSeeder extends Seeder
     public function run()
     {
         User::factory()->create([
-            'role' => 'superadmin',
+            'role' => json_encode(['maintenance', 'cataloging']),
             'position' => 'Head',
             'username' => 'superadmin',
             'password' => Hash::make('Admin123')
         ]);
 
         User::factory()->create([
-            'role' => 'cataloging',
+            'role' => json_encode(['cataloging']),
             'position' => 'Chief',
             'username' => 'cataloging',
             'password' => Hash::make('Admin123')
         ]);
 
         User::factory()->create([
-            'role' => 'frontdesk',
+            'role' => json_encode(['frontdesk']),
             'position' => 'Front Desk',
             'username' => 'front',
             'password' => Hash::make('Admin123')
         ]);
 
         User::factory()->create([
-            'role' => 'opac',
+            'role' => json_encode(['user']),
             'position' => 'OPAC User',
             'username' => 'opac',
             'password' => Hash::make('Admin123')
@@ -46,7 +46,7 @@ class UserSeeder extends Seeder
         User::factory()->count(20)->create();
         
         User::factory()->create([
-            'role' => 'user',
+            'role' => json_encode(['user']),
             'id' => 202110194,
             'program_id' => 1,
             'gender' => 1,
@@ -57,7 +57,7 @@ class UserSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'role' => 'user',
+            'role' => json_encode(['user']),
             'id' => 202111304,
             'program_id' => 5,
             'gender' => 1,
@@ -68,7 +68,7 @@ class UserSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'role' => 'user',
+            'role' => json_encode(['user']),
             'id' => 202110876,
             'program_id' => 10,
             'gender' => 1,
@@ -79,7 +79,7 @@ class UserSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'role' => 'user',
+            'role' => json_encode(['user']),
             'id' => 202110878,
             'program_id' => 14,
             'gender' => 0,
@@ -90,7 +90,7 @@ class UserSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'role' => 'user',
+            'role' => json_encode(['user']),
             'id' => 202110188,
             'program_id' => 22,
             'gender' => 1,
