@@ -29,15 +29,10 @@ return new class extends Migration
         Schema::create('patrons', function (Blueprint $table) {
             $table->id();
             $table->string('patron')->unique();
-<<<<<<< Updated upstream
-            $table->decimal('fine');
-            $table->text('description');
-=======
             $table->string('description')->nullable();
             $table->decimal('fine', 8, 2)->nullable();
             $table->integer('hours_allowed')->nullable();
             $table->integer('materials_allowed')->nullable();
->>>>>>> Stashed changes
             $table->timestamps(1);
         });
 
