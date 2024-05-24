@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Locker;
+use App\Models\LockerHistory;
 use Illuminate\Http\Request;
 use App\Models\LockersLog;
 use Carbon\Carbon;
@@ -78,6 +79,18 @@ class LockerController extends Controller
             $lockers[] = $locker;
         }
 
+        $user_id = $request->user()->id;
+
+        $log = new LockerHistoryController();
+        if($request->numberOfLockers > 1) {
+            $details = "create " . $request->numberOfLockers . " lockers";
+        } 
+        else {
+            $details = "create " . $request->numberOfLockers . " locker";
+        }
+
+        $log->add($user_id, "create", $details);
+
         return response()->json(['success' => $lockers]);
     }
 
@@ -112,6 +125,11 @@ class LockerController extends Controller
         $locker = Locker::findorfail($id);
         $locker->update($data->validated());
 
+        $user_id = $request->user()->id;
+
+        $log = new LockerHistoryController();
+        $log->add($user_id, "update", "update locker #" . $locker->lockerNumber);
+
         return response()->json(['success' => $locker]);
     }
 
@@ -124,8 +142,13 @@ class LockerController extends Controller
             return response()->json(['errors' => 'You must delete the latest locker first.'], 400 );
         }
 
+        $locker = Locker::findorfail($id);
+        $locker->delete();
 
-        $locker = Locker::findorfail($id)->delete();
+        $user_id = Auth()->user()->id;
+
+        $log = new LockerHistoryController();
+        $log->add($user_id, "delete", "delete locker #" . $locker->lockerNumber);
         
         return response()->json(['success' => 'Locker has been deleted.']);
     }
