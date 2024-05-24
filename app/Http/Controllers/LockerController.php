@@ -82,7 +82,14 @@ class LockerController extends Controller
         $user_id = $request->user()->id;
 
         $log = new LockerHistoryController();
-        $log->add($user_id, "create", "create " . $request->numberOfLockers . " locker/s");
+        if($request->numberOfLockers > 1) {
+            $details = "create " . $request->numberOfLockers . " lockers";
+        } 
+        else {
+            $details = "create " . $request->numberOfLockers . " locker";
+        }
+
+        $log->add($user_id, "create", $details);
 
         return response()->json(['success' => $lockers]);
     }
