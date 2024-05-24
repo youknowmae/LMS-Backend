@@ -20,10 +20,6 @@ class InventoryController extends Controller
     }
     public function enterBarcode(Request $request): JsonResponse
     {
-
-
-
-
         // Create new inventory item
         $inventoryItem = new Inventory();
         $inventoryItem->barcode = $request->barcode;

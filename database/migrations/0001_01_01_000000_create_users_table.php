@@ -40,7 +40,7 @@ return new class extends Migration
             $table->id();
             $table->string('username')->unique();
             $table->string('role')->default('user');
-            $table->foreignId('patron_id')->references('id')->on('patrons');
+            $table->foreignId('patron_id')->nullable()->constrained('patrons');
             $table->string('password');
             $table->rememberToken();
         
@@ -48,14 +48,11 @@ return new class extends Migration
             $table->string('first_name', 30);
             $table->string('middle_name', 30)->nullable();
             $table->string('last_name', 30);
-            $table->string('gender')->nullable();
+            $table->integer('gender')->nullable();
             $table->string('ext_name', 10)->nullable();
-            $table->foreignId('program_id')->references('id')->on('programs');
-            $table->string('course_id', 10)->nullable();
-            $table->string('studentNumber', 10)->nullable(); // Student ID
-            $table->string('department', 50)->nullable();
+            $table->foreignId('program_id')->nullable()->constrained('programs');
             $table->string('position', 50)->nullable(); 
-            $table->string('profile_image')->nullable(); // Add profile image field
+            $table->string('profile_image')->nullable();
             
             // New columns
             $table->string('main_address')->nullable();

@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::where('role', '<>', 'superadmin')->get();
+        $users = User::where('position', '<>', 'Head')->get();
         return response()->json(['users' => $users]);
     }
 
@@ -25,39 +25,30 @@ class UserController extends Controller
     {
         $validator = Validator::make( $request->all(), [
             'username' => 'required|unique:users',
-            // 'patron_id' => 'required',
-            // 'department' => 'required',
-            // 'position' => 'required',
-            'password' => 'required',
-            'first_name' => 'required',
-            'middle_name' => 'nullable',
-            'last_name' => 'required',
-            'ext_name' => 'nullable',
-            'access' => 'required|string'
+            'role' => 'required|string|max:255',
+            'password' => 'required|string|max:25',
+            'first_name' => 'required|string|max:50',
+            'middle_name' => 'nullable|string|max:50',
+            'last_name' => 'required|string|max:50',
+            'ext_name' => 'nullable|string|max:20'
         ]);
 
         if($validator->fails()) {
             return response()->json(['errors' => $validator->errors()]);
         }
 
-        $user = User::create([
+        User::create([
             'username' => $request->username,
-            'patron_id' => 1,  //kung ano nalang applicaton
-            'program_id'=> 10, // added to make post work on personnels
-            'role' => 'admin',
-            'department' => $request->department,
-            'position' => $request->position,
+            'role' => $request->role,
             'password' => Hash::make($request->password),
             'first_name' => $request->first_name,
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
-            'ext_name' => $request->ext_name,
-            'access' => $request->access,
+            'ext_name' => $request->ext_name
         ]);
 
         return response()->json([
             'message'=> 'User created successfully',
-            //'data'=> $user
         ]);
     }
 
@@ -66,15 +57,12 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            // 'patron_id' => 'required|unique:users,patron_id,'.$user->id,
-            // 'department' => 'required',
-            // 'position' => 'required',
-            'password' => 'nullable',
-            'first_name' => 'required',
-            'middle_name' => 'nullable',
-            'last_name' => 'required',
-            'ext_name' => 'nullable',
-            'access' => 'required'
+            'role' => 'nullable|string|max:100',
+            'password' => 'nullable|string|max:25',
+            'first_name' => 'nullable|string|max:50',
+            'middle_name' => 'nullable|string|max:50',
+            'last_name' => 'nullable|string|max:50',
+            'ext_name' => 'nullable|string|max:20'
         ]);
 
         if($validator->fails()) {
@@ -82,21 +70,16 @@ class UserController extends Controller
         }
 
         $user->update([
-            // 'patron_id' => $request->patron_id,
-            // 'role' => 'admin',
-            // 'department' => $request->department,
-            // 'position' => $request->position,
+            'role' => $request->role,
             'password' => Hash::make($request->password),
             'first_name' => $request->first_name,
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
-            'ext_name' => $request->ext_name,
-            'access' => $request->access
+            'ext_name' => $request->ext_name
         ]);
 
         return response()->json([
-            'message'=> 'User updated successfully',
-            'data'=> $user->fresh()
+            'message'=> 'User updated successfully'
         ]);
     }
 
