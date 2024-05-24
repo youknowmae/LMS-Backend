@@ -19,6 +19,7 @@ use App\Http\Controllers\PatronController;
 use App\Http\Controllers\CollegeController; 
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\DepartmentController;
 
 
 
@@ -359,3 +360,7 @@ Route::get('/patrons', [PatronController::class, 'index']);
 Route::get('/patrons/{id}', [PatronController::class, 'edit']);
 Route::post('/patrons/{id}', [PatronController::class, 'update']);
 
+//Maintenance Cataloging Routes
+Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function () {
+    Route::post('/add-program',[DepartmentController::class, 'AddProgram']);
+});
