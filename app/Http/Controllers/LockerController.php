@@ -65,16 +65,20 @@ class LockerController extends Controller
             $latestLockerNumber = intval($latestLocker->lockerNumber);
         }
 
+        $lockers = [];
         
         for ($i = $latestLockerNumber + 1; $i <= $latestLockerNumber + $request->numberOfLockers; $i++) {
             $lockerNumber = str_pad($i, 3, '0', STR_PAD_LEFT);
 
             $locker = new Locker();
             $locker->lockerNumber = $lockerNumber;
+            $locker->status = 'Available';
             $locker->save();
+
+            $lockers[] = $locker;
         }
 
-        return response()->json(['success' => 'Locker has been created']);
+        return response()->json(['success' => $lockers]);
     }
 
     public function getStartingLockerNumber() {
@@ -90,24 +94,25 @@ class LockerController extends Controller
     }
 
     public function show($id) {
-        $locker = Locker::select('id', 'lockerNumber', 'status', 'remarks')->findorfail($id);
-
+        $locker = Locker::select('id', 'lockerNumber', 'status')->findorfail($id);
+        // , 'remarks'
         return $locker;
     }
 
     public function update(Request $request, $id) {
         $data = Validator::make($request->all(), [
             'status' => 'required|in:Occupied,Available,Unavailable',
-            'remarks' => 'nullable|string|max:256'
+            // 'remarks' => 'nullable|string|max:256'
         ]);
 
         if($data->fails()){
             return response()->json(['errors' => $data->errors()], 400 );
         }
 
-        Locker::findorfail($id)->update($data->validated());
+        $locker = Locker::findorfail($id);
+        $locker->update($data->validated());
 
-        return response()->json(['success' => 'Locker has been updated']);
+        return response()->json(['success' => $locker]);
     }
 
     public function destroy($id) {
