@@ -9,7 +9,7 @@ use Exception, DB, Storage, Str;
 
 class ProjectController extends Controller
 {
-    const URL = 'http://192.168.10.122:8000';
+    const URL = 'http://192.168.14.1748000';
     public function getProjects() {
         $projects = Project::with(['program.department'])->orderByDesc('created_at')->get();
 

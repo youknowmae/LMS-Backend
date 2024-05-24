@@ -12,15 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lockers', function (Blueprint $table) {
-
-
             $table->id();
-            $table->string('lockerNumber')->unique();
-            $table->string('studentNumber')->unique()->nullable(); // Set to nullable
-            $table->string('collegeProgram')->nullable();
-            $table->string('collegeDepartment')->nullable();
+            $table->string('locker_number')->unique();
             $table->foreignId('user_id')->unique()->nullable()->references('id')->on('users');
-            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
             $table->enum('status', ['Occupied', 'Available', 'Unavailable', 'Damaged'])->default('Available');
             $table->string('remarks')->nullable();
             $table->timestamps();

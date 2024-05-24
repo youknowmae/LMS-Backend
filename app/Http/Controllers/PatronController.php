@@ -29,7 +29,6 @@ class PatronController extends Controller
         $patron = Patron::findorfail($id);
 
         $patron->fines_if_overdue = $request->fines_if_overdue;
-        $patron->days_allowed = $request->days_allowed;
         $patron->hours_allowed = $request->hours_allowed;
         
         $patron->save();

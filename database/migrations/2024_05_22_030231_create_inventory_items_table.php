@@ -17,9 +17,6 @@ class CreateInventoryItemsTable extends Migration
             $table->id();
             $table->string('barcode')->unique();
             $table->string('accession_number')->unique();
-            $table->string('title');
-            $table->string('author');
-            $table->string('location');
             $table->enum('status', ['available', 'unavailable', 'missing'])->default('available');
             $table->timestamps();
         });
