@@ -1,32 +1,42 @@
 <?php
-
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use App\Models\Program;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
-        'name',
-        'email',
+        'id',
+        'username',
+        'patron_id',
+        'role',
+        'department',
+        'position',
         'password',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'ext_name',
+        'access',
+        'program_id'
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $hidden = [
         'password',
@@ -34,15 +44,83 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array
      */
-    protected function casts(): array
+    protected $casts = [
+        'access' => 'array',
+        'roles' => 'array',
+    ];
+
+    /**
+     * Retrieve the username column name.
+     *
+     * @return string
+     */
+    public function username(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return 'username';
     }
+
+    // Find user by username
+    public function findForIdentifier($username)
+    {
+        return $this->where('username', $username)->first();
+    }
+
+    // Check if user has a certain role
+    public function hasRole($role)
+    {
+        return $this->role === $role;
+    }
+
+    public function logs() {
+        return $this->hasMany(CatalogingLog::class);
+    }
+
+    // public function program() {
+    //     return $this->belongsTo(Program::class);
+    // }
+
+    // public function department(){
+    //     return $this->belongsTo(Program::class);
+    // }
+
+    public function patrons(){
+        return $this->belongsTo(Program::class);
+    }
+    public function getRolesAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function collegeProgram()
+    {
+        return $this->belongsTo(Program::class, 'program_id');
+    }
+
+    public function collegeDepartment()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class, 'program_id');
+    }
+
+
+    public function department()
+    {
+        return $this->hasOneThrough(Department::class, Program::class, 'id', 'id', 'program_id', 'department_id');
+    }
+
+
 }
+
