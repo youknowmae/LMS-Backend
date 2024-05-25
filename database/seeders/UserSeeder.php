@@ -30,20 +30,22 @@ class UserSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'role' => json_encode(['frontdesk']),
+            'role' => json_encode(['circulation']),
             'position' => 'Front Desk',
-            'username' => 'front',
+            'username' => 'circulation',
             'password' => Hash::make('Admin123')
         ]);
 
         User::factory()->create([
-            'role' => json_encode(['user']),
+            'role' => json_encode(['opac']),
             'position' => 'OPAC User',
             'username' => 'opac',
             'password' => Hash::make('Admin123')
         ]);
 
-        User::factory()->count(20)->create();
+        User::factory()->count(20)->create([
+            'role' => json_encode(['user'])
+        ]);
         
         User::factory()->create([
             'role' => json_encode(['user']),
