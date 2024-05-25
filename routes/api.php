@@ -53,11 +53,16 @@ Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function (
     Route::delete('/personnels/{personnel}', [UserController::class, 'destroy']);
 
     //Inventory routes
-    Route::prefix('inventory')->group(function () {
-        Route::get('/', [InventoryController::class, 'index']);
-        Route::post('/enter', [InventoryController::class, 'enterBarcode']);
-        Route::post('/scan', [InventoryController::class, 'scanBarcode']);
-        Route::post('/clear', [InventoryController::class, 'clearHistory']);
+    Route::prefix('/inventory')->group(function () {
+        Route::prefix('/books')->group(function () {
+            Route::get('/clear', [InventoryController::class, 'clearBooksHistory']);
+            Route::get('/{filter}', [InventoryController::class, 'getBookInventory']);
+            Route::post('/{id}', [InventoryController::class, 'updateBookStatus']);
+        });
+        // Route::get('/', [InventoryController::class, 'index']);
+        // Route::post('/enter', [InventoryController::class, 'enterBarcode']);
+        // Route::post('/scan', [InventoryController::class, 'scanBarcode']);
+        // Route::post('/clear', [InventoryController::class, 'clearHistory']);
     });
 
     //circulation 

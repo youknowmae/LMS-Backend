@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('source_of_fund');
             $table->float('price', 2)->nullable();
             $table->boolean('available')->default(true);
+            $table->enum('status', ['available', 'unreturned', 'missing', 'unlabeled'])->default('available');
             $table->timestamps();
             $table->softDeletes();
         });
