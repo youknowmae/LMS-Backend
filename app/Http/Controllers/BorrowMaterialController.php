@@ -7,73 +7,100 @@ use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Book;
-use Exeption;
-use Storage;
+use Exception, Carbon, Storage;
 
 
 class BorrowMaterialController extends Controller
 {
     public function borrowbook(Request $request)
     {
-        $payload=json_decode($request->payload);
-
+        $payload = json_decode($request->payload);
+    
         // Check if the book_id exists in the books table
         $book = Book::find($payload->book_id);
         if (!$book) {
             return response()->json(['error' => 'Book not found'], 404);
         }
-
+    
         // Check if the book is available
-        if ($book->available  == 0) {
+        if ($book->available == 0) {
             return response()->json(['error' => 'Book is not available for borrowing'], 400);
         }
-        
-        // Create a new BorrowMaterial instance
-        $borrowMaterial = new BorrowMaterial();
-        $borrowMaterial->book_id = $payload->book_id;
-        $borrowMaterial->user_id = $payload->user_id;
-        $borrowMaterial->fine = $payload->fine;
-        $borrowMaterial->borrow_expiration = $payload->borrow_expiration;
-        $borrowMaterial->borrow_date = $payload->borrow_date;
-        
     
-     // Rollback the decrement operation if saving BorrowMaterial failed
-        $book->available = 0;
-        $book->save();
-        $borrowMaterial->save();
-        $data = ['borrow_material' => $borrowMaterial];
-        return response()->json($data);
+        // Check if the user has 3 active borrows
+        $activeBorrowsCount = BorrowMaterial::where('user_id', $payload->user_id)
+                                            ->where('status', 1) // Assuming status 1 means active
+                                            ->count();
+    
+        if ($activeBorrowsCount >= 3) {
+            return response()->json(['error' => 'User already has 3 active borrows'], 400);
+        }
+    
+        // Use a transaction to ensure both operations happen at the same time
+        DB::beginTransaction();
+    
+        try {
+            // Create a new BorrowMaterial instance
+            $borrowMaterial = new BorrowMaterial();
+            $borrowMaterial->book_id = $payload->book_id;
+            $borrowMaterial->user_id = $payload->user_id;
+            $borrowMaterial->fine = $payload->fine;
+            $borrowMaterial->borrow_expiration = $payload->borrow_expiration;
+            $borrowMaterial->borrow_date = $payload->borrow_date;
+            $borrowMaterial->status = 1; // Assuming status 1 means active
+            $borrowMaterial->save();
+    
+            // Set the book as not available
+            $book->available = 0;
+            $book->save();
+    
+            // Commit the transaction
+            DB::commit();
+            
+            $data = ['borrow_material' => $borrowMaterial];
+            return response()->json($data);
+        } catch (Exception $e) {
+            // Rollback the transaction in case of an error
+            DB::rollBack();
+            return response()->json(['error' => 'An error occurred while borrowing the book', 'details' => $e->getMessage()], 500);
+        }
     }
 
     public function fromreservation(Request $request, $id)
     {
-        $payload=json_decode($request->payload);
-
+        $payload = json_decode($request->payload);
+    
         // Check if the book_id exists in the books table
         $book = Book::find($payload->book_id);
         if (!$book) {
             return response()->json(['error' => 'Book not found'], 404);
         }
-
+    
         // Check if the book is available
-        if ($book->available  == 0) {
+        if ($book->available == 0) {
             return response()->json(['error' => 'Book is not available for borrowing'], 400);
         }
-
+    
         $reservation = Reservation::find($id);
-
+    
         // Create a new BorrowMaterial instance
         $borrowMaterial = new BorrowMaterial();
-        $borrowMaterial->book_id = $payload->book_id;
         $borrowMaterial->user_id = $payload->user_id;
-        $borrowMaterial->borrow_expiration = $payload->end_date;
-        $borrowMaterial->borrow_date = $payload->start_date;
-       
+        $borrowMaterial->book_id = $payload->book_id;
+        $borrowMaterial->fine = $payload->fine;
+    
+        // Set start date as current date and time
+        $borrowMaterial->borrow_date = Carbon::now();
+    
+        // Set end date as one week from the start date
+        $borrowMaterial->borrow_expiration = Carbon::now()->addWeek();
+    
         $reservation->status = 0;
         $book->available = 0;
         $reservation->save();
         $book->save();
         $borrowMaterial->save();
+    
         $data = ['borrow_material' => $borrowMaterial];
         return response()->json($data);
     }
@@ -121,10 +148,9 @@ class BorrowMaterialController extends Controller
     }   
 
     public function userlist(Request $request){
-        $users = User::with('program.department', 'patrons')->where('role', 'user')->get();
+        $users = User::with('program.department', 'patrons')->where('role', '["user"]')->get();
         return response()->json($users, 200);
     }
-
 
     //return book
 
