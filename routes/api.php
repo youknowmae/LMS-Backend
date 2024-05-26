@@ -222,17 +222,24 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
     Route::get('student/projects/type/{type}', [ProjectController::class, 'viewProjectByType']);//'viewP
     Route::get('student/periodicals/materialtype/{materialType}', [PeriodicalController::class, 'getPeriodicalByMaterialType']);//'viewP
 
-
     // Reservation routes
     Route::post('reservations', [ReservationController::class, 'store']); // Changed from 'reservation/{id}' to 'reservations'
     // Reservation Cancel
     Route::delete('/cancel-reservation/{id}', [ReservationController::class, 'cancelReservation']);
     
-    
     // API resource route for reservations
-   
     Route::get('reservations/{id}', [ReservationController::class, 'getUserById']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
+
+    Route::get('reservations/{id}', [ReservationController::class, 'getUserById']);
+    Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
+    Route::get('borrow/user/{userId}', [BorrowMaterialController::class, 'getByUserId']);
+
+    //Search 
+    Route::get('/search/books', [BookController::class, 'searchBooks']);
+    Route::get('/search/articles', [ArticleController::class, 'searchArticles']); 
+    Route::get('/search/periodicals', [PeriodicalController::class, 'searchPeriodicals']);
+    Route::get('/search/project', [ProjectController::class, 'searchProjects']);
 });
 
 // RED ZONE 

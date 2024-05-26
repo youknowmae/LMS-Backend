@@ -14,30 +14,26 @@ class ReservationController extends Controller
         return response()->json($reservations);
     }
 
-    public function store(Request $request)
-{
-    // Validation
-    // $request->validate([
-    //     'user_id' => 'required|exists:user,id',
-    //     'book_id' => 'required|exists:book,id',
-    //     'start_date' => 'required|date',
-    //     'end_date' => 'required|date|after_or_equal:start_date',
-    //     'fine' => 'nullable|numeric',
-    //     'status' => 'boolean'
-    // ]);
+    public function store(Request $request) {
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'book_id' => 'required|exists:books,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'fine' => 'nullable|numeric',
+            'status' => 'boolean',
+            'type' => 'required|string', // New field type with value 'online'
+        ]);
 
-    $reservation = Reservation::create([
-        'user_id' => $request->user_id,
-        'book_id' => $request->book_id,
-        'start_date' => $request->start_date,
-        'end_date' => $request->end_date,
-        'fine' => $request->fine,
-        'status' => $request->status ?? true,
-        'type'=> $request->type,
-    ]);
+        // Add 'type' with value 'online' to validated data
+        $validatedData['type'] = 'online';
 
-    return response()->json($reservation, 201);
-}
+        // Create reservation using automatic model binding
+        $reservation = Reservation::create($validatedData);
+
+        return response()->json($reservation, 201);
+    }
+
     public function getUserById($id)
     {
         $reservations = Reservation::where('user_id', $id)->with('book')->get();
