@@ -104,7 +104,7 @@ class AuthController extends Controller
                     'token' => $token,
                     'id' => $user->id,
                     'displayName' => $user->first_name . ' ' . $user->last_name,
-                    'role' => $user->role
+                    'position' => $user->position,
                 ];
 
                 $tokenModel = $user->tokens->last();
@@ -118,7 +118,6 @@ class AuthController extends Controller
                     'token' => $token,
                     'id' => $user->id,
                     'department' => $student->program->department,
-                    'role' => $user->role,
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
                     'middle_name' => $user->middle_name,

@@ -182,13 +182,13 @@ class ProgramSeeder extends Seeder
                 'program' => 'BSHM',
                 'full_program' => 'Bachelor of Science in Hospitality Management',
                 'department_id' => 4,
-                'category' => 'Research'
+                'category' => 'Feasibility Study'
             ],
             [
                 'program' => 'BSTM',
                 'full_program' => 'Bachelor of Science in Tourism Management',
                 'department_id' => 4,
-                'category' => 'Research'
+                'category' => 'Thesis'
             ],
         ]);
     }

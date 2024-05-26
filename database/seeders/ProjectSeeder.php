@@ -57,7 +57,7 @@ class ProjectSeeder extends Seeder
         /* CHTM */
         Project::factory()->count(10)->create([
             'program_id' => fn() => fake()->numberBetween(22, 23),
-            'category' => fn() => fake()->randomElement(['Research', 'Feasibility Study']),
+            'category' => fn() => fake()->randomElement(['Thesis', 'Feasibility Study']),
             'keywords' => '["technology", "magic", "chakra", "haki"]'
         ]);
     }

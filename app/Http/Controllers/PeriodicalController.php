@@ -9,7 +9,7 @@ use Storage, Str;
 
 class PeriodicalController extends Controller
 {
-    const URL = 'http://192.168.14.174:8000';
+    const URL = 'http://192.168.68.124:8000';
     public function getPeriodicals() {
         $periodicals = Periodical::orderByDesc('updated_at')->get();
 
@@ -254,6 +254,13 @@ class PeriodicalController extends Controller
         }
 
         return $periodicals;
+    }
+    public function getPeriodicalByMaterialType($materialType)
+    {
+        // Filter articles by material type
+        $filteredPeriodical = Periodical::where('material_type', $materialType)->get();
+
+        return response()->json($filteredPeriodical);
     }
 }
 

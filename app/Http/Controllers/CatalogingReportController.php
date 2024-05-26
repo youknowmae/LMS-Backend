@@ -101,6 +101,19 @@ class CatalogingReportController extends Controller
         ]);
     }
 
+    public function countProjects(Request $request, string $department) {
+        
+        $categoryCounts = Project::selectRaw('projects.category as category, COUNT(projects.id) as project_count')
+                                 ->join('programs', 'projects.program_id', '=', 'programs.id')
+                                 ->join('departments', 'programs.department_id', '=', 'departments.id')
+                                 ->join('categories', 'projects.category_id', '=', 'categories.id')
+                                 ->where('departments.department', $department)
+                                 ->groupBy('categories.name')
+                                 ->get();
+        
+        return $categoryCounts;
+    }
+
     public function generatePDF(Request $request, string $type){
 
         $dompdf = new Dompdf();

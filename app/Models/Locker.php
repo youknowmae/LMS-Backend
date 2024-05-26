@@ -20,6 +20,10 @@ class Locker extends Model
     return $this->belongsTo(User::class);
 }
 
-
+    protected $fillable = [
+        'lockerNumber',
+        'remarks',
+        'status'
+    ];
 
 }

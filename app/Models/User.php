@@ -83,8 +83,8 @@ class User extends Authenticatable
         return $this->belongsTo(Program::class);
     }
 
-    public function patrons(){
-        return $this->belongsTo(Program::class);
+    public function patron(){
+        return $this->belongsTo(Patron::class);
     }
     public function getRolesAttribute($value)
     {

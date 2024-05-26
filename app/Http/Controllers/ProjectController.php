@@ -9,7 +9,7 @@ use Exception, DB, Storage, Str;
 
 class ProjectController extends Controller
 {
-    const URL = 'http://192.168.14.1748000';
+    const URL = 'http://192.168.68.124:8000';
     public function getProjects() {
         $projects = Project::with(['program.department'])->orderByDesc('created_at')->get();
 
@@ -290,27 +290,40 @@ class ProjectController extends Controller
 
     // PENDING APPROVAL
     
-    public function getProjectCategoriesByDepartment($department)
-    {
-        // Retrieve projects based on the provided department
-        $projects = Project::with('program')->get();
-        
-        $newProjects = [];
-        foreach($projects as $project) {
-            if($project->program->department == $department) {
-                array_push($newProjects, $project);
-            }
+    public function getProjectCategoriesByDepartment($department) {
+        // Define the mapping of department strings to department IDs
+        $departmentMapping = [
+            'CCS' => 1,
+            'Business' => 5,
+            'Nursing' => 2,
+            'Education' => 3,
+            'Tourism' => 4,
+            // Add other mappings as necessary
+        ];
+    
+        // Check if the provided department string exists in the mapping
+        if (!isset($departmentMapping[$department])) {
+            return response()->json(['error' => 'Invalid department'], 400);
         }
-
-        $newProjects = collect($newProjects);
-        
+    
+        // Get the department ID from the mapping
+        $departmentId = $departmentMapping[$department];
+    
+        // Retrieve projects with their related program
+        $projects = Project::with('program')->get();
+    
+        // Filter projects based on the provided department
+        $filteredProjects = $projects->filter(function ($project) use ($departmentId) {
+            return $project->program->department_id == $departmentId;
+        });
+    
         // Group projects by category
-        $groupedProjects = $newProjects->groupBy('category');
-
+        $groupedProjects = $filteredProjects->groupBy('category');
+    
         // Get the category names
         $categories = $groupedProjects->keys();
-
-        // Return an array containing category names and their respective projects
+    
+        // Prepare the response array containing category names and their respective projects
         $projectCategories = [];
         foreach ($categories as $category) {
             $projectCategories[] = [
@@ -318,10 +331,10 @@ class ProjectController extends Controller
                 'projects' => $groupedProjects[$category],
             ];
         }
-
+    
+        // Return the response as JSON
         return response()->json($projectCategories);
     }
-
     public function opacGetProjects(Request $request, $category){
         if(!in_array($category, ['thesis', 'Classroom Based Action Research', 'capstone', 'feasibility study', 'research', 'dissertation'])){
             return response()->json(['error' => 'Page not found'], 404);

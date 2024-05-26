@@ -90,24 +90,24 @@ class BorrowMaterialController extends Controller
         $borrowMaterial->fine = $payload->fine;
     
         // Set start date as current date and time
-        $borrowMaterial->borrow_date = Carbon::now();
+        $borrowMaterial->borrow_date = now();
     
         // Set end date as one week from the start date
-        $borrowMaterial->borrow_expiration = Carbon::now()->addWeek();
+        $borrowMaterial->borrow_expiration = now()->addWeek();
     
         $reservation->status = 0;
         $book->available = 0;
         $reservation->save();
-        $book->save();
+        
         $borrowMaterial->save();
-    
+        $book->save();
         $data = ['borrow_material' => $borrowMaterial];
         return response()->json($data);
     }
 
 
     public function borrowlist(Request $request){
-        $borrowMaterial = BorrowMaterial::with('user.program.department', 'user.patrons')
+        $borrowMaterial = BorrowMaterial::with('user.program.department', 'user.patron')
                             ->whereHas('user', function($query) {
                                 $query->where('status', 1);
                             })
@@ -116,7 +116,7 @@ class BorrowMaterialController extends Controller
     }
 
     public function returnedlist(Request $request){
-        $borrowMaterial = BorrowMaterial::with(['user.program', 'user.department', 'user.patrons'])
+        $borrowMaterial = BorrowMaterial::with(['user.program', 'user.department', 'user.patron'])
                             ->whereHas('user', function($query){
                                 $query->where('status', 0);
                             })
@@ -148,7 +148,7 @@ class BorrowMaterialController extends Controller
     }   
 
     public function userlist(Request $request){
-        $users = User::with('program.department', 'patrons')->where('role', '["user"]')->get();
+        $users = User::with('program.department', 'patron')->where('role', '["user"]')->get();
         return response()->json($users, 200);
     }
 

@@ -37,7 +37,7 @@ class ReserveBookController extends Controller
     }
 
     public function reservelist(Request $request){
-        $reservelist = Reservation::with(['user.program', 'user.department', 'user.patrons'])
+        $reservelist = Reservation::with(['user.program', 'user.department', 'user.patron'])
                         ->whereHas('user', function($query){
                             $query->where('status', 1);
                         })
