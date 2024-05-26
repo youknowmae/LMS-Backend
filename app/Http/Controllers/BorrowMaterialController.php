@@ -6,6 +6,7 @@ use App\Models\BorrowMaterial;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Patron;
 use App\Models\Book;
 use Exception, Carbon, Storage;
 
@@ -69,7 +70,7 @@ class BorrowMaterialController extends Controller
     public function fromreservation(Request $request, $id)
     {
         $payload = json_decode($request->payload);
-    
+        
         // Check if the book_id exists in the books table
         $book = Book::find($payload->book_id);
         if (!$book) {
@@ -82,18 +83,37 @@ class BorrowMaterialController extends Controller
         }
     
         $reservation = Reservation::find($id);
+        
+        // Find the user
+        $user = User::find($payload->user_id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+    
+        // Get the patron ID associated with the user
+        $patronId = $user->patron_id;
+    
+        // Retrieve the patron from the patrons table
+        $patron = Patron::find($patronId);
+        if (!$patron) {
+            return response()->json(['error' => 'Patron not found for the user'], 404);
+        }
+    
+        // Get the fine associated with the patron
+        $fine = $patron->fine;
+        if (!$fine) {
+           
+            $fine = 0; 
+            
+        }
     
         // Create a new BorrowMaterial instance
         $borrowMaterial = new BorrowMaterial();
         $borrowMaterial->user_id = $payload->user_id;
         $borrowMaterial->book_id = $payload->book_id;
-        $borrowMaterial->fine = $payload->fine;
-    
-        // Set start date as current date and time
-        $borrowMaterial->borrow_date = now();
-    
-        // Set end date as one week from the start date
-        $borrowMaterial->borrow_expiration = now()->addWeek();
+        $borrowMaterial->fine = $fine; 
+        $borrowMaterial->borrow_date = now(); 
+        $borrowMaterial->borrow_expiration = now()->addWeek(); 
     
         $reservation->status = 0;
         $book->available = 0;
@@ -101,9 +121,11 @@ class BorrowMaterialController extends Controller
         
         $borrowMaterial->save();
         $book->save();
+    
         $data = ['borrow_material' => $borrowMaterial];
         return response()->json($data);
     }
+    
 
 
     public function borrowlist(Request $request){
