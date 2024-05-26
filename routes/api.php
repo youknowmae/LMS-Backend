@@ -236,10 +236,10 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
     Route::get('borrow/user/{userId}', [BorrowMaterialController::class, 'getByUserId']);
 
     //Search 
-    Route::get('/search/books', [BookController::class, 'searchBooks']);
-    Route::get('/search/articles', [ArticleController::class, 'searchArticles']); 
-    Route::get('/search/periodicals', [PeriodicalController::class, 'searchPeriodicals']);
-    Route::get('/search/project', [ProjectController::class, 'searchProjects']);
+    Route::get('student/books/search/', [BookController::class, 'searchBooks']);
+    Route::get('student/periodicals/search/', [PeriodicalController::class, 'searchPeriodicals']);
+    Route::get('student/articles/search/', [ArticleController::class, 'searchArticle']);
+    Route::get('student/projects/search/', [ProjectController::class, 'searchProjects']);
 });
 
 // RED ZONE 

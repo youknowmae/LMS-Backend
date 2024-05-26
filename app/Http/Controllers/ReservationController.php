@@ -33,13 +33,12 @@ class ReservationController extends Controller
 
         return response()->json($reservation, 201);
     }
-
+    
     public function getUserById($id)
     {
         $reservations = Reservation::where('user_id', $id)->with('book')->get();
         return response()->json($reservations);
     }
-    
 
     // Other CRUD methods (show, edit, update, destroy) can be added here
 }

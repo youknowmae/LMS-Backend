@@ -255,6 +255,8 @@ class PeriodicalController extends Controller
 
         return $periodicals;
     }
+
+    // STUDENT PORTAL
     public function getPeriodicalByMaterialType($materialType)
     {
         // Filter articles by material type
@@ -262,5 +264,17 @@ class PeriodicalController extends Controller
 
         return response()->json($filteredPeriodical);
     }
+
+    //PERIODICAL 
+    public function searchPeriodicals(Request $request) {
+        // Retrieve the query parameter from the request
+        $query = $request->input('query');
+        
+        $periodicals = Periodical::where('title', 'LIKE', "%{$query}%")
+                                ->get();
+
+        return response()->json($periodicals);
+    }
+
 }
 

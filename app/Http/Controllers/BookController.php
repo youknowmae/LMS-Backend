@@ -71,6 +71,25 @@ class BookController extends Controller
         return $book;
     }
 
+    // search BOOKS
+    public function searchBooks(Request $request)
+    {
+        // Retrieve the query parameter from the request
+        $query = $request->input('query');
+
+        // Check if the query parameter is empty or not provided
+        if(empty($query)) {
+            // Return a response indicating that the query is required
+            return response()->json(['message' => 'Please provide a search query.'], 400);
+        }
+        
+        // Search for books where the title contains the query string
+        $books = Book::where('title', 'LIKE', "%{$query}%")->get();
+
+        // Return the results as a JSON response
+        return response()->json($books);
+    }
+
     /* PROCESSING OF DATA */
 
     public function add(Request $request) {

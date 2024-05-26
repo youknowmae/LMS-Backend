@@ -8,10 +8,12 @@ use Illuminate\Validation\Rule;
 use Exception;
 use Auth;
 use DB, Http, Str;
+use Storage;
 
 class AuthController extends Controller
 {
 
+    const URL = 'http://26.68.32.39:8000';
     // public function studentLogin(Request $request) {
     //     $auth_url = 'http://127.0.0.1:8001/api/login';
     //     $details = Http::get($auth_url)->json();
@@ -123,7 +125,7 @@ class AuthController extends Controller
                     'middle_name' => $user->middle_name,
                     'domain_account' => $user->domain_email,
                     'main_address' => $user->main_address,
-                    'profile_picture' => $user->profile_image
+                    'profile_picture' => self::URL .  Storage::url($user->profile_image)
                 ];
 
                 return response()->json($responseData, 200);

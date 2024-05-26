@@ -210,5 +210,19 @@ class ArticleController extends Controller
         }
 
         return $articles;
-    }   
+    } 
+    
+    //ARTICLE
+    public function searchArticles(Request $request)
+    {
+        // Retrieve the query parameter from the request
+        $query = $request->input('query');
+        
+        // Search for books where the title contains the query string
+        $articles = Article::where('title', 'LIKE', "%{$query}%")
+                    ->get();
+        
+        // Return the results as a JSON response
+        return response()->json($articles);
+    }
 }
