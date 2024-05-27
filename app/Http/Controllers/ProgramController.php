@@ -8,44 +8,48 @@ use Illuminate\Http\Request;
 
 class ProgramController extends Controller
 {
-    public function get() {
-        return Program::with('department')->get();
-    }
+    public function AddProgram(Request $request){
+        // Decode the JSON payload
+        $payload = $request->input('payload');
 
-    public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'program' => 'required|string|max:10',
-            'full_program' => 'required|string|max:255',
-            'category' => 'required|string|max:50',
-            'department_id' => 'required|exists:departments,id'
-        ]);
-
-        $program = Program::create($validatedData);
-
-        return response()->json(['message' => 'Program added successfully!', 'program' => $program], 201);
-    }
-
-    //note
-    // Route::get('CBA-list',[ProgramController::class,'viewcba']);
-    // Route::get('CCS-list',[ProgramController::class,'viewccs']);
-    // Route::get('CEAS-list',[ProgramController::class,'viewceas']);
-    // Route::get('CAHS-list',[ProgramController::class,'viewcahs']);
-    // Route::get('CHTM-list',[ProgramController::class,'viewchtm']);
-
-    public function viewDepartmentProgram($department)
-    {
-       
-        // Retrieve the department by its name
-        $departmentModel = Department::where('department', $department)->first();
-
-        // If the department is found, retrieve the programs associated with it
-        if ($departmentModel) {
-            $programs = $departmentModel->programs()->pluck('full_program');
-            return response()->json(['department' => $department, 'programs' => $programs]);
-        } else {
-            // Handle invalid department route, maybe return a 404 response
+        // Check if the department exists
+        $department = Department::where('department', $payload['department'])->first();
+        if (!$department) {
             return response()->json(['error' => 'Department not found'], 404);
         }
+
+        // Create a new Program instance and assign values from the payload
+        $addprogram = new Program();
+        $addprogram->program = $payload['program'];
+        $addprogram->department_id = $department->id; // Assign the department ID
+        $addprogram->category = $payload['category'];
+        $addprogram->full_program = $payload['full_program'];
+
+        // Save the Program object
+        $addprogram->save();
+
+        // Return the created program
+        return response()->json($addprogram, 201);
     }
+
+    public function viewDepartmentProgram($id)
+    {
+       $department = Department::with('programs')->findorfail($id);
+
+       return $department;
+    }
+        
+    // public function store(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'program' => 'required|string|max:10',
+    //         'full_program' => 'required|string|max:255',
+    //         'category' => 'required|string|max:50',
+    //         'department_id' => 'required|exists:departments,id'
+    //     ]);
+
+    //     $program = Program::create($validatedData);
+
+    //     return response()->json(['message' => 'Program added successfully!', 'program' => $program], 201);
+    // }
 }
