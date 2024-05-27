@@ -42,4 +42,18 @@ class DepartmentController extends Controller
         // Return the created program
         return response()->json($addprogram, 201);
     }
+
+    public function AddDepartment(Request $request)
+    {
+        $payload = $request->input('payload');
+
+        //Create a new Department Instance and assigned values from payload
+        $addDepartment = new Department();
+        $addDepartment->department =$payload["department"];
+        $addDepartment->full_department = $payload['full_department'];
+
+        $addDepartment->save();
+
+        return response()->json($addDepartment, 201);
+    }
 }
