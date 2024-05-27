@@ -31,6 +31,29 @@ class InventoryController extends Controller
         return $books;
     }
 
+    public function searchBookInventory(Request $request, $filter)
+    {
+        $search = $request->input('search', '');
+        
+        if(!in_array($filter, ['available', 'unreturned', 'missing', 'unlabeled'])){
+            return response()->json(['error' => 'Page not found'], 404);
+        }
+
+        $books = Book::with('location')
+                    ->where('status', $filter)
+                    ->where('call_number', 'LIKE', "%" . $search . "%")
+                    ->orderByDesc('created_at')
+                    ->get();
+        
+        foreach($books as $book) {
+            $book->authors = json_decode($book->authors);
+        }
+
+      
+
+        return $books;
+    }
+
     public function updateBookStatus(Request $request, $id) {
         $data = Validator::make($request->all(), [
             'status' => 'required|in:available,unreturned,missing,unlabeled'
@@ -47,7 +70,7 @@ class InventoryController extends Controller
     }
 
     public function clearBooksHistory() {
-        Book::query()->update(['status' => 'unlabeled']);
+        Book::where('status', 'available')->update(['status' => 'unlabeled']);
         
         return response()->json(['success' => 'History has been cleared.'], 200);
     }
