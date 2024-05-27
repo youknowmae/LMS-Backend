@@ -368,7 +368,7 @@ Route::post('/patrons/{id}', [PatronController::class, 'update']);
 //Maintenance Cataloging Routes
 Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function () {
     Route::get('view/{department}',[ProgramController::class,'viewDepartmentProgram']);
-    Route::post('/add-program',[ProgramController::class, 'AddProgram']);
-    Route::get('/departments',[CollegeController::class, 'index']);
-    Route::post('/add-department',[CollegeController::class, 'store']);
+    Route::post('/add-program',[ProgramController::class, 'addProgram']);
+    Route::get('/departments',[CollegeController::class, 'getColleges']);
+    Route::post('/add-department',[CollegeController::class, 'addCollege']);
 });

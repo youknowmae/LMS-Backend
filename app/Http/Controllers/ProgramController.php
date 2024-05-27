@@ -5,31 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\Program;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProgramController extends Controller
 {
-    public function AddProgram(Request $request){
-        // Decode the JSON payload
-        $payload = $request->input('payload');
+    public function addProgram(Request $request){
+        $data = Validator::make($request->all(), [
+            'program' => 'required|string|max:10',
+            'full_program' => 'required|string|max:255',
+            'category' => 'required|string|max:50',
+            'department_id' => 'required|exists:departments,id'
+        ]);
 
-        // Check if the department exists
-        $department = Department::where('department', $payload['department'])->first();
-        if (!$department) {
-            return response()->json(['error' => 'Department not found'], 404);
+        if($data->fails()) {
+            return response()->json(['errors', $data->errors()], 400);
         }
 
-        // Create a new Program instance and assign values from the payload
-        $addprogram = new Program();
-        $addprogram->program = $payload['program'];
-        $addprogram->department_id = $department->id; // Assign the department ID
-        $addprogram->category = $payload['category'];
-        $addprogram->full_program = $payload['full_program'];
+        Program::create($data->validated());
 
-        // Save the Program object
-        $addprogram->save();
-
-        // Return the created program
-        return response()->json($addprogram, 201);
+        return response()->json(['success' => 'Program has been created.'], 201);
     }
 
     public function viewDepartmentProgram($id)
@@ -38,18 +32,4 @@ class ProgramController extends Controller
 
        return $department;
     }
-        
-    // public function store(Request $request)
-    // {
-    //     $validatedData = $request->validate([
-    //         'program' => 'required|string|max:10',
-    //         'full_program' => 'required|string|max:255',
-    //         'category' => 'required|string|max:50',
-    //         'department_id' => 'required|exists:departments,id'
-    //     ]);
-
-    //     $program = Program::create($validatedData);
-
-    //     return response()->json(['message' => 'Program added successfully!', 'program' => $program], 201);
-    // }
 }
