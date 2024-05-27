@@ -15,9 +15,7 @@ class CreateInventoryItemsTable extends Migration
     {
         Schema::create('inventory_items', function (Blueprint $table) {
             $table->id();
-            $table->string('barcode')->unique();
-            $table->string('accession_number')->unique();
-            $table->enum('status', ['available', 'unavailable', 'missing'])->default('available');
+            $table->foreignId('book_id')->references('id')->on('books');
             $table->timestamps();
         });
     }

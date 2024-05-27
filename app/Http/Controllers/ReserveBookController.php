@@ -55,38 +55,34 @@ class ReserveBookController extends Controller
             return response()->json($queueData);
     }
 
-    public function getQueuePosition(Request $request, $id)
-{
-    // Get the authenticated user's ID
-    $id = $request->user()->id;
-    // Fetch all reservations for the user's books with a status other than 0
-    $userReservations = Reservation::where('user_id', $id)
-                        ->where('status', '!=', 0) // Exclude reservations with status 0
-                        ->orderBy('start_date')
-                        ->get(['book_id', 'start_date']);
+    public function getQueuePosition(Request $request, $id) {
+        // Get the authenticated user's ID
+        $id = $request->user()->id;
+        // Fetch all reservations for the user's books with a status other than 0
+        $userReservations = Reservation::where('user_id', $id)
+                            ->where('status', '!=', 0) // Exclude reservations with status 0
+                            ->orderBy('start_date')
+                            ->get(['book_id', 'start_date']);
 
-    // Initialize the queue positions
-    $queuePositions = [];
+        // Initialize the queue positions
+        $queuePositions = [];
 
-    // Process the user's reservations and determine the queue position for each book
-    foreach ($userReservations as $userReservation) {
-        $bookId = $userReservation->book_id;
-        
-        // Count the number of reservations with earlier start dates for the same book
-        $position = Reservation::where('book_id', $bookId)
-                        ->where('start_date', '<', $userReservation->start_date)
-                        ->where('status', '!=', 0) // Exclude reservations with status 0
-                        ->count() + 1; // Add 1 to start positions from 1
+        // Process the user's reservations and determine the queue position for each book
+        foreach ($userReservations as $userReservation) {
+            $bookId = $userReservation->book_id;
+            
+            // Count the number of reservations with earlier start dates for the same book
+            $position = Reservation::where('book_id', $bookId)
+                            ->where('start_date', '<', $userReservation->start_date)
+                            ->where('status', '!=', 0) // Exclude reservations with status 0
+                            ->count() + 1; // Add 1 to start positions from 1
 
-        // Assign the queue position for the book
-        $queuePositions[$bookId] = $position;
+            // Assign the queue position for the book
+            $queuePositions[$bookId] = $position;
+        }
+
+        return response()->json($queuePositions);
     }
-
-    return response()->json($queuePositions);
-}
-
-
-
 }
 
 

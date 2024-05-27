@@ -109,9 +109,9 @@ class AuthController extends Controller
                     'position' => $user->position,
                 ];
 
-                $tokenModel = $user->tokens->last();
-                $expiryTime = now()->addHour();
-                $tokenModel->update(['expires_at' => $expiryTime]);
+                // $tokenModel = $user->tokens->last();
+                // $expiryTime = now()->addHour();
+                // $tokenModel->update(['expires_at' => $expiryTime]);
 
                 return response()->json($responseData, 200);
             } else if(in_array('user', $roles)) {

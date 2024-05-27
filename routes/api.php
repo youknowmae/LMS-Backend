@@ -226,10 +226,12 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
     Route::post('reservations', [ReservationController::class, 'store']); // Changed from 'reservation/{id}' to 'reservations'
     // Reservation Cancel
     Route::delete('/cancel-reservation/{id}', [ReservationController::class, 'cancelReservation']);
+    Route::get('students/queue-pos/{id}', [ReserveBookController::class, 'getQueuePosition']);
     
     // API resource route for reservations
     Route::get('reservations/{id}', [ReservationController::class, 'getUserById']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
+    Route::get('borrow/user/{userId}', [BorrowMaterialController::Class, 'getByUserId']);
 
     Route::get('reservations/{id}', [ReservationController::class, 'getUserById']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);

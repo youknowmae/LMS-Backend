@@ -10,6 +10,14 @@ use App\Models\Patron;
 use App\Models\Book;
 use Exception, Carbon, Storage;
 
+/*  
+    0 => already borrowed?
+    1=> available
+    2 => missing
+    3 => unreturned
+    4 => unlabeled
+*/
+    
 
 class BorrowMaterialController extends Controller
 {

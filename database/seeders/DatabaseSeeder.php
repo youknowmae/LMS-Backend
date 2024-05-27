@@ -15,13 +15,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
         DB::table('patrons')->insert([[
             'patron' => 'student (online)',
             'fine' => 500.00,
@@ -51,7 +44,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'GC Admin members'
         ],
     ]);
-    
+
         $this->call([
             ProgramSeeder::class,
             UserSeeder::class,
