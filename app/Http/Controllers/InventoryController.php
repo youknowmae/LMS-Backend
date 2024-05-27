@@ -17,7 +17,16 @@ class InventoryController extends Controller
             return response()->json(['error' => 'Page not found'], 404);
         }
 
-        $books = Book::with('location')->where('status', $filter)->get();
+        $books = Book::with('location')
+                    ->where('status', $filter)
+                    ->orderByDesc('created_at')
+                    ->get();
+        
+        foreach($books as $book) {
+            $book->authors = json_decode($book->authors);
+        }
+
+      
 
         return $books;
     }
