@@ -11,6 +11,7 @@ use App\Http\Controllers\BorrowBookController;
 use App\Http\Controllers\BorrowMaterialController;
 //circulation
 use App\Http\Controllers\CirculationLogController;
+use Symfony\Component\HttpFoundation\Request; 
 
 // default view
 Route::get('/', function (Request $request) {
