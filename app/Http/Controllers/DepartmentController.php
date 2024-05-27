@@ -42,16 +42,18 @@ class DepartmentController extends Controller
         // Return the created program
         return response()->json($addprogram, 201);
     }
-    // Add a new college
-    public function store(Request $request)
+
+    public function AddDepartment(Request $request)
     {
-        $validatedData = $request->validate([
-            'department' => 'required|string|max:10|unique:departments',
-            'full_department' => 'required|string|max:255'
-        ]);
+        $payload = $request->input('payload');
 
-        $department = Department::create($validatedData);
+        //Create a new Department Instance and assigned values from payload
+        $addDepartment = new Department();
+        $addDepartment->department =$payload["department"];
+        $addDepartment->full_department = $payload['full_department'];
 
-        return response()->json(['message' => 'College added successfully!', 'department' => $department], 201);
+        $addDepartment->save();
+
+        return response()->json($addDepartment, 201);
     }
 }
