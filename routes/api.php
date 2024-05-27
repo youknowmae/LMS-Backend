@@ -57,6 +57,7 @@ Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function (
         Route::prefix('/books')->group(function () {
             Route::get('/clear', [InventoryController::class, 'clearBooksHistory']);
             Route::get('/{filter}', [InventoryController::class, 'getBookInventory']);
+            Route::get('/search/{filter}', [InventoryController::class, 'searchBookInventory']);
             Route::post('/{id}', [InventoryController::class, 'updateBookStatus']);
         });
         // Route::get('/', [InventoryController::class, 'index']);
