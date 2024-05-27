@@ -369,5 +369,5 @@ Route::post('/patrons/{id}', [PatronController::class, 'update']);
 Route::middleware(['auth:sanctum', 'check.access:superadmin'])->group(function () {
     Route::get('view/{department}',[ProgramController::class,'viewDepartmentProgram']);
     Route::post('/add-program',[DepartmentController::class, 'AddProgram']);
-    
+    Route::post('/add-department',[DepartmentController::class, 'AddDepartment']);
 });
