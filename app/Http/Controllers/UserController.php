@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $users = User::where('role', '<>', 'superadmin')->get();
-        return response()->json(['users' => $users]);
+
+        return $users;
     }
 
     public function show(int $personnel)
@@ -37,7 +38,7 @@ class UserController extends Controller
         ]);
 
         if($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()]);
+            return response()->json(['errors' => $validator->errors()], 400);
         }
 
         $user = User::create([
@@ -55,10 +56,7 @@ class UserController extends Controller
             'access' => $request->access,
         ]);
 
-        return response()->json([
-            'message'=> 'User created successfully',
-            //'data'=> $user
-        ]);
+        return response()->json(['success'=> $user], 201);
     }
 
     public function update(Request $request, $id)
