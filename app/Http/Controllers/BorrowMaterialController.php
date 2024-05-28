@@ -21,6 +21,7 @@ use Exception, Carbon, Storage;
 
 class BorrowMaterialController extends Controller
 {
+    const URL = 'http://192.168.68.124:8000';
     public function borrowbook(Request $request)
     {
         $payload = json_decode($request->payload);
@@ -221,7 +222,7 @@ class BorrowMaterialController extends Controller
     
             // Return a success response
             return response()->json(['message' => 'Book returned successfully'], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Rollback the transaction if any operation fails
             DB::rollback();
     
@@ -232,8 +233,8 @@ class BorrowMaterialController extends Controller
     
 
     public function bookBorrowersReport(Request $request){
-        // Fetch distinct borrowers with their user and program relations
-        $borrowers = BorrowMaterial::with(['user.program'])
+        // Fetch distinct borrowers with their user and program relations, including nested department
+        $borrowers = BorrowMaterial::with(['user.program.department'])
             ->select('user_id')
             ->distinct()
             ->get();
@@ -251,8 +252,8 @@ class BorrowMaterialController extends Controller
             $program = $user->program;
     
             // Increment count by department
-            if ($program) {
-                $department = $program->department;
+            if ($program && $program->department) {
+                $department = $program->department->full_department; // Assuming you want the full_department name
                 if (isset($borrowersByDepartment[$department])) {
                     $borrowersByDepartment[$department]++;
                 } else {
@@ -261,12 +262,8 @@ class BorrowMaterialController extends Controller
             }
     
             // Increment count by gender
-            $gender = $user->gender;
-            if (isset($borrowersByGender[$gender])) {
-                $borrowersByGender[$gender]++;
-            } else {
-                $borrowersByGender[$gender] = 1;
-            }
+            $gender = $user->gender == 1 ? 'Male' : 'Female'; // Assuming gender 1 represents Male and 2 represents Female
+            $borrowersByGender[$gender]++;
         }
     
         // Return the response as JSON
@@ -275,6 +272,7 @@ class BorrowMaterialController extends Controller
             'borrowersByGender' => $borrowersByGender
         ]);
     }
+    
 
     public function mostBorrowed(Request $request){
         $mostBorrowedBooks = BorrowMaterial::select('book_id', DB::raw('COUNT(*) as borrow_count'))
@@ -289,16 +287,39 @@ class BorrowMaterialController extends Controller
         $topborrowers = BorrowMaterial::select(
             'user_id',
             DB::raw('COUNT(*) as borrow_count'),
-            'users.last_name'
+            'users.last_name',
+            'users.first_name',
         )
         ->join('users', 'borrow_materials.user_id', '=', 'users.id')
-        ->groupBy('borrow_materials.user_id', 'users.last_name')
+        ->join('programs', 'borrow_materials.user_id', '=', 'users.id')
+        ->groupBy('borrow_materials.user_id', 'users.last_name', 'users.first_name')
         ->orderByDesc('borrow_count')
         ->get();
 
         return response()->json($topborrowers,200);
     }
 
+    public function getByUserId(Request $request, $userId)
+    {
+        $borrowMaterial = BorrowMaterial::with('book')->where('user_id', $userId)
+                                        ->orderBy('borrow_expiration', 'asc')
+                                        ->get();
+
+        foreach($borrowMaterial as $book) {
+            echo self::URL . Storage::url($book->book->image_url) . "\n";
+            if($book->book->image_url != null)
+                $book->book->image_url = self::URL . Storage::url($book->book->image_url);
+
+            // $book->book->authors = json_decode($book->book->authors);
+            // $book->book->authors = 'sup';
+        }
+
+        if ($borrowMaterial->isEmpty()) {
+            return response()->json(['message' => 'No borrow records found for the user'], 404);
+        }
+
+        return response()->json($borrowMaterial, 200);
+    }
 }
 
 

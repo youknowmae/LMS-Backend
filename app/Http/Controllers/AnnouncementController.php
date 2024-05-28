@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
-    const URL = 'http://192.168.14.174:8000';
+    const URL = 'http://192.168.18.185:8000';
 
     public function index()
     {
@@ -49,7 +49,13 @@ class AnnouncementController extends Controller
 
         $announcement->save();
 
-        return response()->json(['message' => 'Announcement created successfully'], 201);
+        if($announcement->image != null)
+            $announcement->image = self::URL . Storage::url($announcement->image);
+        else {
+            $announcement->image = null;
+        }
+
+        return response()->json(['success' => $announcement], 201);
     }
 
     public function show(Announcement $announcement)
@@ -82,7 +88,13 @@ class AnnouncementController extends Controller
             $announcement->save();
         }
 
-        return response()->json(['message' => 'Announcement updated successfully']);
+        if($announcement->image != null)
+            $announcement->image = self::URL . Storage::url($announcement->image);
+        else {
+            $announcement->image = null;
+        }
+
+        return response()->json(['success' => $announcement], 201);
     }
 
     public function destroy(Announcement $announcement)

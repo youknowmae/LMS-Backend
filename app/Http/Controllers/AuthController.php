@@ -13,7 +13,8 @@ use Storage;
 class AuthController extends Controller
 {
 
-    const URL = 'http://26.68.32.39:8000';
+    // const URL = 'http://26.68.32.39:8000';
+    const URL = 'http://192.168.89.174:8000';
     // public function studentLogin(Request $request) {
     //     $auth_url = 'http://127.0.0.1:8001/api/login';
     //     $details = Http::get($auth_url)->json();

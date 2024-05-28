@@ -8,6 +8,7 @@ use App\Models\LockersLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Models\LockerLog;
+use Validator;
 use App\Models\User;
 
 
@@ -16,7 +17,7 @@ class LockerController extends Controller
 {
     public function getAllLockers()
 {
-    $lockers = Locker::with('user:id,first_name,last_name,studentNumber,program_id,department,gender')
+    $lockers = Locker::with('user.program.department')
         ->select('Id', 'user_id', 'locker_number', 'status')
         ->get();
 
@@ -26,7 +27,7 @@ class LockerController extends Controller
     public function getLockerInfo($lockerId)
     {
         $locker = Locker::with(['user' => function($query) {
-            $query->select('id', 'studentNumber', 'first_name', 'last_name', 'program_id', 'gender')
+            $query->select('id', 'first_name', 'last_name', 'program_id', 'gender')
                 ->with(['program' => function($programQuery) {
                     $programQuery->select('id', 'program', 'full_program', 'department_id')
                                 ->with(['department' => function($departmentQuery) {
@@ -45,11 +46,114 @@ class LockerController extends Controller
 
     public function index()
     {
-        $lockers = Locker::with('lockerLogs')->get();
+        $lockers = Locker::select('id', 'status', 'locker_number', 'updated_at')->get();
 
-        return view('lockers.index', compact('lockers'));
+        return $lockers;
     }
 
+    public function store(Request $request) {
+        $data = Validator::make($request->all(), [
+            'numberOfLockers' => 'required|numeric|gt:0'
+        ]);
+
+        if($data->fails()){
+            return response()->json(['errors' => $data->errors()], 400 );
+        }
+
+        $latestLocker = Locker::latest('id')->first();
+
+        if(!$latestLocker) {
+            $latestLockerNumber = 0;
+        }
+        else {
+            $latestLockerNumber = intval($latestLocker->locker_number);
+        }
+
+        $lockers = [];
+        
+        for ($i = $latestLockerNumber + 1; $i <= $latestLockerNumber + $request->numberOfLockers; $i++) {
+            $lockerNumber = str_pad($i, 3, '0', STR_PAD_LEFT);
+
+            $locker = new Locker();
+            $locker->locker_number = $lockerNumber;
+            $locker->status = 'Available';
+            $locker->save();
+
+            $lockers[] = $locker;
+        }
+        $user_id = $request->user()->id;
+
+        $log = new LockerHistoryController();
+        if($request->numberOfLockers > 1) {
+            $details = "create " . $request->numberOfLockers . " lockers";
+        } 
+        else {
+            $details = "create " . $request->numberOfLockers . " locker";
+        }
+
+        $log->add($user_id, "create", $details);
+
+        return response()->json(['success' => $lockers]);
+    }
+
+    public function getStartingLockerNumber() {
+        $latestLocker = Locker::latest('id')->first();
+
+        if(!$latestLocker) {
+            return 1;
+        }
+
+        $latestLockerNumber = intval($latestLocker->locker_number);
+
+        return $latestLockerNumber + 1;
+    }
+
+    public function show($id) {
+        $locker = Locker::select('id', 'locker_number', 'status')->findorfail($id);
+        // , 'remarks'
+        return $locker;
+    }
+
+    public function update(Request $request, $id) {
+        $data = Validator::make($request->all(), [
+            'status' => 'required|in:Occupied,Available,Unavailable',
+            // 'remarks' => 'nullable|string|max:256'
+        ]);
+
+        if($data->fails()){
+            return response()->json(['errors' => $data->errors()], 400 );
+        }
+
+        $locker = Locker::findorfail($id);
+        $locker->update($data->validated());
+
+        $user_id = $request->user()->id;
+
+        $log = new LockerHistoryController();
+        $log->add($user_id, "update", "update locker #" . $locker->locker_number);
+
+        return response()->json(['success' => $locker]);
+    }
+
+    public function destroy($id) {
+        $latestLocker = Locker::latest('id')->first();
+
+        // return $latestLocker->id;
+
+        if($latestLocker->id != $id) {
+            return response()->json(['errors' => 'You must delete the latest locker first.'], 400 );
+        }
+
+        $locker = Locker::findorfail($id);
+        $locker->delete();
+
+        $user_id = Auth()->user()->id;
+
+        $log = new LockerHistoryController();
+        $log->add($user_id, "delete", "delete locker #" . $locker->lockerNumber);
+        
+        return response()->json(['success' => 'Locker has been deleted.']);
+    }
 
 //LOCKER MAINTENANCE
     public function locker(Request $request)

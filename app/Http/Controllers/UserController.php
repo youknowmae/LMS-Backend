@@ -9,9 +9,18 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $users = User::where('position', '<>', 'Head')->get();
+        $all_users = User::all();
+        $users = [];
+
+        foreach($all_users as $user) {
+            $roles = json_decode($user->role);
+            $user->role = $roles;
+            if(!in_array('user', $roles) && !in_array('maintenance', $roles)) {
+                array_push($users, $user);
+            }
+        }
         return response()->json(['users' => $users]);
     }
 
@@ -25,19 +34,22 @@ class UserController extends Controller
     {
         $validator = Validator::make( $request->all(), [
             'username' => 'required|unique:users',
-            'role' => 'required|string|max:255',
-            'password' => 'required|string|max:25',
-            'first_name' => 'required|string|max:50',
-            'middle_name' => 'nullable|string|max:50',
-            'last_name' => 'required|string|max:50',
-            'ext_name' => 'nullable|string|max:20'
+            // 'patron_id' => 'required',
+            // 'department' => 'required',
+            // 'position' => 'required',
+            'password' => 'required',
+            'first_name' => 'required',
+            'middle_name' => 'nullable',
+            'last_name' => 'required',
+            'ext_name' => 'nullable',
+            'role' => 'required|string'
         ]);
 
         if($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()]);
+            return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        User::create([
+        $user = User::create([
             'username' => $request->username,
             'role' => $request->role,
             'password' => Hash::make($request->password),
@@ -47,9 +59,7 @@ class UserController extends Controller
             'ext_name' => $request->ext_name
         ]);
 
-        return response()->json([
-            'message'=> 'User created successfully',
-        ]);
+        return response()->json(['success'=> $user], 201);
     }
 
     public function update(Request $request, $id)
@@ -57,12 +67,15 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'role' => 'nullable|string|max:100',
-            'password' => 'nullable|string|max:25',
-            'first_name' => 'nullable|string|max:50',
-            'middle_name' => 'nullable|string|max:50',
-            'last_name' => 'nullable|string|max:50',
-            'ext_name' => 'nullable|string|max:20'
+            // 'patron_id' => 'required|unique:users,patron_id,'.$user->id,
+            // 'department' => 'required',
+            // 'position' => 'required',
+            'password' => 'nullable',
+            'first_name' => 'required',
+            'middle_name' => 'nullable',
+            'last_name' => 'required',
+            'ext_name' => 'nullable',
+            'role' => 'required'
         ]);
 
         if($validator->fails()) {
@@ -79,7 +92,8 @@ class UserController extends Controller
         ]);
 
         return response()->json([
-            'message'=> 'User updated successfully'
+            'message'=> 'User updated successfully',
+            'data'=> $user->fresh()
         ]);
     }
 

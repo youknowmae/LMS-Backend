@@ -21,18 +21,19 @@ class PatronController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'fines_if_overdue' => 'required|numeric',
-            'days_allowed' => 'required|integer',
-            'hours_allowed' => 'required|integer',
+            'fine' => 'required|numeric|gt:-1',
+            'days_allowed' => 'nullable|integer|gt:-1',
+            'hours_allowed' => 'required|integer|between:0,23',
         ]);
         
         $patron = Patron::findorfail($id);
 
-        $patron->fines_if_overdue = $request->fines_if_overdue;
-        $patron->hours_allowed = $request->hours_allowed;
+        $patron->fine = $request->fine;
+        $hours = ($request->days_allowed * 24) + $request->hours_allowed;
+        $patron->hours_allowed = $hours;
         
         $patron->save();
 
-        return response()->json(['message' => 'Patron type updated successfully.']);
+        return response()->json(['success' => 'Patron has been successfully updated']);
     }
 }

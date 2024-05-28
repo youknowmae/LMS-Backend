@@ -21,6 +21,18 @@ class ReserveBookController extends Controller
         if (!$book) {
             return response()->json(['error' => 'Book not found'], 404);
         }
+
+        // Check if the user already has a reservation with status 1 on the same book
+        $existingReservation = Reservation::where('book_id', $payload->book_id)
+        ->where('user_id', $payload->user_id)
+        ->whereHas('user', function ($query) {
+            $query->where('status', 1);
+        })
+        ->exists();
+
+        if ($existingReservation) {
+            return response()->json(['error' => 'User already has a reservation for this book'], 400);
+        }
     
         // Create Reservation instance
         $reservation = new reservation();
@@ -36,12 +48,28 @@ class ReserveBookController extends Controller
         return response()->json($data);
     }
 
-    public function reservelist(Request $request){
-        $reservelist = Reservation::with(['user.program', 'user.department', 'user.patron'])
+    // public function reservelist(Request $request){
+    //     $reservelist = Reservation::with(['user.program', 'user.department', 'user.patron'])
+    //                     ->whereHas('user', function($query){
+    //                         $query->where('status', 1);
+    //                     })
+    //                     ->get();
+    //     return response()->json($reservelist);
+    // }
+
+    public function reservelist(Request $request, $type = null){
+        $reservelist = Reservation::with(['user.program.department', 'user.patron'])
                         ->whereHas('user', function($query){
                             $query->where('status', 1);
-                        })
-                        ->get();
+                        });
+
+                        if ($type === 'online') {
+                            $reservelist->where('type', 'online');
+                        } elseif ($type === 'walk-in') {
+                            $reservelist->where('type', 'walk-in');
+                        }
+                    
+                        $reservelist = $reservelist->get();
         return response()->json($reservelist);
     }
 
@@ -55,34 +83,36 @@ class ReserveBookController extends Controller
             return response()->json($queueData);
     }
 
-    public function getQueuePosition(Request $request, $id) {
+    public function getQueuePosition(Request $request) {
         // Get the authenticated user's ID
-        $id = $request->user()->id;
-        // Fetch all reservations for the user's books with a status other than 0
-        $userReservations = Reservation::where('user_id', $id)
+        $userId = $request->user()->id;
+    
+        // Fetch all active reservations for the user's books
+        $userReservations = Reservation::where('user_id', $userId)
                             ->where('status', '!=', 0) // Exclude reservations with status 0
                             ->orderBy('start_date')
                             ->get(['book_id', 'start_date']);
-
+    
         // Initialize the queue positions
         $queuePositions = [];
-
+    
         // Process the user's reservations and determine the queue position for each book
         foreach ($userReservations as $userReservation) {
             $bookId = $userReservation->book_id;
-            
+    
             // Count the number of reservations with earlier start dates for the same book
             $position = Reservation::where('book_id', $bookId)
                             ->where('start_date', '<', $userReservation->start_date)
                             ->where('status', '!=', 0) // Exclude reservations with status 0
                             ->count() + 1; // Add 1 to start positions from 1
-
+    
             // Assign the queue position for the book
             $queuePositions[$bookId] = $position;
         }
-
+    
         return response()->json($queuePositions);
     }
+    
 }
 
 

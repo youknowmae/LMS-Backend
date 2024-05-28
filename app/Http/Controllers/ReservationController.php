@@ -36,7 +36,11 @@ class ReservationController extends Controller
     
     public function getUserById($id)
     {
-        $reservations = Reservation::where('user_id', $id)->with('book')->get();
+        $reservations = Reservation::where('user_id', $id)
+        ->with('book')
+        ->orderBy('created_at', 'desc')
+        ->get();
+        
         return response()->json($reservations);
     }
 

@@ -294,10 +294,10 @@ class ProjectController extends Controller
         // Define the mapping of department strings to department IDs
         $departmentMapping = [
             'CCS' => 1,
-            'Business' => 5,
-            'Nursing' => 2,
-            'Education' => 3,
-            'Tourism' => 4,
+            'CAHS' => 2,
+            'CEAS' => 3,
+            'CHTM' => 4,
+            'CBA' => 5,
             // Add other mappings as necessary
         ];
     

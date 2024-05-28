@@ -21,11 +21,11 @@ class LocationController extends Controller
         ]);
 
         if($location->fails()) {
-            return response()->json(['error' => $location->errors()]);
+            return response()->json(['error' => $location->errors()], 400);
         }
 
-        Location::create($location->validated());
+        $location = Location::create($location->validated());
 
-        return response()->json(['success' => 'Location has been successfully created.'], 200);        
+        return response()->json(['success' => $location], 201);        
     }
 }

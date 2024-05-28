@@ -15,90 +15,110 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        User::factory()->create([
-            'role' => json_encode(['maintenance', 'cataloging']),
-            'position' => 'Head',
-            'username' => 'superadmin',
-            'password' => Hash::make('Admin123')
-        ]);
+        // User::factory()->create([
+        //     'role' => json_encode(['maintenance', 'cataloging']),
+        //     'position' => 'Head',
+        //     'username' => 'superadmin',
+        //     'password' => Hash::make('Admin123')
+        // ]);
 
-        User::factory()->create([
-            'role' => json_encode(['cataloging']),
-            'position' => 'Chief',
-            'username' => 'cataloging',
-            'password' => Hash::make('Admin123')
-        ]);
+        // User::factory()->create([
+        //     'role' => json_encode(['cataloging']),
+        //     'position' => 'Chief',
+        //     'username' => 'cataloging',
+        //     'password' => Hash::make('Admin123')
+        // ]);
 
-        User::factory()->create([
-            'role' => json_encode(['circulation']),
-            'position' => 'Front Desk',
-            'username' => 'circulation',
-            'password' => Hash::make('Admin123')
-        ]);
+        // User::factory()->create([
+        //     'role' => json_encode(['circulation']),
+        //     'position' => 'Front Desk',
+        //     'username' => 'circulation',
+        //     'password' => Hash::make('Admin123')
+        // ]);
 
-        User::factory()->create([
-            'role' => json_encode(['opac']),
-            'position' => 'OPAC User',
-            'username' => 'opac',
-            'password' => Hash::make('Admin123')
-        ]);
+        // User::factory()->create([
+        //     'role' => json_encode(['opac']),
+        //     'position' => 'OPAC User',
+        //     'username' => 'opac',
+        //     'password' => Hash::make('Admin123')
+        // ]);
 
-        User::factory()->count(20)->create([
-            'role' => json_encode(['user'])
-        ]);
+        // User::factory()->create([
+        //     'role' => json_encode(['locker', 'circulation']),
+        //     'position' => 'Front Desk',
+        //     'username' => 'frontdesk',
+        //     'password' => Hash::make('Admin123')
+        // ]);
+
+    //     User::factory()->count(20)->create([
+    //         'role' => json_encode(['user'])
+    //     ]);
         
-        User::factory()->create([
-            'role' => json_encode(['user']),
-            'id' => 202110194,
-            'program_id' => 1,
-            'gender' => 1,
-            'first_name' => 'Charles John',
-            'last_name' => 'Malit',
-            'username' => '202110194',
-            'password' => Hash::make('123')
-        ]);
+    //     User::factory()->create([
+    //         'role' => json_encode(['user']),
+    //         'id' => 202110194,
+    //         'program_id' => 1,
+    //         'gender' => 1,
+    //         'first_name' => 'Charles John',
+    //         'last_name' => 'Malit',
+    //         'username' => '202110194',
+    //         'password' => Hash::make('123')
+    //     ]);
 
-        User::factory()->create([
-            'role' => json_encode(['user']),
-            'id' => 202111304,
-            'program_id' => 5,
-            'gender' => 1,
-            'first_name' => 'Don Ace',
-            'last_name' => 'Rañada',
-            'username' => '202111304',
-            'password' => Hash::make('123')
-        ]);
+    //     User::factory()->create([
+    //         'role' => json_encode(['user']),
+    //         'id' => 202111304,
+    //         'program_id' => 5,
+    //         'gender' => 1,
+    //         'first_name' => 'Don Ace',
+    //         'last_name' => 'Rañada',
+    //         'username' => '202111304',
+    //         'password' => Hash::make('123')
+    //     ]);
 
-        User::factory()->create([
-            'role' => json_encode(['user']),
-            'id' => 202110876,
-            'program_id' => 10,
-            'gender' => 1,
-            'first_name' => 'John Laurenze',
-            'last_name' => 'Leguidleguid',
-            'username' => '202110876',
-            'password' => Hash::make('123')
-        ]);
+    //     User::factory()->create([
+    //         'role' => json_encode(['user']),
+    //         'id' => 202110876,
+    //         'program_id' => 10,
+    //         'gender' => 1,
+    //         'first_name' => 'John Laurenze',
+    //         'last_name' => 'Leguidleguid',
+    //         'username' => '202110876',
+    //         'password' => Hash::make('123')
+    //     ]);
 
-        User::factory()->create([
-            'role' => json_encode(['user']),
-            'id' => 202110878,
-            'program_id' => 14,
-            'gender' => 0,
-            'first_name' => 'Eunice',
-            'last_name' => 'Protasio',
-            'username' => '202110878',
-            'password' => Hash::make('123')
-        ]);
+    //     User::factory()->create([
+    //         'role' => json_encode(['user']),
+    //         'id' => 202110878,
+    //         'program_id' => 14,
+    //         'gender' => 0,
+    //         'first_name' => 'Eunice',
+    //         'last_name' => 'Protasio',
+    //         'username' => '202110878',
+    //         'password' => Hash::make('123')
+    //     ]);
 
+    //     User::factory()->create([
+    //         'role' => json_encode(['user']),
+    //         'id' => 202110188,
+    //         'program_id' => 22,
+    //         'gender' => 1,
+    //         'first_name' => 'Ehdrian',
+    //         'last_name' => 'Lim',
+    //         'username' => '202110188',
+    //         'password' => Hash::make('123')
+    //     ]);
+
+    
         User::factory()->create([
             'role' => json_encode(['user']),
-            'id' => 202110188,
+            'id' => 202110999,
             'program_id' => 22,
+            'patron_id' => 2,
             'gender' => 1,
-            'first_name' => 'Ehdrian',
-            'last_name' => 'Lim',
-            'username' => '202110188',
+            'first_name' => 'Kevin',
+            'last_name' => 'Costamero',
+            'username' => '202110999',
             'password' => Hash::make('123')
         ]);
     }

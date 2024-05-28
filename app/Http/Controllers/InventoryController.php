@@ -65,6 +65,7 @@ class InventoryController extends Controller
 
         $book = Book::findorfail($id);
         $book->update($data->validated());
+        $book->save();
 
         return response()->json(['success' => 'Item has been updated.'], 200);
     }
