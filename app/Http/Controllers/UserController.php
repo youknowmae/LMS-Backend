@@ -27,6 +27,8 @@ class UserController extends Controller
     public function show(int $personnel)
     {
         $user = User::findorfail($personnel);
+        $user->role = json_decode($user->role);
+
         return $user;
     }
 
@@ -59,6 +61,7 @@ class UserController extends Controller
             'ext_name' => $request->ext_name
         ]);
 
+        $user->role = json_decode($user->role);
         return response()->json(['success'=> $user], 201);
     }
 
@@ -67,9 +70,6 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            // 'patron_id' => 'required|unique:users,patron_id,'.$user->id,
-            // 'department' => 'required',
-            // 'position' => 'required',
             'password' => 'nullable',
             'first_name' => 'required',
             'middle_name' => 'nullable',
@@ -79,7 +79,7 @@ class UserController extends Controller
         ]);
 
         if($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()]);
+            return response()->json(['errors' => $validator->errors()], 400);
         }
 
         $user->update([
@@ -91,10 +91,13 @@ class UserController extends Controller
             'ext_name' => $request->ext_name
         ]);
 
+        $user = $user->fresh();
+        $user->role = json_decode($user->role);
+
         return response()->json([
-            'message'=> 'User updated successfully',
-            'data'=> $user->fresh()
-        ]);
+            'success'=> 'User updated successfully',
+            'data'=> $user
+        ], 200);
     }
 
     public function destroy($id)
