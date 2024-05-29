@@ -9,7 +9,7 @@ use Exception, DB, Storage, Str;
 
 class ProjectController extends Controller
 {
-    const URL = 'http://192.168.68.124:8000';
+    const URL = 'http://26.68.32.39:8000';
     public function getProjects() {
         $projects = Project::with(['program.department'])->orderByDesc('created_at')->get();
 
@@ -139,7 +139,7 @@ class ProjectController extends Controller
             'keywords' => 'required|string|max:1024',
             // 'abstract' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'abstract' => 'required|string|max:2048',
-            'image_url' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         
 

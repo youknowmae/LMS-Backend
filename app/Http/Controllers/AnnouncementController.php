@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
-    const URL = 'http://192.168.18.185:8000';
+    const URL = 'http://192.168.10.131:8000';
 
     public function index()
     {

@@ -180,9 +180,6 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
     Route::get('mostborrowed', [BorrowMaterialCOntroller::class, 'mostborrowed']);
 });
 
-
-
-
 // Material viewing routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:materials-read']], function () {
 

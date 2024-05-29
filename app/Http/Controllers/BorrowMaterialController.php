@@ -306,7 +306,6 @@ class BorrowMaterialController extends Controller
                                         ->get();
 
         foreach($borrowMaterial as $book) {
-            echo self::URL . Storage::url($book->book->image_url) . "\n";
             if($book->book->image_url != null)
                 $book->book->image_url = self::URL . Storage::url($book->book->image_url);
 

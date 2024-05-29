@@ -12,7 +12,7 @@ class Book extends Model
     protected $fillable = ['id', 'call_number', 'title', 'authors', 'publisher',
                             'location_id', 'copyright', 'volume', 'edition', 'remarks',
                             'pages', 'content', 'remarks', 'acquired_date', 'source_of_fund',
-                            'price', 'available', 'fine'];
+                            'price', 'available', 'fine', 'status'];
 
     public function location()
     {

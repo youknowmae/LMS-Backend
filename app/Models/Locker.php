@@ -21,9 +21,18 @@ class Locker extends Model
 }
 
     protected $fillable = [
-        'lockerNumber',
+        'locker_number',
         'remarks',
         'status'
     ];
 
+    public function programs()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function departments()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

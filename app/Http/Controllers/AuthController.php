@@ -14,7 +14,7 @@ class AuthController extends Controller
 {
 
     // const URL = 'http://26.68.32.39:8000';
-    const URL = 'http://192.168.89.174:8000';
+    const URL = 'http://26.68.32.39:8000';
     // public function studentLogin(Request $request) {
     //     $auth_url = 'http://127.0.0.1:8001/api/login';
     //     $details = Http::get($auth_url)->json();
@@ -92,7 +92,7 @@ class AuthController extends Controller
             if(in_array('locker', $roles))
                 array_push($abilities, 'locker');
 
-            if(in_array('opac', $abilities))
+            if(in_array('opac', $roles))
                 array_push($abilities, 'opac');
 
             if(in_array('user', $roles))
@@ -163,9 +163,6 @@ class AuthController extends Controller
         }
     }
 
-
-
-    
     public function getUser($id)
     {
         $user = User::findOrFail($id);

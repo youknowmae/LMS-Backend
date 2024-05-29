@@ -8,7 +8,7 @@ use Exception, Str;
 
 class ArticleController extends Controller
 {
-    const URL = 'http://192.168.10.122:8000';
+    const URL = 'http://26.68.32.39:8000';
     public function getArticles() {
         $articles = Article::orderByDesc('updated_at')->get();
         

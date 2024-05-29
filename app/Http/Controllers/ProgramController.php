@@ -9,6 +9,9 @@ use Validator;
 
 class ProgramController extends Controller
 {
+    public function get(Request $request) {
+        return Program::with('department')->get();
+    }
     public function addProgram(Request $request){
         $data = Validator::make($request->all(), [
             'program' => 'required|string|max:10',

@@ -9,7 +9,7 @@ use Storage, Str;
 
 class PeriodicalController extends Controller
 {
-    const URL = 'http://192.168.68.124:8000';
+    const URL = 'http://26.68.32.39:8000';
     public function getPeriodicals() {
         $periodicals = Periodical::orderByDesc('updated_at')->get();
 

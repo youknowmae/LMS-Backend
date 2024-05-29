@@ -22,12 +22,12 @@ class UserSeeder extends Seeder
         //     'password' => Hash::make('Admin123')
         // ]);
 
-        // User::factory()->create([
-        //     'role' => json_encode(['cataloging']),
-        //     'position' => 'Chief',
-        //     'username' => 'cataloging',
-        //     'password' => Hash::make('Admin123')
-        // ]);
+        User::factory()->create([
+            'role' => json_encode(['cataloging']),
+            'position' => 'Chief',
+            'username' => 'cataloging',
+            'password' => Hash::make('Admin123')
+        ]);
 
         // User::factory()->create([
         //     'role' => json_encode(['circulation']),
@@ -110,16 +110,16 @@ class UserSeeder extends Seeder
     //     ]);
 
     
-        User::factory()->create([
-            'role' => json_encode(['user']),
-            'id' => 202110999,
-            'program_id' => 22,
-            'patron_id' => 2,
-            'gender' => 1,
-            'first_name' => 'Kevin',
-            'last_name' => 'Costamero',
-            'username' => '202110999',
-            'password' => Hash::make('123')
-        ]);
+        // User::factory()->create([
+        //     'role' => json_encode(['user']),
+        //     'id' => 202110999,
+        //     'program_id' => 22,
+        //     'patron_id' => 2,
+        //     'gender' => 1,
+        //     'first_name' => 'Kevin',
+        //     'last_name' => 'Costamero',
+        //     'username' => '202110999',
+        //     'password' => Hash::make('123')
+        // ]);
     }
 }
