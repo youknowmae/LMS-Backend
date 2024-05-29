@@ -114,15 +114,14 @@ class LockerController extends Controller
     }
 
     public function show($id) {
-        $locker = Locker::select('id', 'locker_number', 'status')->findorfail($id);
-        // , 'remarks'
+        $locker = Locker::select('id', 'locker_number', 'remarks', 'status')->findorfail($id);
         return $locker;
     }
 
     public function update(Request $request, $id) {
         $data = Validator::make($request->all(), [
             'status' => 'required|in:Occupied,Available,Unavailable',
-            // 'remarks' => 'nullable|string|max:256'
+            'remarks' => 'nullable|string|max:256'
         ]);
 
         if($data->fails()){
