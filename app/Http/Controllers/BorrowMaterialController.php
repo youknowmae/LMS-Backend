@@ -199,8 +199,8 @@ class BorrowMaterialController extends Controller
 
     public function borrowcount(Request $request, $id){
         $user = User::find($id);
-        $activeBorrowsCount = Borrow::where('user_id', $id)
-                                    ->where('status', 'active')
+        $activeBorrowsCount = BorrowMaterial::where('user_id', $id)
+                                    ->where('status', 1)
                                     ->count();
         return response()->json(['active_borrows_count' => $activeBorrowsCount]);
     }
@@ -355,39 +355,3 @@ class BorrowMaterialController extends Controller
         return response()->json($borrowMaterial, 200);
     }
 }
-
-
-//edited out
-        // // Create a new BorrowBook instance
-        // $borrowBook = new BorrowBook();
-        // $borrowBook->request_id = $borrowMaterial->id; // Set the request_id
-        // $borrowBook->book_id = $request->book_id; // Save the book_id
-    
-        // // Save the BorrowBook instance
-        // $borrowBook->save();
-    
-        // Check if the BorrowBook was saved successfully
-        // if (!$borrowBook->id) {
-        //     return response()->json(['error' => 'Failed to create borrow book'], 500);
-        // }
-    
-
-        // Update the availability of the book
-        // $book->available -= 1;
-        // $book->save(); // Save the updated book
-
-        
-        // public function bookBorrowersReport(Request $request){
-        // $borrowers = BorrowMaterial::with('user.program')
-        //     ->select('user_id')
-        //     ->distinct()
-        //     ->get();
-
-        // $borrowersByDepartment = $borrowers->groupBy('user.program.department');
-        // $borrowersByGender = $borrowers->groupBy('user.gender');
-
-        // return response()->json([
-        //     'borrowersByDepartment' => $borrowersByDepartment,
-        //     'borrowersByGender' => $borrowersByGender
-        // ]);
-        // }
