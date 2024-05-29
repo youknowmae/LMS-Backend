@@ -169,6 +169,16 @@ class BorrowMaterialController extends Controller
         return response()->json($borrowMaterial);
     }
 
+    public function returnedlistid($id)
+    {
+        $returnedItems = BorrowMaterial::where('user_id', $id)
+                                       ->get();
+        if ($returnedItems->isEmpty()) {
+            return response()->json(['message' => 'No returned items found for this user'], 404);
+        }
+        return response()->json($returnedItems, 200);
+    }
+
     public function borrowEdit(Request $request){
         $payload = json_decode($request->payload);
   

@@ -155,6 +155,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
 
     //returned book list
     Route::get('returned-list',[BorrowMaterialController::class,'returnedlist']);
+    Route::get('returned-list/{id}',[BorrowMaterialController::class,'returnedlistid']);
 
     //reservebook
     Route::post('/reserve/book', [ReserveBookController::class, 'reservebook']);
@@ -180,6 +181,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
 
     //delete
     Route::delete('delete-borrowlist/{id}', [BorrowMaterialController::class, 'destroy']);
+    Route::delete('delete-reservelist/{id}', [ReserveBookController::class,'destroy']);
 });
 
 // Material viewing routes
