@@ -173,6 +173,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
     Route::get('circulation/get-user/{id}', [CirculationUserController::class, 'getUser']);
     Route::get('circulation/get-book/{id}', [CirculationUserController::class, 'getBook']); 
     Route::get('circulation/getpatrons', [PatronController::class, 'index']);
+    Route::get('borrow-count/{id}', [BorrowMaterialController::class, 'borrowcount']);
 
     //get report
     Route::get('report', [BorrowMaterialController::class, 'bookBorrowersReport']);
@@ -180,7 +181,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
     Route::get('mostborrowed', [BorrowMaterialController::class, 'mostborrowed']);
 
     //delete
-    Route::get('delete-borrowlist/{id}', [BorrowMaterialController::class, 'destroy']);
+    Route::delete('delete-borrowlist/{id}', [BorrowMaterialController::class, 'destroy']);
 });
 
 // Material viewing routes

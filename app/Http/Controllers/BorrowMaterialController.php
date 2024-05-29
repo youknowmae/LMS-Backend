@@ -197,6 +197,14 @@ class BorrowMaterialController extends Controller
         return response()->json($users, 200);
     }
 
+    public function borrowcount(Request $request, $id){
+        $user = User::find($id);
+        $activeBorrowsCount = Borrow::where('user_id', $id)
+                                    ->where('status', 'active')
+                                    ->count();
+        return response()->json(['active_borrows_count' => $activeBorrowsCount]);
+    }
+
     //return book
 
     public function returnbook(Request $request, $id)
