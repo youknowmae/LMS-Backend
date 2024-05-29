@@ -112,6 +112,24 @@ class ReserveBookController extends Controller
     
         return response()->json($queuePositions);
     }
+
+    public function destroy ($id){
+        // Find the reservation by ID
+        $reservation = Reservation::find($id);
+
+        // Check if the reservation exists
+        if (!$reservation) {
+            return response()->json(['message' => 'Reservation not found'], 404);
+        }
+
+        // Attempt to delete the reservation
+        try {
+            $reservation->delete();
+            return response()->json(['message' => 'Reservation deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to delete reservation', 'error' => $e->getMessage()], 500);
+        }
+    }
     
 }
 
