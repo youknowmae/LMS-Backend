@@ -20,16 +20,10 @@ class Program extends Model
         return $this->hasMany(User::class);
     }
 
-
     public function program()
     {
         return $this->belongsTo(Program::class);
     }
-
-    // public function program()
-    // {
-    //     return $this->belongsTo(Program::class, 'program_id');
-    // }
 
     public function department()
     {
