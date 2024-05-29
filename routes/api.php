@@ -177,7 +177,10 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
     //get report
     Route::get('report', [BorrowMaterialController::class, 'bookBorrowersReport']);
     Route::get('topborrowers', [BorrowMaterialController::class, 'topborrowers']);
-    Route::get('mostborrowed', [BorrowMaterialCOntroller::class, 'mostborrowed']);
+    Route::get('mostborrowed', [BorrowMaterialController::class, 'mostborrowed']);
+
+    //delete
+    Route::get('delete-borrowlist/{id}', [BorrowMaterialController::class, 'destroy']);
 });
 
 // Material viewing routes

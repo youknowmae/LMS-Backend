@@ -37,13 +37,27 @@ class BorrowMaterialController extends Controller
             return response()->json(['error' => 'Book is not available for borrowing'], 400);
         }
     
-        // Check if the user has 3 active borrows
+        //user and patron information
+        $user = User::find($payload->user_id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        
+        $patron = Patron::find($user->patron_id);
+        if (!$patron) {
+            return response()->json(['error' => 'Patron not found'], 404);
+        }
+        
+        //number of materials allowed for this patron
+        $materialsAllowed = $patron->materials_allowed;
+        
+        // allowed number of active borrows
         $activeBorrowsCount = BorrowMaterial::where('user_id', $payload->user_id)
                                             ->where('status', 1) // Assuming status 1 means active
                                             ->count();
-    
-        if ($activeBorrowsCount >= 3) {
-            return response()->json(['error' => 'User already has 3 active borrows'], 400);
+        
+        if ($activeBorrowsCount >= $materialsAllowed) {
+            return response()->json(['error' => 'User already has the maximum number of active borrows allowed'], 400);
         }
     
         // Use a transaction to ensure both operations happen at the same time
@@ -229,6 +243,19 @@ class BorrowMaterialController extends Controller
             // Handle the exception, e.g., log the error or return an error response
             return response()->json(['message' => 'An error occurred while returning the book'], 500);
         }
+    }
+
+    public function destroy($id)
+    {
+        // Find the record
+        $borrowMaterial = BorrowMaterial::find($id);
+       
+        if (!$borrowMaterial) {
+            return response()->json(['error' => 'BorrowMaterial not found'], 404);
+        }
+
+        $borrowMaterial->delete();
+        return response()->json(['message' => 'BorrowMaterial deleted successfully']);
     }
     
 
