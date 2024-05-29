@@ -20,16 +20,12 @@ class User extends Authenticatable
     protected $fillable = [
         'id',
         'username',
-        'patron_id',
         'role',
-        'department',
-        'position',
         'password',
         'first_name',
         'middle_name',
         'last_name',
         'ext_name',
-        'access',
         'program_id'
     ];
 
@@ -79,48 +75,22 @@ class User extends Authenticatable
         return $this->hasMany(CatalogingLog::class);
     }
 
-    // public function program() {
-    //     return $this->belongsTo(Program::class);
-    // }
-
-    // public function department(){
-    //     return $this->belongsTo(Program::class);
-    // }
-
-    public function patrons(){
-        return $this->belongsTo(Program::class);
+    public function patron(){
+        return $this->belongsTo(Patron::class);
     }
     public function getRolesAttribute($value)
     {
         return json_decode($value, true);
     }
 
-    public function users()
-    {
-        return $this->hasMany(User::class);
-    }
-
-    public function collegeProgram()
-    {
-        return $this->belongsTo(Program::class, 'program_id');
-    }
-
-    public function collegeDepartment()
-    {
-        return $this->belongsTo(Department::class, 'department_id');
-    }
-
-    public function program()
-    {
-        return $this->belongsTo(Program::class, 'program_id');
-    }
-
-
     public function department()
     {
         return $this->hasOneThrough(Department::class, Program::class, 'id', 'id', 'program_id', 'department_id');
     }
 
+    public function program() {
+        return $this->belongsTo(Program::class);
+    }
+
 
 }
-

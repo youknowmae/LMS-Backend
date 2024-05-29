@@ -20,15 +20,8 @@ class Program extends Model
         return $this->hasMany(User::class);
     }
 
-    public function program()
-    {
-        return $this->belongsTo(Program::class);
+    public function department() {
+        return $this->belongsTo(Department::class);
     }
-
-    public function department()
-    {
-        return $this->belongsTo(Department::class, 'department_id');
-    }
-
 
 }

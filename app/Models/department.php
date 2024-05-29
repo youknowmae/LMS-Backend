@@ -19,9 +19,4 @@ class Department extends Model
         return $this->hasMany(Program::class);
     }
 
-        public function department()
-    {
-        return $this->belongsTo(Department::class, 'department_id');
-    }
-
 }

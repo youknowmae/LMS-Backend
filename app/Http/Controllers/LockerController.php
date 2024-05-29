@@ -24,24 +24,29 @@ class LockerController extends Controller
         return response()->json($lockers);
     }
 
+
     public function getLockerInfo($lockerId)
     {
+        // Fetch the locker with nested user, program, and department relationships
         $locker = Locker::with(['user' => function ($query) {
             $query->select('id', 'first_name', 'last_name', 'program_id', 'gender')
-                ->with(['program' => function ($programQuery) {
-                    $programQuery->select('id', 'program', 'full_program', 'department_id')
-                        ->with(['department' => function ($departmentQuery) {
-                            $departmentQuery->select('id', 'department', 'full_department');
-                        }]);
-                }]);
-        }])->findOrFail($lockerId);
+                  ->with(['program' => function ($programQuery) {
+                      $programQuery->select('id', 'program', 'full_program', 'department_id')
+                                  ->with(['department' => function ($departmentQuery) {
+                                      $departmentQuery->select('id', 'department', 'full_department');
+                                  }]);
+                  }]);
+        }])->find($lockerId);
 
+        // Check if locker is found
         if (!$locker) {
             return response()->json(['error' => 'Locker not found'], 404);
         }
 
+        // Return the locker info in JSON format
         return response()->json($locker);
     }
+
 
 
     public function index()
