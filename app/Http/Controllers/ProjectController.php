@@ -372,7 +372,7 @@ class ProjectController extends Controller
 
     public function opacGetProject($id){
 
-        $project =Project::with('program')->findOrfail($id);
+        $project =Project::with('program', 'program.department')->findOrfail($id);
 
         $project->authors = json_decode($project->authors);
         $project->keywords = json_decode($project->keywords);
