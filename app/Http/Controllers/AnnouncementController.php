@@ -25,16 +25,16 @@ class AnnouncementController extends Controller
     public function store(Request $request)
     {
         $data = Validator::make($request->all(), [
-            'title' => 'required|string',
-            'category' => 'required|string',
-            'text' => 'required|string',
+            'title' => 'required|string|max:128',
+            'category' => 'required|string|max:128',
+            'text' => 'required|string|max:8192',
             'file' => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048', // Example validation for file upload
         ]);
 
         $user_id =  $request->user()->id;
         
         if ($data->fails()) {
-            return response()->json(['error' => $data->errors()]);
+            return response()->json(['error' => $data->errors()], 400);
         }
 
         $announcement = new Announcement($data->validated());
@@ -66,16 +66,16 @@ class AnnouncementController extends Controller
     public function update(Request $request, Announcement $announcement)
     {
         $data = Validator::make($request->all(), [
-            'title' => 'required|string',
-            'category' => 'required|string',
-            'text' => 'required|string',
+            'title' => 'required|string|max:128',
+            'category' => 'required|string|max:128',
+            'text' => 'required|string|max:8192',
             'file' => 'nullable|mimes:jpg,jpeg,png,pdf|max:2048', // Example validation for file upload
         ]);
 
         // $request->user()->id;
         
         if ($data->fails()) {
-            return response()->json(['error' => $data->errors()]);
+            return response()->json(['error' => $data->errors()], 400);
         }
 
         $announcement->update($data->validated());
