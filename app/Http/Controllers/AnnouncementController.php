@@ -34,7 +34,7 @@ class AnnouncementController extends Controller
         $user_id =  $request->user()->id;
         
         if ($data->fails()) {
-            return response()->json(['error' => $data->errors()], 400);
+            return response()->json(['error' => $data->errors()], 422);
         }
 
         $announcement = new Announcement($data->validated());
@@ -75,7 +75,7 @@ class AnnouncementController extends Controller
         // $request->user()->id;
         
         if ($data->fails()) {
-            return response()->json(['error' => $data->errors()], 400);
+            return response()->json(['error' => $data->errors()], 422);
         }
 
         $announcement->update($data->validated());

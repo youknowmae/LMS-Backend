@@ -21,7 +21,7 @@ class LocationController extends Controller
         ]);
 
         if($location->fails()) {
-            return response()->json(['error' => $location->errors()], 400);
+            return response()->json(['error' => $location->errors()], 422);
         }
 
         $location = Location::create($location->validated());

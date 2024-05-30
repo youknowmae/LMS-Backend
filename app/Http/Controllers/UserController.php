@@ -48,7 +48,7 @@ class UserController extends Controller
         ]);
 
         if($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         $user = User::create([
@@ -79,7 +79,7 @@ class UserController extends Controller
         ]);
 
         if($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         $user->update([

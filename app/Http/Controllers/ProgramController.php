@@ -21,7 +21,7 @@ class ProgramController extends Controller
         ]);
 
         if($data->fails()) {
-            return response()->json(['errors', $data->errors()], 400);
+            return response()->json(['errors', $data->errors()], 422);
         }
 
         Program::create($data->validated());

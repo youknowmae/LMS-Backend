@@ -23,7 +23,7 @@ class CollegeController extends Controller
         ]);
 
         if($data->fails()) {
-            return response()->json(['error' => $data->errors()], 400);
+            return response()->json(['error' => $data->errors()], 422);
         }
 
         $department = Department::create($data->validated());
