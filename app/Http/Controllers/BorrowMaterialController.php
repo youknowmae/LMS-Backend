@@ -170,14 +170,30 @@ class BorrowMaterialController extends Controller
     }
 
     public function returnedlistid($id)
-    {
-        $returnedItems = BorrowMaterial::where('user_id', $id)
-                                       ->get();
-        if ($returnedItems->isEmpty()) {
-            return response()->json(['message' => 'No returned items found for this user'], 404);
-        }
-        return response()->json($returnedItems, 200);
+{
+    $returnedItems = BorrowMaterial::with('book')
+                                   ->where('user_id', $id)
+                                   ->where('status', 0) // Assuming 0 represents returned status
+                                   ->get();
+                                   
+    // Count the total number of returned books
+    $totalReturnedBooks = $returnedItems->count();
+    
+    if ($returnedItems->isEmpty()) {
+        return response()->json(['message' => 'No returned items found for this user'], 404);
     }
+    
+    // Append the title of the book to each returned item
+    foreach ($returnedItems as $item) {
+        $item->title = $item->book->title;
+    }
+    
+    // Return the response with the updated returned items and total count
+    return response()->json([
+        'returnedItems' => $returnedItems,
+        'totalReturnedBooks' => $totalReturnedBooks
+    ], 200);
+}
 
     public function borrowEdit(Request $request){
         $payload = json_decode($request->payload);
@@ -267,11 +283,14 @@ class BorrowMaterialController extends Controller
     {
         // Find the record
         $borrowMaterial = BorrowMaterial::find($id);
-       
+        $book = Book::find($payload->book_id);
+        if (!$book) {
+            return response()->json(['error' => 'Book not found'], 404);
+        }
         if (!$borrowMaterial) {
             return response()->json(['error' => 'BorrowMaterial not found'], 404);
         }
-
+        $book->available = 1;
         $borrowMaterial->delete();
         return response()->json(['message' => 'BorrowMaterial deleted successfully']);
     }
