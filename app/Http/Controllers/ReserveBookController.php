@@ -57,31 +57,90 @@ class ReserveBookController extends Controller
     //     return response()->json($reservelist);
     // }
 
-    public function reservelist(Request $request, $type = null){
+    public function reservelist(Request $request, $type = null) {
+        // Fetch all reservation data from the reservations table
         $reservelist = Reservation::with(['user.program.department', 'user.patron'])
-                        ->whereHas('user', function($query){
+                        ->whereHas('user', function($query) {
                             $query->where('status', 1);
                         });
-
-                        if ($type === 'online') {
-                            $reservelist->where('type', 'online');
-                        } elseif ($type === 'walk-in') {
-                            $reservelist->where('type', 'walk-in');
-                        }
-                    
-                        $reservelist = $reservelist->get();
-        return response()->json($reservelist);
-    }
-
-    public function queue(Request $request){
-       // Fetch all queue data from the reservations table
-            $queueData = Reservation::orderBy('book_id')
+    
+        if ($type === 'online') {
+            $reservelist->where('type', 'online');
+        } elseif ($type === 'walk-in') {
+            $reservelist->where('type', 'walk-in');
+        }
+        
+        // Include the id field along with other fields for queue data
+        $queueData = $reservelist->orderBy('book_id')
             ->orderBy('start_date', 'asc')
-            ->get(['user_id', 'book_id', 'start_date']); // Adjust the fields as necessary
-
-            // Return the data as JSON (or any other format required by the front end)
-            return response()->json($queueData);
+            ->get(['id', 'user_id', 'book_id', 'start_date', 'status']);
+    
+        // Initialize an array to keep track of queue positions for each book
+        $bookQueuePositions = [];
+    
+        // Iterate through each reservation to calculate queue positions
+        foreach ($queueData as $reservation) {
+            // Check if reservation status is 0 (not active)
+            if ($reservation->status == 0) {
+                continue; // Skip reservations with status 0
+            }
+    
+            // Get the book ID
+            $bookId = $reservation->book_id;
+    
+            // If the book ID is not yet in the bookQueuePositions array, initialize its queue position to 1
+            if (!isset($bookQueuePositions[$bookId])) {
+                $bookQueuePositions[$bookId] = 1;
+            }
+    
+            // Set the queue position for the current reservation
+            $reservation->queue_position = $bookQueuePositions[$bookId];
+    
+            // Increment the queue position for the next reservation
+            $bookQueuePositions[$bookId]++;
+        }
+    
+        // Return the combined result as JSON
+        return response()->json($queueData);
     }
+    
+
+    public function queue(Request $request) {
+        // Fetch all queue data from the reservations table
+        $queueData = Reservation::orderBy('book_id')
+            ->orderBy('start_date', 'asc')
+            ->get(['user_id', 'book_id', 'start_date', 'status']); // Include the status field
+    
+        // Initialize an array to keep track of queue positions for each book
+        $bookQueuePositions = [];
+    
+        // Iterate through each reservation to calculate queue positions
+        foreach ($queueData as $reservation) {
+            // Check if reservation status is 0 (not active)
+            if ($reservation->status == 0) {
+                continue; // Skip reservations with status 0
+            }
+    
+            // Get the book ID
+            $bookId = $reservation->book_id;
+    
+            // If the book ID is not yet in the bookQueuePositions array, initialize its queue position to 1
+            if (!isset($bookQueuePositions[$bookId])) {
+                $bookQueuePositions[$bookId] = 1;
+            }
+    
+            // Set the queue position for the current reservation
+            $reservation->queue_position = $bookQueuePositions[$bookId];
+    
+            // Increment the queue position for the next reservation
+            $bookQueuePositions[$bookId]++;
+        }
+    
+        // Return the result as JSON (or any other format required by the front end)
+        return response()->json($queueData);
+    }
+    
+    
 
     public function getQueuePosition(Request $request) {
         // Get the authenticated user's ID
