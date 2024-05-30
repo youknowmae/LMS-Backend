@@ -283,11 +283,14 @@ class BorrowMaterialController extends Controller
     {
         // Find the record
         $borrowMaterial = BorrowMaterial::find($id);
-       
+        $book = Book::find($payload->book_id);
+        if (!$book) {
+            return response()->json(['error' => 'Book not found'], 404);
+        }
         if (!$borrowMaterial) {
             return response()->json(['error' => 'BorrowMaterial not found'], 404);
         }
-
+        $book->available = 1;
         $borrowMaterial->delete();
         return response()->json(['message' => 'BorrowMaterial deleted successfully']);
     }
