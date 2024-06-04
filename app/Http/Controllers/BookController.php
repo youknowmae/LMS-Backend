@@ -6,6 +6,7 @@ use App\Models\Book;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\Location;
+use App\Models\Material;
 use Storage, Str;
 
 class BookController extends Controller
@@ -270,18 +271,11 @@ class BookController extends Controller
     }
 
     //opac
-    public function opacGetBooks(Request $request) {        
-        $sort = $request->input('sort', 'acquired_date desc'); 
-    
-        $sort = $this->validateSort($sort);
-        
-        if ($sort[0] === 'date_published') {
-            $sort[0] = 'acquired_date';
-        }
-    
-        $books = Book::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
-                     ->orderBy($sort[0], $sort[1])
-                     ->paginate(24);
+    public function opacGetBooks() {     
+        $books = Material::select('accession', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
+                    ->where('material_type', 0)
+                    ->orderByDesc('date_published', 'desc')
+                    ->paginate(24);
     
         foreach ($books as $book) {
             $book->authors = json_decode($book->authors);
@@ -293,28 +287,18 @@ class BookController extends Controller
         return $books;
     }
     
-    
     public function opacSearchBooks(Request $request){  
         $search = $request->input('search');
-        $sort = $request->input('sort', 'acquired_date desc');
 
-        $sort = $this->validateSort($sort);
-        
-        if($sort[0] === 'date_published') {
-            $sort[0] = 'acquired_date';
-        }
-
-        $books = Book::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
-                    ->where('title', 'like', '%' . $search . "%")
-                    ->orWhere('authors', 'like', '%' . $search . "%")
-                    ->orWhere('call_number', 'like', '%' . $search . "%")
-                    ->orderBy($sort[0], $sort[1])
+        $books = Material::select('accession', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
+                    ->where('material_type', 0)
+                    ->where(function($query) use($search) {
+                        $query->where('title', 'like', '%' . $search . "%")
+                            ->orWhere('authors', 'like', '%' . $search . "%");
+                    })
+                    ->orderByDesc('date_published')
                     ->paginate(24);
 
-        if ($books->isEmpty()) {
-            return $books;
-        }
-        
         foreach($books as $book) {
             if($book->image_url != null)
                 $book->image_url = self::URL . Storage::url($book->image_url);

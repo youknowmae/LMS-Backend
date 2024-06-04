@@ -10,6 +10,7 @@ class Program extends Model
     use HasFactory;
 
     protected $primaryKey = 'program_short';
+    protected $keyType = 'string';
     protected $fillable = ['program_short', 'program_full', 'department_short', 'department_full', 'category'];
 
     public function projects()
