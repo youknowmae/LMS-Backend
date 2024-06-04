@@ -75,8 +75,8 @@ class User extends Authenticatable
         return $this->hasMany(CatalogingLog::class);
     }
 
-    public function program() {
-        return $this->belongsTo(Program::class);
+    public function student_program() {
+        return $this->belongsTo(Program::class, 'program', 'program_short');
     }
 
     public function department()

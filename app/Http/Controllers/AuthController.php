@@ -116,11 +116,12 @@ class AuthController extends Controller
 
                 return response()->json($responseData, 200);
             } else if(in_array('user', $roles)) {
-                $student = User::with('program')->find($user->id);
+                $student = User::with('student_program')->find($user->id);
+                
                 $responseData = [
                     'token' => $token,
                     'id' => $user->id,
-                    'department' => $student->program->department,
+                    'department' => $student->student_program->department_short,
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
                     'middle_name' => $user->middle_name,
