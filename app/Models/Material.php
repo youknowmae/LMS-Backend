@@ -10,4 +10,5 @@ class Material extends Model
     use HasFactory;
 
     protected $primaryKey = 'accession';
+    protected $keyType = 'string';
 }
