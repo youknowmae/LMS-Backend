@@ -56,14 +56,15 @@ class BookController extends Controller
                 'volume' => $book->volume,
                 'edition' => $book->edition,
                 'available' => $book->available,
-                'copyright' => $book->copyright
+                'copyright' => $book->copyright,
+                'fine' => $book->fine
             ]);
         }
         return $books_array;
     }
 
     public function viewBook(int $id) {
-        $book = Book::find($id, ['available', 'title', 'id', 'call_number', 'copyright', 'authors',
+        $book = Book::find($id, ['available', 'title', 'id', 'call_number', 'copyright', 'price', 'authors',
         'volume', 'pages', 'edition', 'remarks', 'image_url']);
 
         $book->authors = json_decode($book->authors);

@@ -11,21 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
-            $table->id();
-            $table->string('accession')->unique();
-            $table->string('category');
+        Schema::create('academic_projects', function (Blueprint $table) {
+            $table->string('accession')->primary();
+            $table->string('category', 50);
             $table->string('title');
-            $table->string('authors');
-            $table->foreignId('program_id')->references('id')->on('programs');
-            $table->string('image_url')->nullable();
+            $table->string('authors', 100);
+            $table->string('program');
+            $table->string('image_url', 100)->nullable();
             $table->date('date_published');
-            $table->string('language');
+            $table->string('language', 20);
             $table->text('abstract');
-            $table->string('keywords');
-            $table->boolean('available')->default(true);
+            $table->string('keywords', 50);
             $table->timestamps();
-            $table->softDeletes();
+
+            $table->foreign('program')->references('program_short')->on('programs');
+            $table->index('category');
         });
     }
 

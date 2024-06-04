@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('category');
             $table->foreignId('author_id')->references('id')->on('users');
-            $table->string('text');
-            $table->string('image')->nullable();
+            $table->text('text');
+            $table->string('image_url')->nullable();
             $table->timestamps();
         });
     }

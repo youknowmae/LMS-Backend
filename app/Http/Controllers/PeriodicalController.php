@@ -28,7 +28,7 @@ class PeriodicalController extends Controller
 
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
-                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
+                $periodical->image_url = self::URL . Storage::url($periodical->image_url);
 
             $periodical->authors = json_decode($periodical->authors);
         }
@@ -37,7 +37,9 @@ class PeriodicalController extends Controller
     }
 
     public function getPeriodical($id) {
-        return Periodical::find($id);
+        $periodical = Periodical::findOrFail($id);
+        $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
+        return $periodical;
     }
 
     // FOR STUDENT PORTAL

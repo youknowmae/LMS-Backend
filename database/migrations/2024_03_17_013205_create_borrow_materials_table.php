@@ -14,14 +14,27 @@ return new class extends Migration
         Schema::create('borrow_materials', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users');
-            $table->foreignId('book_id')->references('id')->on('books');
-            $table->float('fine');
-            $table->timestamp('borrow_date')->useCurrent();
-            $table->date('borrow_expiration');
-            $table->timestamp('date_returned')->nullable(true)->useCurrentOnUpdate();
-            $table->boolean('paid')->default(0);
-            $table->boolean('status')->default(true);
+            $table->string('book_id');
+
+            // Borrowing
+            $table->timestamp('borrow_date')->nullable();
+            $table->date('borrow_expiration')->nullable();
+            $table->timestamp('date_returned')->nullable();
+
+            // Reservations
+            $table->timestamp('reserve_date')->nullable();
+            $table->date('reserve_expiration')->nullable();
+
+            // payments
+            $table->float('fine', 2);
+
+            // 0 -> paid, 1 -> pending, 2 -> N/A
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
+
+            // indexes
+            $table->index('status');
+            $table->foreign('book_id')->references('accession')->on('materials');
         });
     }
 

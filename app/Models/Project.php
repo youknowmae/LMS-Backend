@@ -8,8 +8,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     
+    protected $table = 'academic_projects';
+
+    protected $primaryKey = 'accession';
+
     protected $fillable = ['accession', 'category', 'authors', 'title', 'program_id', 'image_location', 'date_published',
                            'keywords', 'language', 'abstract'];
 

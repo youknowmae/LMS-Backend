@@ -15,50 +15,44 @@ class ProjectSeeder extends Seeder
     {
 
         /* CCS */
-        Project::factory()->count(10)->create([
-            'program_id' => 1,
-            'category' => 'Capstone',
-            'keywords' => '["technology", "magic", "chakra", "haki"]'
+        Project::factory()->count(30)->create([
+            'program' => 'BSIT',
+            'category' => 'Capstone'
         ]);
 
-        Project::factory()->count(10)->create([
-            'program_id' => 2,
-            'category' => 'Thesis',
-            'keywords' => '["technology", "magic", "chakra", "haki"]'
+        Project::factory()->count(30)->create([
+            'program' => 'BSCS',
+            'category' => 'Thesis'
         ]);
 
-        Project::factory()->count(10)->create([
-            'program_id' => 3,
-            'category' => 'Thesis',
-            'keywords' => '["technology", "magic", "chakra", "haki"]'
+        Project::factory()->count(30)->create([
+            'program' => 'BSEMC',
+            'category' => 'Research'
         ]);
 
         /* CBA */
-        Project::factory()->count(20)->create([
-            'program_id' => fn() => fake()->numberBetween(5, 9),
-            'category' => fn() => fake()->randomElement(['Research', 'Feasibility Study']),
-            'keywords' => '["technology", "magic", "chakra", "haki"]'
+        Project::factory()->count(500)->create([
+            'program' => fn() => fake()->randomElement(['BSA', 'BSCA', 'BSBA-FM', 'BSBA-MKT', 'BSBA-HRM']),
+            'category' => fn() => fake()->randomElement(['Research', 'Feasibility Study'])
         ]);
 
         /* CAHS */
-        Project::factory()->count(20)->create([
-            'program_id' => fn() => fake()->numberBetween(10, 11),
-            'category' => 'Research',
-            'keywords' => '["technology", "magic", "chakra", "haki"]'
+        Project::factory()->count(200)->create([
+            'program' => fn() => fake()->randomElement(['BSN', 'BSM']),
+            'category' => 'Research'
         ]);
 
         /* CEAS */
-        Project::factory()->count(40)->create([
-            'program_id' => fn() => fake()->numberBetween(13, 21),
-            'category' => 'Classroom Based Action Research',
-            'keywords' => '["technology", "magic", "chakra", "haki"]'
+        Project::factory()->count(1000)->create([
+            'program' => fn() => fake()->randomElement(['BSED-SOC', 'BSED-SCI', 'BSED-MATH', 
+                                'BSED-FIL', 'BSED-ENG', 'BECED', 'BCAED', 'BPED', 'BEED', 'BACOMM']),
+            'category' => 'Classroom Based Action Research'
         ]);
 
         /* CHTM */
-        Project::factory()->count(10)->create([
-            'program_id' => fn() => fake()->numberBetween(22, 23),
-            'category' => fn() => fake()->randomElement(['Thesis', 'Feasibility Study']),
-            'keywords' => '["technology", "magic", "chakra", "haki"]'
+        Project::factory()->count(300)->create([
+            'program' => fn() => fake()->randomElement(['BSHM', 'BSTM']),
+            'category' => fn() => fake()->randomElement(['Thesis', 'Feasibility Study'])
         ]);
     }
 }

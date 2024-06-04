@@ -13,181 +13,176 @@ class ProgramSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('departments')->insert([
-            [
-                'department' => 'CCS',
-                'full_department' => 'College of Computer Studies'
-            ],
-
-            [
-                'department' => 'CAHS',
-                'full_department' => 'College of Allied Health Studies'
-            ],
-
-            [
-                'department' => 'CEAS',
-                'full_department' => 'College of Education, Arts and Sciences'
-            ],
-
-            [
-                'department' => 'CHTM',
-                'full_department' => 'College of Hospitality and Tourism Management'
-            ],
-
-            [
-                'department' => 'CBA',
-                'full_department' => 'College of Business and Accountancy'
-            ],
-
-        ]);
-
         DB::table('programs')->insert([
 
             // CCS
             [
-                'program' => 'BSIT',
-                'full_program' => 'Bachelor of Science in Information Technology',
-                'department_id' => 1,
+                'department_short' => 'CCS',
+                'department_full' => 'College of Computer Studies',
+                'program_short' => 'BSIT',
+                'program_full' => 'Bachelor of Science in Information Technology',
                 'category' => 'Capstone'
             ],
             [
-                'program' => 'BSCS',
-                'full_program' => 'Bachelor of Science in Computer Science',
-                'department_id' => 1,
+                'department_short' => 'CCS',
+                'department_full' => 'College of Computer Studies',
+                'program_short' => 'BSCS',
+                'program_full' => 'Bachelor of Science in Computer Science',
                 'category' => 'Thesis'
             ],
             [
-                'program' => 'BSEMC',
-                'full_program' => 'Bachelor of Science in Entertainment and Multimedia Computing',
-                'department_id' => 1,
+                'department_short' => 'CCS',
+                'department_full' => 'College of Computer Studies',
+                'program_short' => 'BSEMC',
+                'program_full' => 'Bachelor of Science in Entertainment and Multimedia Computing',
                 'category' => 'Thesis'
             ],
             [
-                'program' => 'ACT',
-                'full_program' => 'Associate in Computer Technology',
-                'department_id' => 1,
+                'department_short' => 'CCS',
+                'department_full' => 'College of Computer Studies',
+                'program_short' => 'ACT',
+                'program_full' => 'Associate in Computer Technology',
                 'category' => 'Thesis'
             ],
 
             // CBA
             [
-                'program' => 'BSA',
-                'full_program' => 'Bachelor of Science in Accountancy',
-                'department_id' => 5,
+                'department_short' => 'CBA',
+                'department_full' => 'College of Business and Accountancy',
+                'program_short' => 'BSA',
+                'program_full' => 'Bachelor of Science in Accountancy',
                 'category' => 'Research'
             ],
             [
-                'program' => 'BSCA',
-                'full_program' => 'Bachelor of Science in Customs Administration',
-                'department_id' => 5,
+                'department_short' => 'CBA',
+                'department_full' => 'College of Business and Accountancy',
+                'program_short' => 'BSCA',
+                'program_full' => 'Bachelor of Science in Customs Administration',
                 'category' => 'Research'
             ],
             [
-                'program' => 'BSBA-FM',
-                'full_program' => 'Bachelor of Science in Business Administration - Major in Financial Management',
-                'department_id' => 5,
+                'department_short' => 'CBA',
+                'department_full' => 'College of Business and Accountancy',
+                'program_short' => 'BSBA-FM',
+                'program_full' => 'Bachelor of Science in Business Administration - Major in Financial Management',
                 'category' => 'Research'
             ],
             [
-                'program' => 'BSBA-MKT',
-                'full_program' => 'Bachelor of Science in Business Administration - Major in Marketing Management',
-                'department_id' => 5,
+                'department_short' => 'CBA',
+                'department_full' => 'College of Business and Accountancy',
+                'program_short' => 'BSBA-MKT',
+                'program_full' => 'Bachelor of Science in Business Administration - Major in Marketing Management',
                 'category' => 'Research'
             ],
             [
-                'program' => 'BSBA-HRM',
-                'full_program' => 'Bachelor of Science in Business Administration - Major in Human Resource Management',
-                'department_id' => 5,
+                'department_short' => 'CBA',
+                'department_full' => 'College of Business and Accountancy',
+                'program_short' => 'BSBA-HRM',
+                'program_full' => 'Bachelor of Science in Business Administration - Major in Human Resource Management',
                 'category' => 'Research'
             ],
 
             // CAHS
             [
-                'program' => 'BSN',
-                'full_program' => 'Bachelor of Science in Nursing',
-                'department_id' => 2,
+                'department_short' => 'CAHS',
+                'department_full' => 'College of Allied Health Studies',
+                'program_short' => 'BSN',
+                'program_full' => 'Bachelor of Science in Nursing',
                 'category' => 'Research'
             ],
             [
-                'program' => 'BSM',
-                'full_program' => 'Bachelor of Science in Midwifery',
-                'department_id' => 2,
+                'department_short' => 'CAHS',
+                'department_full' => 'College of Allied Health Studies',
+                'program_short' => 'BSM',
+                'program_full' => 'Bachelor of Science in Midwifery',
                 'category' => 'Research'
             ],
 
-            // BSED
+            // CEAS
             [
-                'program' => 'BACOMM',
-                'full_program' => 'Bachelor of Arts in Communication',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BACOMM',
+                'program_full' => 'Bachelor of Arts in Communication',
                 'category' => 'Thesis'
             ],
             [
-                'program' => 'BEED',
-                'full_program' => 'Bachelor of Elementary Education',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BEED',
+                'program_full' => 'Bachelor of Elementary Education',
                 'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BPED',
-                'full_program' => 'Bachelor of Physical Education',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BPED',
+                'program_full' => 'Bachelor of Physical Education',
                 'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BCAED',
-                'full_program' => 'Bachelor of Cultural and Arts Education',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BCAED',
+                'program_full' => 'Bachelor of Cultural and Arts Education',
                 'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BECED',
-                'full_program' => 'Bachelor of Early Childhood Education',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BECED',
+                'program_full' => 'Bachelor of Early Childhood Education',
                 'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BSED-ENG',
-                'full_program' => 'Bachelor of Secondary Education - Major in English',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BSED-ENG',
+                'program_full' => 'Bachelor of Secondary Education - Major in English',
                 'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BSED-FIL',
-                'full_program' => 'Bachelor of Secondary Education - Major in Filipino',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BSED-FIL',
+                'program_full' => 'Bachelor of Secondary Education - Major in Filipino',
                 'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BSED-MATH',
-                'full_program' => 'Bachelor of Secondary Education - Major in Math',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BSED-MATH',
+                'program_full' => 'Bachelor of Secondary Education - Major in Math',
                 'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BSED-SCI',
-                'full_program' => 'Bachelor of Secondary Education - Major in Science',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BSED-SCI',
+                'program_full' => 'Bachelor of Secondary Education - Major in Science',
                 'category' => 'Classroom Based Action Research'
             ],
             [
-                'program' => 'BSED-SOC',
-                'full_program' => 'Bachelor of Secondary Education - Major in Social Studies',
-                'department_id' => 3,
+                'department_short' => 'CEAS',
+                'department_full' => 'College of Education, Arts and Sciences',
+                'program_short' => 'BSED-SOC',
+                'program_full' => 'Bachelor of Secondary Education - Major in Social Studies',
                 'category' => 'Classroom Based Action Research'
             ],
 
             // CHTM
             [
-                'program' => 'BSHM',
-                'full_program' => 'Bachelor of Science in Hospitality Management',
-                'department_id' => 4,
+                'department_short' => 'CHTM',
+                'department_full' => 'College of Hospitality and Tourism Management',
+                'program_short' => 'BSHM',
+                'program_full' => 'Bachelor of Science in Hospitality Management',
                 'category' => 'Feasibility Study'
             ],
             [
-                'program' => 'BSTM',
-                'full_program' => 'Bachelor of Science in Tourism Management',
-                'department_id' => 4,
+                'department_short' => 'CHTM',
+                'department_full' => 'College of Hospitality and Tourism Management',
+                'program_short' => 'BSTM',
+                'program_full' => 'Bachelor of Science in Tourism Management',
                 'category' => 'Thesis'
             ],
         ]);

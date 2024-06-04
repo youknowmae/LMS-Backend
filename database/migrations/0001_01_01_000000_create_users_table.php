@@ -10,20 +10,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
-            $table->id();
-            $table->string('department', 10)->unique();
-            $table->string('full_department', 100);
-            $table->timestamps();
-        });
-
         Schema::create('programs', function (Blueprint $table) {
-            $table->id();
-            $table->string('program', 10)->unique();
-            $table->string('full_program', 100);
-            $table->foreignId('department_id')->references('id')->on('departments');
+            $table->string('program_short', 10)->unique();
+            $table->string('program_full', 100);
+            $table->string('department_short');
+            $table->string('department_full');
             $table->string('category');
             $table->timestamps();
+
+            $table->primary('program_short');
         });
 
         Schema::create('patrons', function (Blueprint $table) {
@@ -50,7 +45,7 @@ return new class extends Migration
             $table->string('last_name', 30);
             $table->integer('gender')->nullable();
             $table->string('ext_name', 10)->nullable();
-            $table->foreignId('program_id')->nullable()->constrained('programs');
+            $table->string('program')->nullable();
             $table->string('position', 50)->nullable(); 
             $table->string('profile_image')->nullable();
             
@@ -60,21 +55,8 @@ return new class extends Migration
             
             $table->timestamps();
             $table->softDeletes();  
-        });
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+            $table->foreign('program')->references('program_short')->on('programs');
         });
     }
 
@@ -84,7 +66,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
     }
 };

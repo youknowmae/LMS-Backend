@@ -15,20 +15,20 @@ class LocationSeeder extends Seeder
     {
         DB::table('locations')->insert([
         [
-            'location' => 'FIL',
-            'full_location' => 'Filipino'
+            'location_short' => 'FIL',
+            'location_full' => 'Filipino'
         ],
         [
-            'location' => 'FOR',
-            'full_location' => 'Foreign'
+            'location_short' => 'FOR',
+            'location_full' => 'Foreign'
         ],
         [
-            'location' => 'MED',
-            'full_location' => 'Medical'
+            'location_short' => 'MED',
+            'location_full' => 'Medical'
         ],
         [
-            'location' => 'COM',
-            'full_location' => 'Computer'
+            'location_short' => 'COM',
+            'location_full' => 'Computer'
         ]
     ]);
     }

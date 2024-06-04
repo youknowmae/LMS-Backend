@@ -21,7 +21,7 @@ use Exception, Carbon, Storage;
 
 class BorrowMaterialController extends Controller
 {
-    const URL = 'http://192.168.68.124:8000';
+    const URL = 'http://26.68.32.39:8000';
     public function borrowbook(Request $request)
     {
         $payload = json_decode($request->payload);
@@ -283,7 +283,7 @@ class BorrowMaterialController extends Controller
     {
         // Find the record
         $borrowMaterial = BorrowMaterial::find($id);
-        $book = Book::find($payload->book_id);
+        $book = Book::find($id);
         if (!$book) {
             return response()->json(['error' => 'Book not found'], 404);
         }

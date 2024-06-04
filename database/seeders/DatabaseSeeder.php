@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Article;
-use App\Models\User;
+use App\Models\Material;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use DB;
@@ -45,15 +44,15 @@ class DatabaseSeeder extends Seeder
         ],
     ]);
 
+
         $this->call([
             ProgramSeeder::class,
             UserSeeder::class,
             LocationSeeder::class,
-            BookSeeder::class,
-            PeriodicalSeeder::class,
-            ArticleSeeder::class,
             ProjectSeeder::class,
             AnnouncementSeeder::class
-          ]);
+        ]);
+            
+        Material::factory()->count(10000)->create();
     }
 }
