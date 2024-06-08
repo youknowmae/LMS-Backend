@@ -275,7 +275,7 @@ Route::group(['prefix' => 'opac'], function () {
     //books
     Route::get('books', [BookController::class, 'opacGetBooks']);
     Route::get('/books/search', [BookController::class, 'opacSearchBooks']);
-    Route::get('/book/{id}', [BookController::class, 'getBook']);
+    Route::get('/book/{id}', [BookController::class, 'opacGetBook']);
 
 
     //periodicals
@@ -283,17 +283,17 @@ Route::group(['prefix' => 'opac'], function () {
         Route::get('/{material_type}', [PeriodicalController::class, 'opacGetPeriodicals']);
         Route::get('/{material_type}/search', [PeriodicalController::class, 'opacSearchPeriodicals']);
     });
-    Route::get('/periodical/{id}', [PeriodicalController::class, 'getPeriodical']);
+    Route::get('/periodical/{id}', [PeriodicalController::class, 'opacGetPeriodical']);
 
     //articles
     Route::get('/articles', [ArticleController::class, 'opacGetArticles']);
     Route::get('/articles/search', [ArticleController::class, 'opacSearchArticles']);
-    Route::get('/article/{id}', [ArticleController::class, 'getArticle']);
+    Route::get('/article/{id}', [ArticleController::class, 'opacGetArticle']);
 
     //projects
     Route::prefix('/projects')->group(function() { 
         Route::get('/{category}', [ProjectController::class, 'opacGetProjects']);
-        Route::get('/{category}/search', [ProjectController::class, 'opacSearch']);
+        Route::get('/{category}/search', [ProjectController::class, 'opacSearchProjects']);
     });
     Route::get('/project/{id}', [ProjectController::class, 'opacGetProject']);
 });

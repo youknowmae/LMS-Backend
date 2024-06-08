@@ -339,24 +339,18 @@ class ProjectController extends Controller
         if(!in_array($category, ['thesis', 'Classroom Based Action Research', 'capstone', 'feasibility study', 'research', 'dissertation'])){
             return response()->json(['error' => 'Page not found'], 404);
         }
-        
-        $filter = $request->input('filter', '%');
 
-        $projects = Project::select('id', 'title', 'image_url', 'date_published', 'authors', 'program_id')
+        $filter = $request->input('filter', null);
+
+        $projects = Project::select('accession', 'title', 'image_url', 'date_published', 'authors', 'program', 'keywords')
                     ->where('category', $category)
-                    ->orderby('date_published', 'desc')
-                    // ->with('program.department')  //kahit wala tong with na to
-                    ->whereHas('program.department', function($query) use($filter) {
-                        if ($filter !== '%') {
-                            $query->where('department', $filter);
+                    ->wherehas('program', function($query) use($filter) {
+                        if ($filter) {
+                            $query->where('department_short', $filter);
                         }
                     })
+                    ->orderbyDesc('date_published')
                     ->paginate(24);
-
-        if ($projects->isEmpty()) {
-            return $projects;
-            // return response()->json(['message' => 'No projects found'], 404);
-        }
 
         foreach ($projects as $project) {
             $project->authors = json_decode($project->authors);
@@ -372,7 +366,9 @@ class ProjectController extends Controller
 
     public function opacGetProject($id){
 
-        $project =Project::with('program')->findOrfail($id);
+        $project = Project::select('accession', 'title', 'authors', 'program', 'image_url', 'language', 'keywords', 'abstract', 'date_published')
+                        ->with('program')
+                        ->findOrfail($id);
 
         $project->authors = json_decode($project->authors);
         $project->keywords = json_decode($project->keywords);
@@ -383,36 +379,29 @@ class ProjectController extends Controller
         return $project;
     }
 
-    public function opacSearch(Request $request, $category) {
+    public function opacSearchProjects(Request $request, $category) {
         if(!in_array($category, ['thesis', 'Classroom Based Action Research', 'capstone', 'feasibility study', 'research', 'dissertation'])){
             return response()->json(['error' => 'Page not found'], 404);
         }
 
         $search = $request->input('search');
-        $sort = $request->input('sort', 'date_published desc');
-        $filter = $request->input('filter', '%');
+        $filter = $request->input('filter', null);
+
+        $projects = Project::select('accession', 'title', 'image_url', 'date_published', 'authors', 'program', 'keywords')
+                ->where('category', $category)
+                ->where(function ($query) use ($search) {
+                    $query->where('title', 'like', '%' . $search . "%")
+                            ->orWhere('authors', 'like', '%' . $search . "%");
+                            // ->orWhere('keywords', 'like', '%' . $search . "%");
+                })
+                ->wherehas('program', function($query) use($filter) {
+                    if ($filter) {
+                        $query->where('department_short', $filter);
+                    }
+                })
+                ->orderByDesc('date_published')
+                ->paginate(24);
     
-        $sort = $this->validateSort($sort);
-
-        $projects = Project::select('id', 'title', 'date_published', 'image_url', 'abstract', 'authors')    
-            ->where('category', $category)
-            ->where(function ($query) use ($search) {
-                $query->where('title', 'like', '%' . $search . "%")
-                        ->orWhere('authors', 'like', '%' . $search . "%");
-            })
-            ->whereHas('program.department', function($query) use($filter) {
-                if ($filter !== '%') {
-                    $query->where('department', $filter);
-                }
-            })
-            ->orderBy($sort[0], $sort[1])
-            ->paginate(24);
-        
-        if ($projects->isEmpty()) {
-            return $projects;
-            // return response()->json(['message' => 'No projects found'], 404);
-        }
-
         foreach ($projects as $project) {
             $project->authors = json_decode($project->authors);
             $project->keywords = json_decode($project->keywords);

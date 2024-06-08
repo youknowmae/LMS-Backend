@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Article;
+use App\Models\Material;
 use Exception, Str;
 
 class ArticleController extends Controller
@@ -173,14 +174,11 @@ class ArticleController extends Controller
     }
 
     //opac
-    public function opacGetArticles(Request $request){
-        $sort = $request->input('sort');
-
-        $sort = $this->validateSort($sort);
-        
-        $articles = Article::select('id', 'title', 'date_published', 'authors', 'abstract')
-                           ->orderBy($sort[0], $sort[1])
-                           ->paginate(24);
+    public function opacGetArticles(){
+        $articles = Material::select('accession', 'title', 'date_published', 'authors', 'abstract')
+                            ->where('material_type', 2)
+                            ->orderBy('date_published', 'desc')
+                            ->paginate(24);
                              
         foreach($articles as $article) {
             $article->authors = json_decode($article->authors);
@@ -189,21 +187,26 @@ class ArticleController extends Controller
         return $articles;
     }
 
+    public function opacGetArticle($id) {
+        $article = Material::select('title', 'authors', 'date_published', 'issue', 'abstract', 'pages')
+                            ->findorfail($id);
+
+        $article->authors = json_decode($article->authors);
+
+        return $article;
+    }
+
     public function opacSearchArticles(Request $request){
         $search = $request->input('search');
-        $sort = $request->input('sort', 'date_published desc');
 
-        $sort = $this->validateSort($sort);
-
-        $articles = Article::select('id', 'title', 'date_published', 'authors', 'abstract')
-                ->where('title', 'like', '%' . $search . "%")
-                ->orWhere('authors', 'like', '%' . $search . "%")
-                ->orderBy($sort[0], $sort[1])
+        $articles = Material::select('accession', 'title', 'date_published', 'authors', 'abstract')
+                ->where('material_type', 2)
+                ->where(function ($query) use ($search) {
+                    $query->where('title', 'like', '%' . $search . "%")
+                        ->orWhere('authors', 'like', '%' . $search . "%");
+                })
+                ->orderBy('date_published', 'desc')
                 ->paginate(24);
-
-        if ($articles->isEmpty()) {
-            return $articles;
-        }
 
         foreach($articles as $article) {
             $article->authors = json_decode($article->authors);

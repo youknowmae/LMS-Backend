@@ -286,6 +286,17 @@ class BookController extends Controller
         
         return $books;
     }
+
+    public function opacGetBook($id) {
+        $book = Material::select('title', 'location', 'call_number', 'copyright', 'authors', 'acquired_date', 'volume', 'pages', 'edition', 'remarks', 'status')
+                        ->findOrFail($id);
+
+        $book->authors = json_decode($book->authors);
+        if($book->image_url != null)
+            $book->image_url = self::URL . Storage::url($book->image_url);
+
+        return $book;
+    }
     
     public function opacSearchBooks(Request $request){  
         $search = $request->input('search');

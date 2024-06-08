@@ -13,11 +13,12 @@ class Project extends Model
     protected $table = 'academic_projects';
 
     protected $primaryKey = 'accession';
+    protected $keyType = 'string';
 
     protected $fillable = ['accession', 'category', 'authors', 'title', 'program_id', 'image_location', 'date_published',
                            'keywords', 'language', 'abstract'];
 
     public function program(){
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(Program::class, 'program', 'program_short');
     }
 }
