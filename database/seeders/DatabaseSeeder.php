@@ -53,6 +53,6 @@ class DatabaseSeeder extends Seeder
             AnnouncementSeeder::class
         ]);
             
-        Material::factory()->count(10000)->create();
+        Material::factory()->count(20000)->create();
     }
 }

@@ -10,12 +10,12 @@ class Location extends Model
     use HasFactory;
     
     protected $fillable = [
-        'location',
-        'full_location'
+        'location_short',
+        'location_full'
     ];
     
     public function books(){
-        return $this->hasMany(Book::class);
+        return $this->hasMany(Material::class);
     }
 }
 

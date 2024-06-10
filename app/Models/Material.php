@@ -11,4 +11,21 @@ class Material extends Model
 
     protected $primaryKey = 'accession';
     protected $keyType = 'string';
+    
+    protected $fillable = ['accession', 'material_type', 'title', 'authors', 'publisher', 'image_url',
+                            'location', 'volume', 'edition', 'pages', 'remarks', 'acquired_date', 
+                            'date_published', 'remarks', 'copyright', 
+                            
+                            // BOOKS
+                            'call_number', 'source_of_fund', 'price', 'status', 'inventory_status',
+                        
+                            // PERIODICALS
+                            'periodical_type', 'language', 'issue',
+
+                            // ARTICLES
+                            'subject', 'abstract'];
+
+    public function book_location() {
+        return $this->belongsTo(Location::class, 'location', 'location_short');
+    }
 }

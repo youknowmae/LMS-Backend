@@ -18,7 +18,7 @@ class Project extends Model
     protected $fillable = ['accession', 'category', 'authors', 'title', 'program_id', 'image_location', 'date_published',
                            'keywords', 'language', 'abstract'];
 
-    public function program(){
+    public function project_program(){
         return $this->belongsTo(Program::class, 'program', 'program_short');
     }
 }

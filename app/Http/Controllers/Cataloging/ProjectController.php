@@ -1,25 +1,30 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Cataloging;
 
 use App\Models\Program;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use Exception, DB, Storage, Str;
+use App\Http\Controllers\Controller;
 
 class ProjectController extends Controller
 {
-    const URL = 'http://26.68.32.39:8000';
-    public function getProjects() {
-        $projects = Project::with(['program.department'])->orderByDesc('created_at')->get();
+    // const URL = 'http://26.68.32.39:8000';
+    const URL = 'http://127.0.0.1:8000';
 
-        foreach($projects as &$project) {
+    public function getProjects() {
+        $projects = Project::with('project_program')
+        ->orderByDesc('updated_at')
+        ->get(['accession', 'program', 'title', 'authors', 'category', 'date_published']);
+
+        foreach($projects as $project) {
             if($project->image_url != null)
                 $project->image_url = self::URL .  Storage::url($project->image_url);
-
+            
             $project->authors = json_decode($project->authors);
-            $project->keywords = json_decode($project->keywords);
         }
+        
         return $projects;
     }
 

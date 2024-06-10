@@ -10,7 +10,7 @@ use Validator;
 class ProgramController extends Controller
 {
     public function get(Request $request) {
-        return Program::with('department')->get();
+        return Program::all();
     }
     public function addProgram(Request $request){
         $data = Validator::make($request->all(), [

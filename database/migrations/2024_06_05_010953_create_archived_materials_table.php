@@ -11,32 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materials', function (Blueprint $table) {
+        Schema::connection('archives')->create('materials', function (Blueprint $table) {
             $table->string('accession', 20)->unique();
 
             // 0 -> books, 1 -> periodicals, 2 -> articles
             $table->tinyInteger('material_type');
             $table->string('title');
             $table->string('authors');
-            $table->string('publisher', 100)->nullable();
+            $table->string('publisher', 50)->nullable();
             $table->string('image_url', 100)->nullable();
-            $table->string('volume', 50)->nullable();
-            $table->string('edition', 50)->nullable();
+            $table->string('location')->nullable();
+            $table->string('volume', 20)->nullable();
+            $table->string('edition', 20)->nullable();
             $table->string('pages', 20); // Pages is string for articles, validate on front end and back for materials
             $table->date('acquired_date')->nullable(); // nullable for articles
-            $table->date('date_published')->nullable(); // nullable for books
+            $table->date('date_published')->nullable();
             $table->string('remarks')->nullable();
             $table->year('copyright')->nullable(); // nullable for articles
 
             // BOOKS            
-            $table->string('location', 20)->nullable();
-            $table->string('call_number', 20)->nullable();
-            $table->string('author_number', 20)->nullable();
+            $table->string('call_number')->nullable();
             $table->tinyInteger('source_of_fund')->nullable();
             $table->float('price', 2)->nullable();
 
             // 0 -> available, 1 -> borrowed, 2 -> reserved, 3 -> unavailable
-            $table->tinyInteger('status')->nullable();
+            $table->integer('status')->nullable();
             $table->tinyInteger('inventory_status')->nullable();
 
             // PERIODICALS
@@ -49,12 +48,13 @@ return new class extends Migration
             $table->string('subject', 100)->nullable();
             $table->text('abstract')->nullable();
 
-            $table->timestamps();
+            $table->timestamp('archived_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
 
             // indexing and primary keys
             $table->primary('accession');
             $table->index(['material_type', 'status']);
-            $table->foreign('location')->references('location_short')->on('locations');
+            // $table->foreign('location')->references('location_short')->on('locations');
         });
     }
 
@@ -63,6 +63,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('books');
+        Schema::dropIfExists('archived_materials');
     }
 };

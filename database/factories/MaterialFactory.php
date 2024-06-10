@@ -32,33 +32,16 @@ class MaterialFactory extends Factory
             fake()->name()
         ];
 
-        $type = fake()->numberBetween(0, 2);
+        $type = fake()->numberBetween(1, 2);
 
-        if($type == 0) {
-            $material = [
-                'material_type' => $type,
-                'accession' => $accession,
-                'call_number' => Str::random(10),
-                'title' => Str::title(fake()->words(3, true)), 
-                'authors' => json_encode($authors),
-                'location' => fake()->randomElement(['FIL', 'MED', 'COM', 'FOR']),
-                'volume' => fake()->numberBetween(1, 3),
-                'edition' => fake()->numberBetween(1, 3),
-                'pages' => fake()->randomNumber(3),
-                'acquired_date' => fake()->date(),
-                'remarks' => fake()->sentence(),
-                'price' => fake()->randomFloat(2, 100, 2000),
-                'source_of_fund' => fake()->numberBetween(0, 2),
-                'copyright' => fake()->numberBetween(1990, 2024)
-            ];
-        } elseif ($type == 1) {
+        if ($type == 1) {
             $material = [
                 'material_type' => $type,
                 'accession' => $accession,
                 'periodical_type' => fake()->numberBetween(0, 2),
                 'title' => Str::title(fake()->words(3, true)), 
                 'authors' => json_encode($authors),
-                'language' => fake()->randomElement(['english', 'tagalog']),
+                'language' => fake()->randomElement(['English', 'Tagalog']),
                 'acquired_date' => fake()->date(),   
                 'publisher' => fake()->company(),
                 'copyright' => fake()->year(),
@@ -75,7 +58,7 @@ class MaterialFactory extends Factory
                 'periodical_type' => fake()->numberBetween(0, 2),
                 'title' => Str::title(fake()->words(3, true)), 
                 'authors' => json_encode($authors),
-                'language' => fake()->randomElement(['english', 'tagalog']),
+                'language' => fake()->randomElement(['English', 'Tagalog']),
                 'subject' => fake()->sentence(7, true),
                 'date_published' => fake()->date(),
                 'publisher' => fake()->company(),

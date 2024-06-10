@@ -1,35 +1,37 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Cataloging;
 
-use App\Models\Book;
+use App\Http\Controllers\Controller;
+use App\Models\Material;
+use App\Http\Controllers\ImageController;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\Location;
-use App\Models\Material;
-use Storage, Str;
+use Storage, Str, DB;
 
 class BookController extends Controller
 {
-    const URL = 'http://26.68.32.39:8000';
+    // const URL = 'http://26.68.32.39:8000';
+    const URL = 'http://127.0.0.1:8000';
+
     public function getLocations() {
         return Location::all();
     }
 
     public function getBooks() {        
-        $books = Book::with('location')->orderByDesc('updated_at')->get();
-        
-        foreach($books as $book) {
-            if($book->image_url != null)
-                $book->image_url = self::URL . Storage::url($book->image_url);
+        $books = Material::where('material_type', 0)->orderByDesc('updated_at')
+        ->get(['accession', 'title', 'authors', 'location', 'copyright']);
 
+        foreach($books as $book) {
             $book->authors = json_decode($book->authors);
         }
+    
         return $books;
     }
 
     public function getBook($id) {
-        $book = Book::with('location')->findOrFail($id);
+        $book = Material::where('accession', $id)->firstOrFail();
         $book->authors = json_decode($book->authors);
         if($book->image_url != null)
             $book->image_url = self::URL . Storage::url($book->image_url);
@@ -39,7 +41,7 @@ class BookController extends Controller
 
     // FOR STUDENT PORTAL
     public function viewBooks() {
-        $books = Book::with('location')->orderByDesc('updated_at')->get();
+        $books = Material::with('location')->orderByDesc('updated_at')->get();
         
         $books_array = [];
         foreach($books as $book) {
@@ -65,7 +67,7 @@ class BookController extends Controller
     }
 
     public function viewBook(int $id) {
-        $book = Book::find($id, ['available', 'title', 'id', 'call_number', 'copyright', 'price', 'authors',
+        $book = Material::find($id, ['available', 'title', 'id', 'call_number', 'copyright', 'price', 'authors',
         'volume', 'pages', 'edition', 'remarks', 'image_url']);
 
         $book->authors = json_decode($book->authors);
@@ -86,7 +88,7 @@ class BookController extends Controller
         }
         
         // Search for books where the title contains the query string
-        $books = Book::where('title', 'LIKE', "%{$query}%")->get();
+        $books = Material::where('title', 'LIKE', "%{$query}%")->get();
 
         // Return the results as a JSON response
         return response()->json($books);
@@ -97,19 +99,18 @@ class BookController extends Controller
     public function add(Request $request) {
 
         $request->validate([
-            'id' => 'nullable|integer',
+            'accession' => 'nullable|string|max:20',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:255',
-            'copyright' => 'required|integer|min:1900|max:'.date('Y'),
-            'volume' => 'nullable|integer',
+            'copyright' => 'required|integer|min:1901|max:'.date('Y'),
+            'volume' => 'nullable|string',
             'edition' => 'nullable|string',
             'pages' => 'required|integer',
             'acquired_date' => 'required|date',
-            'source_of_fund' => 'required|string',
+            'source_of_fund' => 'required|integer',
             'price' => 'nullable|numeric',
-            'location_id' => 'required|integer',
+            'location' => 'required|string',
             'call_number' => 'required|string|max:50',
-            'copies' => 'required|integer|min:1|max:20',
             'remarks' => 'nullable|string|max:512',
             'image_url' => 'nullable|mimes:jpeg,jpg,png|max:2048'
         ]);
@@ -119,11 +120,12 @@ class BookController extends Controller
         } else {
             for($i = 0; $i < $request->copies; $i++) {
 
-                $model = new Book();
+                $model = new Material();
                 try {
                     
                     $model->fill($request->except(['id', 'image_url']));
-
+                    $model->material_type = 0;
+                    
                     // get id if request has an id
                     if($i > 0 && $request->id != null) {
 
@@ -164,16 +166,16 @@ class BookController extends Controller
         }
 
 
-        $location = Location::where('id', $model->location_id)->value('location');
+        // $location = Location::where('id', $model->location_id)->value('location');
 
-        $log = new CatalogingLogController();
+        // $log = new CatalogingLogController();
 
-        if($request->copies == 1)
-            $title = $model->title;
-        else
-            $title = $model->title . ' (' . $request->copies . ')';
+        // if($request->copies == 1)
+        //     $title = $model->title;
+        // else
+        //     $title = $model->title . ' (' . $request->copies . ')';
 
-        $log->add($request->user()->id, 'Added', $title, 'book', $location);
+        // $log->add($request->user()->id, 'Added', $title, 'book', $location);
         
         return response()->json($model, 201);
     }
@@ -181,24 +183,23 @@ class BookController extends Controller
     public function update(Request $request, $id) {
         
         $request->validate([
-            'id' => 'nullable|integer',
+            'accession' => 'nullable|string|max:20',
             'title' => 'nullable|string|max:255',
             'authors' => 'nullable|string|max:255',
-            'copyright' => 'nullable|integer|min:1900|max:'.date('Y'),
-            'volume' => 'nullable|integer',
-            'edition' => 'nullable|integer',
+            'copyright' => 'nullable|integer|min:1901|max:'.date('Y'),
+            'volume' => 'nullable|string',
+            'edition' => 'nullable|string',
             'pages' => 'nullable|integer',
             'acquired_date' => 'nullable|date',
-            'source_of_fund' => 'nullable|string',
+            'source_of_fund' => 'nullable|integer',
             'price' => 'nullable|numeric',
-            'location_id' => 'nullable|integer',
+            'location' => 'nullable|string',
             'call_number' => 'nullable|string|max:50',
-            'copies' => 'nullable|integer|min:1|max:20',
             'remarks' => 'nullable|string|max:512',
             'image_url' => 'nullable|mimes:jpeg,jpg,png|max:2048'
         ]);
 
-        $model = Book::findOrFail($id);
+        $model = Material::where('accession', $id)->firstOrFail();
 
         try {
             $model->fill($request->except('image_url', 'title', 'authors'));
@@ -216,7 +217,7 @@ class BookController extends Controller
 
             // Store image and save path
             try {
-                $books = Book::withTrashed()->where('image_url', '=', $model->image_url)->count();
+                $books = Material::where('image_url', '=', $model->image_url)->count();
 
                 if(!empty($model->image_url) && $books == 1) {
                     
@@ -225,7 +226,7 @@ class BookController extends Controller
                 }
                 
                 $path = $request->file('image_url')->store('public/images/books');
-                $model->image_url = $path;
+                $model->update(['image_url' => $path]);
 
             } catch (Exception $e) {
                 // add function
@@ -240,42 +241,24 @@ class BookController extends Controller
         }
 
         $model->authors = json_encode($authors);
-
         $model->save();
-        
-        $location = Location::where('id', $model->location_id)->value('location');
-
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Updated', $model->title, 'book', $location);
 
         return response()->json($model, 200);
     }
 
-    public function delete(Request $request, $id) {
-        $model = Book::findOrFail($id);
-        $books = Book::withTrashed()->where('image_url', '=', $model->image_url)->count();
-
-        if(!empty($model->image_url) && $books == 1) {
-            
-            $image = new ImageController();
-            $image->delete($model->image_url);
-        }
-        $model->delete();
-
-        $location = Location::where('id', $model->location_id)->value('location');
-        
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Archived', $model->title, 'book', $location);
-
-        return response()->json(['Response' => $books], 200);
-    }
-
     //opac
-    public function opacGetBooks() {     
-        $books = Material::select('accession', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
-                    ->where('material_type', 0)
-                    ->orderByDesc('date_published', 'desc')
-                    ->paginate(24);
+    public function opacGetBooks(Request $request) {        
+        $sort = $request->input('sort', 'acquired_date desc'); 
+    
+        $sort = $this->validateSort($sort);
+        
+        if ($sort[0] === 'date_published') {
+            $sort[0] = 'acquired_date';
+        }
+    
+        $books = Material::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
+                     ->orderBy($sort[0], $sort[1])
+                     ->paginate(24);
     
         foreach ($books as $book) {
             $book->authors = json_decode($book->authors);
@@ -300,14 +283,19 @@ class BookController extends Controller
     
     public function opacSearchBooks(Request $request){  
         $search = $request->input('search');
+        $sort = $request->input('sort', 'acquired_date desc');
 
-        $books = Material::select('accession', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
-                    ->where('material_type', 0)
-                    ->where(function($query) use($search) {
-                        $query->where('title', 'like', '%' . $search . "%")
-                            ->orWhere('authors', 'like', '%' . $search . "%");
-                    })
-                    ->orderByDesc('date_published')
+        $sort = $this->validateSort($sort);
+        
+        if($sort[0] === 'date_published') {
+            $sort[0] = 'acquired_date';
+        }
+
+        $books = Material::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
+                    ->where('title', 'like', '%' . $search . "%")
+                    ->orWhere('authors', 'like', '%' . $search . "%")
+                    ->orWhere('call_number', 'like', '%' . $search . "%")
+                    ->orderBy($sort[0], $sort[1])
                     ->paginate(24);
 
         foreach($books as $book) {

@@ -1,18 +1,23 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Cataloging;
 
 use App\Models\Material;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Periodical;
 use Exception;
 use Storage, Str;
+use App\Http\Controllers\ImageController;
 
 class PeriodicalController extends Controller
 {
-    const URL = 'http://26.68.32.39:8000';
+    // const URL = 'http://26.68.32.39:8000'; 
+    const URL = 'http://127.0.0.1:8000';
+
     public function getPeriodicals() {
-        $periodicals = Periodical::orderByDesc('updated_at')->get();
+        $periodicals = Material::where([['material_type', 1], ['periodical_type', 0]])
+        ->orderByDesc('updated_at')
+        ->get(['accession', 'title', 'author', 'publisher', 'copyright']);
 
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
@@ -25,7 +30,9 @@ class PeriodicalController extends Controller
     }
 
     public function getByType($type) {
-        $periodicals = Periodical::where('material_type', $type)->orderByDesc('updated_at')->get();
+        $periodicals = Material::where([['material_type', 1], ['periodical_type', $type]])
+        ->orderByDesc('updated_at')
+        ->get(['accession', 'title', 'authors', 'publisher', 'copyright']);
 
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
@@ -38,14 +45,16 @@ class PeriodicalController extends Controller
     }
 
     public function getPeriodical($id) {
-        $periodical = Periodical::findOrFail($id);
+        $periodical = Material::findOrFail($id);
+        $periodical->authors = json_decode($periodical->authors);
         $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
+
         return $periodical;
     }
 
     // FOR STUDENT PORTAL
     public function viewPeriodicals() {
-        $periodicals = Periodical::
+        $periodicals = Material::
         select(['id', 'title', 'authors', 'material_type', 'image_url', 'language', 'volume', 'issue', 'copyright', 'remarks'])
         ->orderByDesc('updated_at')->get();
 
@@ -129,12 +138,12 @@ class PeriodicalController extends Controller
     public function update(Request $request, $id) {
 
         $request->validate([
-            'material_type' => 'nullable|string|max:15',
+            'periodical_type' => 'nullable|integer|max:10',
             'title' => 'nullable|string|max:255',
             'author' => 'nullable|string|max:155',
-            'issue' => 'nullable|integer',
+            'issue' => 'nullable|string|max:30',
             'language' => 'nullable|string|max:15',
-            'receive_date' => 'nullable|date',
+            'acquired_date' => 'nullable|date',
             'date_published' => 'nullable|date',
             'copyright' => 'nullable|integer|min:1900|max:'.date('Y'),
             'publisher' =>'nullable|string|max:255',
@@ -144,7 +153,7 @@ class PeriodicalController extends Controller
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $model = Periodical::findOrFail($id);
+        $model = Material::findOrFail($id);
 
         $model->fill($request->except('image_url'));
 
@@ -158,7 +167,7 @@ class PeriodicalController extends Controller
 
             // Store image and save path
             try {
-                $materials = Periodical::withTrashed()->where('image_url', '=', $model->image_url)->count();
+                $materials = Material::withTrashed()->where('image_url', '=', $model->image_url)->count();
 
                 if(!empty($model->image_url) && $materials == 1) {
                     
@@ -176,16 +185,12 @@ class PeriodicalController extends Controller
 
         $model->save();
 
-        $type = strtolower($model->material_type);
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Updated', $model->title, $type, null);
-
         return response()->json($model, 200);
     }
 
     public function delete(Request $request, $id) {
-        $model = Periodical::findOrFail($id);
-        $materials = Periodical::withTrashed()->where('image_url', '=', $model->image_url)->count();
+        $model = Material::findOrFail($id);
+        $materials = Material::withTrashed()->where('image_url', '=', $model->image_url)->count();
 
         if(!empty($model->image_url) && $materials == 1) {
             
@@ -202,14 +207,18 @@ class PeriodicalController extends Controller
     }
 
     //opac
-    public function opacGetPeriodicals($periodical_type){
-        if (!in_array($periodical_type, ['0', '1', '2'])) {
+    public function opacGetPeriodicals(Request $request, $material_type){
+        if (!in_array($material_type, ['0', '1', '2'])) {
             return response()->json(['error' => 'Page not found'], 404);
         }
+        
+        $sort = $request->input('sort', 'date_published desc');
 
-        $periodicals = Material::select('accession', 'title', 'date_published', 'authors', 'image_url')
-                                    ->where('periodical_type', $periodical_type)
-                                    ->orderBy('date_published', 'desc')
+        $sort = $this->validateSort($sort);
+
+        $periodicals = Material::select('id', 'title', 'date_published', 'authors', 'image_url')
+                                    ->where('material_type', $material_type)
+                                    ->orderBy($sort[0], $sort[1])
                                     ->paginate(24);
         
         foreach($periodicals as $periodical) {
@@ -233,15 +242,15 @@ class PeriodicalController extends Controller
         return $periodical;
     }
 
-    public function opacSearchPeriodicals(Request $request, $periodical_type){
-        if (!in_array($periodical_type, ['0', '1', '2'])) {
+    public function opacSearchPeriodicals(Request $request, $material_type){
+        if (!in_array($material_type, ['0', '1', '2'])) {
             return response()->json(['error' => 'Page not found'], 404);
         }
 
         $search = $request->input('search');
 
-        $periodicals = Material::select('accession', 'title', 'date_published', 'authors', 'image_url')
-                        ->where('periodical_type', $periodical_type)
+        $periodicals = Material::select('id', 'title', 'date_published', 'authors', 'image_url', 'material_type')
+                        ->where('material_type', $material_type)
                         ->where(function ($query) use ($search) {
                             $query->where('title', 'like', '%' . $search . "%")
                                 ->orWhere('authors', 'like', '%' . $search . "%");
@@ -263,7 +272,7 @@ class PeriodicalController extends Controller
     public function getPeriodicalByMaterialType($materialType)
     {
         // Filter articles by material type
-        $filteredPeriodical = Periodical::where('material_type', $materialType)->get();
+        $filteredPeriodical = Material::where('material_type', $materialType)->get();
 
         return response()->json($filteredPeriodical);
     }
@@ -273,7 +282,7 @@ class PeriodicalController extends Controller
         // Retrieve the query parameter from the request
         $query = $request->input('query');
         
-        $periodicals = Periodical::where('title', 'LIKE', "%{$query}%")
+        $periodicals = Material::where('title', 'LIKE', "%{$query}%")
                                 ->get();
 
         return response()->json($periodicals);
