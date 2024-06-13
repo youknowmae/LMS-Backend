@@ -49,40 +49,6 @@ class ArticleController extends Controller
         return $article;
     }
 
-    // FOR STUDENT PORTAL
-    public function viewArticles() {
-        $articles = Material::
-        select(['material_type', 'title', 'authors', 'language', 'subject', 'date_published', 
-        'publisher', 'volume', 'issue', 'abstract'])
-        ->orderByDesc('created_at')->get();
-        
-        foreach($articles as $article) {
-            $article->authors = json_decode($article->authors);
-        }
-        
-        return $articles;
-    }
-
-    public function viewArticle(int $id) {
-        $article = Material::find($id, ['material_type', 'title', 'authors', 'language', 'subject', 'date_published', 
-        'publisher', 'volume', 'issue', 'abstract']);
-        
-        $article->authors = json_decode($article->authors);
-        
-        return $article;
-    }
-
-    public function viewArticlesByType($type) {
-        $articles = Material::where('material_type', $type)->orderByDesc('updated_at')->get();
-        
-        foreach($articles as $article) {
-            $article->authors = json_decode($article->authors);
-        }
-
-        return $articles;
-    }
-
-
     /* FOR PROCESSING */
 
     public function add(Request $request) {
@@ -165,64 +131,5 @@ class ArticleController extends Controller
         $log->add($request->user()->id, 'Archived', $model->title, 'article', null);
 
         return response()->json(['Response' => 'Record Deleted'], 200);
-    }
-
-    //opac
-    public function opacGetArticles(Request $request){
-        $sort = $request->input('sort');
-
-        $sort = $this->validateSort($sort);
-        
-        $articles = Material::select('id', 'title', 'date_published', 'authors', 'abstract')
-                           ->orderBy($sort[0], $sort[1])
-                           ->paginate(24);
-                             
-        foreach($articles as $article) {
-            $article->authors = json_decode($article->authors);
-        }
-
-        return $articles;
-    }
-
-    public function opacGetArticle($id) {
-        $article = Material::select('title', 'authors', 'date_published', 'issue', 'abstract', 'pages')
-                            ->findorfail($id);
-
-        $article->authors = json_decode($article->authors);
-
-        return $article;
-    }
-
-    public function opacSearchArticles(Request $request){
-        $search = $request->input('search');
-        $sort = $request->input('sort', 'date_published desc');
-
-        $sort = $this->validateSort($sort);
-
-        $articles = Material::select('id', 'title', 'date_published', 'authors', 'abstract')
-                ->where('title', 'like', '%' . $search . "%")
-                ->orWhere('authors', 'like', '%' . $search . "%")
-                ->orderBy($sort[0], $sort[1])
-                ->paginate(24);
-
-        foreach($articles as $article) {
-            $article->authors = json_decode($article->authors);
-        }
-
-        return $articles;
-    } 
-    
-    //ARTICLE
-    public function searchArticles(Request $request)
-    {
-        // Retrieve the query parameter from the request
-        $query = $request->input('query');
-        
-        // Search for books where the title contains the query string
-        $articles = Material::where('title', 'LIKE', "%{$query}%")
-                    ->get();
-        
-        // Return the results as a JSON response
-        return response()->json($articles);
     }
 }

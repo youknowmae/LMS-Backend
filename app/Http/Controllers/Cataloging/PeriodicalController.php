@@ -53,22 +53,6 @@ class PeriodicalController extends Controller
         return $periodical;
     }
 
-    // FOR STUDENT PORTAL
-    public function viewPeriodicals() {
-        $periodicals = Material::
-        select(['id', 'title', 'authors', 'material_type', 'image_url', 'language', 'volume', 'issue', 'copyright', 'remarks'])
-        ->orderByDesc('updated_at')->get();
-
-        foreach($periodicals as $periodical) {
-            if($periodical->image_url != null)
-                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
-
-            $periodical->authors = json_decode($periodical->authors);
-        }
-        
-        return $periodicals;
-    }
-
     /* PROCESSING OF DATA */
     
     public function add(Request $request) {
@@ -203,88 +187,5 @@ class PeriodicalController extends Controller
 
         return response()->json(['Response' => 'Record Archived'], 200);
     }
-
-    //opac
-    public function opacGetPeriodicals(Request $request, $material_type){
-        if (!in_array($material_type, ['0', '1', '2'])) {
-            return response()->json(['error' => 'Page not found'], 404);
-        }
-        
-        $sort = $request->input('sort', 'date_published desc');
-
-        $sort = $this->validateSort($sort);
-
-        $periodicals = Material::select('id', 'title', 'date_published', 'authors', 'image_url')
-                                    ->where('material_type', $material_type)
-                                    ->orderBy($sort[0], $sort[1])
-                                    ->paginate(24);
-        
-        foreach($periodicals as $periodical) {
-            if($periodical->image_url != null)
-                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
-            
-            $periodical->authors = json_decode($periodical->authors);
-        }
-
-        return $periodicals;
-    }
-
-    public function opacGetPeriodical($id) {
-        $periodical = Material::select('title', 'language', 'copyright', 'authors', 'date_published', 'acquired_date', 'publisher', 'volume', 'issue', 'pages', 'remarks', 'status')
-                            ->findOrFail($id);
-
-        $periodical->authors = json_decode($periodical->authors);
-        if($periodical->image_url)
-            $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
-        
-        return $periodical;
-    }
-
-    public function opacSearchPeriodicals(Request $request, $material_type){
-        if (!in_array($material_type, ['0', '1', '2'])) {
-            return response()->json(['error' => 'Page not found'], 404);
-        }
-
-        $search = $request->input('search');
-
-        $periodicals = Material::select('id', 'title', 'date_published', 'authors', 'image_url', 'material_type')
-                        ->where('material_type', $material_type)
-                        ->where(function ($query) use ($search) {
-                            $query->where('title', 'like', '%' . $search . "%")
-                                ->orWhere('authors', 'like', '%' . $search . "%");
-                        })
-                        ->orderBy('date_published', 'desc')
-                        ->paginate(24);
-
-        foreach($periodicals as $periodical) {
-            if($periodical->image_url != null)
-                $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
-            
-            $periodical->authors = json_decode($periodical->authors);
-        }
-
-        return $periodicals;
-    }
-
-    // STUDENT PORTAL
-    public function getPeriodicalByMaterialType($materialType)
-    {
-        // Filter articles by material type
-        $filteredPeriodical = Material::where('material_type', $materialType)->get();
-
-        return response()->json($filteredPeriodical);
-    }
-
-    //PERIODICAL 
-    public function searchPeriodicals(Request $request) {
-        // Retrieve the query parameter from the request
-        $query = $request->input('query');
-        
-        $periodicals = Material::where('title', 'LIKE', "%{$query}%")
-                                ->get();
-
-        return response()->json($periodicals);
-    }
-
 }
 

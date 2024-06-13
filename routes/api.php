@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\Cataloging\ExcelImportController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\OPAC\OPACSearchController;
+use App\Http\Controllers\OPAC\OPACViewController;
 use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\StudentPortal\StudentSearchController;
+use App\Http\Controllers\StudentPortal\StudentViewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -199,25 +203,33 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
     Route::get('borrow/user/{userId}', [BorrowMaterialController::class, 'getByUserId']);
 
     // ROUTES FOR VIEWING 
-    Route::get('student/announcements', [AnnouncementController::class, 'index']);
+    Route::group(['prefix' => 'student/'], function () {
+        Route::get('announcements', [AnnouncementController::class, 'index']);
 
-    Route::get('student/books', [BookController::class, 'viewBooks']);
-    Route::get('student/periodicals', [PeriodicalController::class, 'viewPeriodicals']);
-    Route::get('student/projects', [ProjectController::class, 'getProjects']);
-    Route::get('student/articles', [ArticleController::class, 'viewArticles']);
-    Route::get('student/projects/department/{department}', [ProjectController::class, 'getProjectCategoriesByDepartment']);//'viewProjectsByDepartment']);
+        Route::get('books', [StudentViewController::class, 'viewBooks']);
+        Route::get('periodicals', [StudentViewController::class, 'viewPeriodicals']);
+        Route::get('projects', [StudentViewController::class, 'getProjects']);
+        Route::get('articles', [StudentViewController::class, 'viewArticles']);
+        Route::get('projects/department/{department}', [StudentViewController::class, 'getProjectCategoriesByDepartment']);//'viewProjectsByDepartment']);
 
-    // FOR SINGLE RECORD
-    Route::get('student/book/id/{id}', [BookController::class, 'viewBook']);
-    Route::get('student/periodicals/id/{id}', [PeriodicalController::class, 'getPeriodical']);
-    Route::get('student/article/id/{id}', [ArticleController::class, 'viewArticle']);
-    Route::get('student/project/id/{id}', [ProjectController::class, 'getProject']);//'viewProjectsByDepartment']);
+        // FOR SINGLE RECORD
+        Route::get('book/id/{id}', [StudentViewController::class, 'viewBook']);
+        Route::get('periodicals/id/{id}', [StudentViewController::class, 'getPeriodical']);
+        Route::get('article/id/{id}', [StudentViewController::class, 'viewArticle']);
+        Route::get('project/id/{id}', [StudentViewController::class, 'getProject']);//'viewProjectsByDepartment']);
 
-    // FOR FILTERING MATERIAL TYPE
-    Route::get('student/periodicals/type/{type}', [PeriodicalController::class, 'viewPeriodicalByType']);
-    Route::get('student/articles/type/{type}', [ArticleController::class, 'viewArticlesByType']);
-    Route::get('student/projects/type/{type}', [ProjectController::class, 'viewProjectByType']);//'viewP
-    Route::get('student/periodicals/materialtype/{materialType}', [PeriodicalController::class, 'getPeriodicalByMaterialType']);//'viewP
+        // FOR FILTERING MATERIAL TYPE
+        Route::get('periodicals/type/{type}', [StudentViewController::class, 'viewPeriodicalByType']);
+        Route::get('articles/type/{type}', [StudentViewController::class, 'viewArticlesByType']);
+        Route::get('projects/type/{type}', [StudentViewController::class, 'viewProjectByType']);
+        Route::get('periodicals/materialtype/{materialType}', [StudentViewController::class, 'getPeriodicalByMaterialType']);
+
+        //Search 
+        Route::get('books/search/', [StudentSearchController::class, 'searchBooks']);
+        Route::get('periodicals/search/', [StudentSearchController::class, 'searchPeriodicals']);
+        Route::get('articles/search/', [StudentSearchController::class, 'searchArticle']);
+        Route::get('projects/search/', [StudentSearchController::class, 'searchProjects']);
+    });
 
     // Reservation routes
     Route::post('reservations', [ReservationController::class, 'store']); // Changed from 'reservation/{id}' to 'reservations'
@@ -233,13 +245,6 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
     Route::get('reservations/{id}', [ReservationController::class, 'getUserById']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
     Route::get('borrow/user/{userId}', [BorrowMaterialController::class, 'getByUserId']);
-
-    //Search 
-    Route::get('student/books/search/', [BookController::class, 'searchBooks']);
-    Route::get('student/periodicals/search/', [PeriodicalController::class, 'searchPeriodicals']);
-    Route::get('student/articles/search/', [ArticleController::class, 'searchArticle']);
-    Route::get('student/projects/search/', [ProjectController::class, 'searchProjects']);
-
         
     Route::get('queue-pos/{id}', [ReserveBookController::class, 'getQueuePosition']);   
 });
@@ -253,29 +258,29 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
 //opac routes
 Route::group(['prefix' => 'opac'], function () {
     //books
-    Route::get('books', [BookController::class, 'opacGetBooks']);
-    Route::get('/books/search', [BookController::class, 'opacSearchBooks']);
-    Route::get('/book/{id}', [BookController::class, 'opacGetBook']);
+    Route::get('books', [OPACViewController::class, 'opacGetBooks']);
+    Route::get('/books/search', [OPACSearchController::class, 'opacSearchBooks']);
+    Route::get('/book/{id}', [OPACViewController::class, 'opacGetBook']);
 
 
     //periodicals
     Route::prefix('/periodicals')->group(function() { 
-        Route::get('/{material_type}', [PeriodicalController::class, 'opacGetPeriodicals']);
-        Route::get('/{material_type}/search', [PeriodicalController::class, 'opacSearchPeriodicals']);
+        Route::get('/{material_type}', [OPACViewController::class, 'opacGetPeriodicals']);
+        Route::get('/{material_type}/search', [OPACSearchController::class, 'opacSearchPeriodicals']);
     });
-    Route::get('/periodical/{id}', [PeriodicalController::class, 'opacGetPeriodical']);
+    Route::get('/periodical/{id}', [OPACViewController::class, 'opacGetPeriodical']);
 
     //articles
-    Route::get('/articles', [ArticleController::class, 'opacGetArticles']);
-    Route::get('/articles/search', [ArticleController::class, 'opacSearchArticles']);
-    Route::get('/article/{id}', [ArticleController::class, 'opacGetArticle']);
+    Route::get('/articles', [OPACViewController::class, 'opacGetArticles']);
+    Route::get('/articles/search', [OPACSearchController::class, 'opacSearchArticles']);
+    Route::get('/article/{id}', [OPACViewController::class, 'opacGetArticle']);
 
     //projects
     Route::prefix('/projects')->group(function() { 
-        Route::get('/{category}', [ProjectController::class, 'opacGetProjects']);
-        Route::get('/{category}/search', [ProjectController::class, 'opacSearchProjects']);
+        Route::get('/{category}', [OPACViewController::class, 'opacGetProjects']);
+        Route::get('/{category}/search', [OPACSearchController::class, 'opacSearchProjects']);
     });
-    Route::get('/project/{id}', [ProjectController::class, 'opacGetProject']);
+    Route::get('/project/{id}', [OPACViewController::class, 'opacGetProject']);
 });
 
 // locker routes

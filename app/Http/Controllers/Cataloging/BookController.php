@@ -39,61 +39,6 @@ class BookController extends Controller
         return $book;
     }
 
-    // FOR STUDENT PORTAL
-    public function viewBooks() {
-        $books = Material::with('location')->orderByDesc('updated_at')->get();
-        
-        $books_array = [];
-        foreach($books as $book) {
-            $image_url = null;
-            if($book->image_url != null)
-                $image_url = self::URL .  Storage::url($book->image_url);
-
-            array_push($books_array, [
-                'id' => $book->id,
-                'image_url' => $image_url,
-                'location' => $book->location->location,
-                'full_location' => $book->location->full_location,
-                'title' => $book->title,
-                'authors' => json_decode($book->authors),
-                'volume' => $book->volume,
-                'edition' => $book->edition,
-                'available' => $book->available,
-                'copyright' => $book->copyright,
-                'fine' => $book->fine
-            ]);
-        }
-        return $books_array;
-    }
-
-    public function viewBook(int $id) {
-        $book = Material::find($id, ['available', 'title', 'id', 'call_number', 'copyright', 'price', 'authors',
-        'volume', 'pages', 'edition', 'remarks', 'image_url']);
-
-        $book->authors = json_decode($book->authors);
-        $book->image_url = self::URL . Storage::url($book->image_url);
-        return $book;
-    }
-
-    // search BOOKS
-    public function searchBooks(Request $request)
-    {
-        // Retrieve the query parameter from the request
-        $query = $request->input('query');
-
-        // Check if the query parameter is empty or not provided
-        if(empty($query)) {
-            // Return a response indicating that the query is required
-            return response()->json(['message' => 'Please provide a search query.'], 400);
-        }
-        
-        // Search for books where the title contains the query string
-        $books = Material::where('title', 'LIKE', "%{$query}%")->get();
-
-        // Return the results as a JSON response
-        return response()->json($books);
-    }
-
     /* PROCESSING OF DATA */
 
     public function add(Request $request) {
@@ -245,67 +190,5 @@ class BookController extends Controller
 
         return response()->json($model, 200);
     }
-
-    //opac
-    public function opacGetBooks(Request $request) {        
-        $sort = $request->input('sort', 'acquired_date desc'); 
-    
-        $sort = $this->validateSort($sort);
-        
-        if ($sort[0] === 'date_published') {
-            $sort[0] = 'acquired_date';
-        }
-    
-        $books = Material::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
-                     ->orderBy($sort[0], $sort[1])
-                     ->paginate(24);
-    
-        foreach ($books as $book) {
-            $book->authors = json_decode($book->authors);
-            if ($book->image_url != null) {
-                $book->image_url = self::URL . Storage::url($book->image_url);
-            }
-        }
-        
-        return $books;
-    }
-
-    public function opacGetBook($id) {
-        $book = Material::select('title', 'location', 'call_number', 'copyright', 'authors', 'acquired_date', 'volume', 'pages', 'edition', 'remarks', 'status')
-                        ->findOrFail($id);
-
-        $book->authors = json_decode($book->authors);
-        if($book->image_url != null)
-            $book->image_url = self::URL . Storage::url($book->image_url);
-
-        return $book;
-    }
-    
-    public function opacSearchBooks(Request $request){  
-        $search = $request->input('search');
-        $sort = $request->input('sort', 'acquired_date desc');
-
-        $sort = $this->validateSort($sort);
-        
-        if($sort[0] === 'date_published') {
-            $sort[0] = 'acquired_date';
-        }
-
-        $books = Material::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
-                    ->where('title', 'like', '%' . $search . "%")
-                    ->orWhere('authors', 'like', '%' . $search . "%")
-                    ->orWhere('call_number', 'like', '%' . $search . "%")
-                    ->orderBy($sort[0], $sort[1])
-                    ->paginate(24);
-
-        foreach($books as $book) {
-            if($book->image_url != null)
-                $book->image_url = self::URL . Storage::url($book->image_url);
-
-            $book->authors = json_decode($book->authors);
-        }
-
-        return $books;
-    } 
 }
 
