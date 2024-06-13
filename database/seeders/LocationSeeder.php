@@ -29,6 +29,50 @@ class LocationSeeder extends Seeder
         [
             'location_short' => 'COM',
             'location_full' => 'Computer'
+        ],
+        [
+            'location_short' => 'ABCOMM',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'CAD',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'EDUC',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'FS',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'HM',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'HM/TM',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'HRM/T',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'IGS',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'REF',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'TM',
+            'location_full' => null
+        ],
+        [
+            'location_short' => 'TM/HM',
+            'location_full' => null
         ]
     ]);
     }

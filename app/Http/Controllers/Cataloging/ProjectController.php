@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 use Exception, DB, Storage, Str;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\ImageController;
 
 class ProjectController extends Controller
 {
@@ -80,7 +81,14 @@ class ProjectController extends Controller
     }
     
     public function getProject($id) {
-        return Project::find($id);
+        $project =  Project::with('project_program')->find($id);
+        if($project->image_url != null)
+                $project->image_url = self::URL .  Storage::url($project->image_url);
+
+            $project->authors = json_decode($project->authors);
+            $project->keywords = json_decode($project->keywords);
+        
+        return $project;
     }
 
     // FOR STUDENT PORTAL
@@ -208,7 +216,7 @@ class ProjectController extends Controller
         
         // VALIDATION
         $request->validate([
-            'program_id' => 'required|integer|max:255',
+            'program' => 'required|string|max:20',
             'category' => 'required|string|max:125',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:1024',
@@ -263,12 +271,6 @@ class ProjectController extends Controller
         $model->authors = json_encode($authors);
         
         $model->save();
-
-        $type = strtolower($model->type);
-        $program = Program::find($model->program_id)->program;
-
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Updated', $model->title, $type, $program);
 
         return response()->json($model, 200);
     }

@@ -47,7 +47,8 @@ class PeriodicalController extends Controller
     public function getPeriodical($id) {
         $periodical = Material::findOrFail($id);
         $periodical->authors = json_decode($periodical->authors);
-        $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
+        if($periodical->image_url)
+            $periodical->image_url = self::URL .  Storage::url($periodical->image_url);
 
         return $periodical;
     }
@@ -74,24 +75,25 @@ class PeriodicalController extends Controller
         
         $request->validate([
             'accession' => 'required|string|max:255',
-            'material_type' => 'required|string|max:15',
+            'periodical_type' => 'required|integer|max:15',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:155',
-            'issue' => 'required|integer',
+            'issue' => 'required|string|max:100',
             'language' => 'required|string|max:15',
-            'receive_date' => 'required|date',
+            'acquired_date' => 'required|date',
             'date_published' => 'required|date',
             'copyright' => 'required|integer|min:1900|max:'.date('Y'),
             'publisher' =>'required|string|max:255',
-            'volume' => 'required|integer',
+            'volume' => 'required|',
             'remarks' => 'nullable|string|max:512',
             'pages' => 'required|integer',
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $model = new Periodical();
+        $model = new Material();
+        $model->material_type = 1;
 
-        $model->fill($request->except('image_url', 'author'));
+        $model->fill($request->except('image_url', 'authors'));
 
         if(!empty($request->image_url)) {
             $ext = $request->file('image_url')->extension();
@@ -127,10 +129,6 @@ class PeriodicalController extends Controller
         $model->authors = json_encode($authors);
         
         $model->save();
-        
-        $type = strtolower($model->material_type);
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Added', $model->title, $type, null);
 
         return response()->json($model, 201);
     }
@@ -141,13 +139,13 @@ class PeriodicalController extends Controller
             'periodical_type' => 'nullable|integer|max:10',
             'title' => 'nullable|string|max:255',
             'author' => 'nullable|string|max:155',
-            'issue' => 'nullable|string|max:30',
+            'issue' => 'nullable|string|max:50',
             'language' => 'nullable|string|max:15',
             'acquired_date' => 'nullable|date',
             'date_published' => 'nullable|date',
             'copyright' => 'nullable|integer|min:1900|max:'.date('Y'),
             'publisher' =>'nullable|string|max:255',
-            'volume' => 'nullable|integer',
+            'volume' => 'nullable|string|max:50',
             'remarks' => 'nullable|string|max:512',
             'pages' => 'nullable|integer',
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',

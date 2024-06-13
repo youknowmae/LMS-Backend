@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('category', 50);
             $table->string('title');
             $table->string('authors', 100);
-            $table->string('program');
+            $table->string('program', 10);
             $table->string('image_url', 100)->nullable();
             $table->date('date_published');
             $table->string('language', 20);

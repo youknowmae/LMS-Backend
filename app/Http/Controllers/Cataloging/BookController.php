@@ -107,32 +107,32 @@ class BookController extends Controller
             'edition' => 'nullable|string',
             'pages' => 'required|integer',
             'acquired_date' => 'required|date',
-            'source_of_fund' => 'required|integer',
+            'source_of_fund' => 'required|string|max:30',
             'price' => 'nullable|numeric',
             'location' => 'required|string',
             'call_number' => 'required|string|max:50',
             'remarks' => 'nullable|string|max:512',
-            'image_url' => 'nullable|mimes:jpeg,jpg,png|max:2048'
+            'image_url' => 'nullable|mimes:jpeg,jpg,png'
         ]);
 
         if($request->copies < 1) {
-            return response('Error: Invalid number of copies', 400);
+            return response()->json(['Error' => 'Invalid number of copies'], 400);
         } else {
             for($i = 0; $i < $request->copies; $i++) {
 
                 $model = new Material();
                 try {
                     
-                    $model->fill($request->except(['id', 'image_url']));
+                    $model->fill($request->except(['accession', 'image_url']));
                     $model->material_type = 0;
                     
                     // get id if request has an id
-                    if($i > 0 && $request->id != null) {
+                    if($i > 0 && $request->accession != null) {
 
-                        $model->id = $request->id + $i;
-                    } else if($i == 0 && $request->id != null) {
+                        $model->accession = $request->accession + $i;
+                    } else if($i == 0 && $request->accession != null) {
 
-                        $model->id = $request->id;
+                        $model->accession = $request->accession;
                     }
 
                 } catch (Exception) {

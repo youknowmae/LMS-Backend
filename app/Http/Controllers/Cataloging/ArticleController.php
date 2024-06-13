@@ -89,15 +89,14 @@ class ArticleController extends Controller
 
         $request->validate([
             'accession' => 'required|string|max:255',
-            'material_type' => 'required|string|max:15',
+            'periodical_type' => 'required|integer',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:255',
-            // 'abstract' => 'required|mimes:jpeg,jpg,png|max:2048',
-            'abstract' => 'required|string|max: 2048',
+            'abstract' => 'required|string|max: 4096',
             'language' => 'required|string|max:15',
-            'issue' => 'required|integer',
+            'issue' => 'required|string|max:50',
             'subject' => 'required|string|max:255',
-            'volume' => 'required|integer',
+            'volume' => 'required|string|max:50',
             'publisher' => 'required|string|max:255',
             'pages' => 'required|string|max:25',
             'date_published' => 'required|date',
@@ -105,24 +104,10 @@ class ArticleController extends Controller
         ]);
 
         // return response()->json(['res' => 'nearly there'], 200);
-        $model = new Article();
+        $model = new Material();
+        $model->material_type = 2;
 
-        $model->fill($request->except(['abstract']));
-
-        if($request->image_url != null) {
-            // foreach($request->abstract)
-            $ext = $request->file('abstract')->extension();
-
-            // Check file extension and raise error
-            if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-                return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
-            }
-
-            // Store image and save path
-            $path = $request->file('abstract')->store('public/images/articles');
-
-            $model->image_url = $path;
-        } 
+        $model->fill($request->all());
 
         $model->title = Str::title($request->title);
         $authors = json_decode($request->authors, true);
@@ -134,9 +119,6 @@ class ArticleController extends Controller
         $model->authors = json_encode($authors);
 
         $model->save();
-
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Added', $model->title, 'article', $model->material_type);
 
         return response()->json($model, 200);
     }

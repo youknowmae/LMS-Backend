@@ -17,7 +17,7 @@ return new class extends Migration
             // 0 -> books, 1 -> periodicals, 2 -> articles
             $table->tinyInteger('material_type');
             $table->string('title');
-            $table->string('authors');
+            $table->string('authors')->nullable();
             $table->string('publisher', 100)->nullable();
             $table->string('image_url', 100)->nullable();
             $table->string('volume', 50)->nullable();
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->string('location', 20)->nullable();
             $table->string('call_number', 20)->nullable();
             $table->string('author_number', 20)->nullable();
-            $table->tinyInteger('source_of_fund')->nullable();
+            $table->string('source_of_fund', 30)->nullable();
             $table->float('price', 2)->nullable();
 
             // 0 -> available, 1 -> borrowed, 2 -> reserved, 3 -> unavailable
@@ -46,7 +46,7 @@ return new class extends Migration
             $table->string('issue', 30)->nullable();
 
             // ARTICLES
-            $table->string('subject', 100)->nullable();
+            $table->string('subject', 150)->nullable();
             $table->text('abstract')->nullable();
 
             $table->timestamps();
