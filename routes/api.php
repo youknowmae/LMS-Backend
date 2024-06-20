@@ -3,7 +3,7 @@
 use App\Http\Controllers\Cataloging\ExcelImportController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\OPAC\OPACSearchController;
-use App\Http\Controllers\OPAC\OPACViewController;
+use App\Http\Controllers\OPAC\OPACMaterialsController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\StudentPortal\StudentSearchController;
 use App\Http\Controllers\StudentPortal\StudentViewController;
@@ -22,7 +22,6 @@ use App\Http\Controllers\LockerController;
 use App\Http\Controllers\CirculationUserController, App\Http\Controllers\UserController, App\Http\Controllers\PatronController,
 App\Http\Controllers\CollegeController, App\Http\Controllers\InventoryController, App\Http\Controllers\LocationController,
 App\Http\Controllers\AnnouncementController, App\Http\Controllers\LockerHistoryController;
-
 
 Route::post('/studentlogin', [AuthController::class, 'studentLogin']);
 Route::get('/', function (Request $request) {
@@ -258,29 +257,29 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
 //opac routes
 Route::group(['prefix' => 'opac'], function () {
     //books
-    Route::get('books', [OPACViewController::class, 'opacGetBooks']);
+    Route::get('books', [OPACMaterialsController::class, 'opacGetBooks']);
     Route::get('/books/search', [OPACSearchController::class, 'opacSearchBooks']);
-    Route::get('/book/{id}', [OPACViewController::class, 'opacGetBook']);
+    Route::get('/book/{id}', [OPACMaterialsController::class, 'opacGetBook']);
 
 
     //periodicals
     Route::prefix('/periodicals')->group(function() { 
-        Route::get('/{material_type}', [OPACViewController::class, 'opacGetPeriodicals']);
+        Route::get('/{material_type}', [OPACMaterialsController::class, 'opacGetPeriodicals']);
         Route::get('/{material_type}/search', [OPACSearchController::class, 'opacSearchPeriodicals']);
     });
-    Route::get('/periodical/{id}', [OPACViewController::class, 'opacGetPeriodical']);
+    Route::get('/periodical/{id}', [OPACMaterialsController::class, 'opacGetPeriodical']);
 
     //articles
-    Route::get('/articles', [OPACViewController::class, 'opacGetArticles']);
+    Route::get('/articles', [OPACMaterialsController::class, 'opacGetArticles']);
     Route::get('/articles/search', [OPACSearchController::class, 'opacSearchArticles']);
-    Route::get('/article/{id}', [OPACViewController::class, 'opacGetArticle']);
+    Route::get('/article/{id}', [OPACMaterialsController::class, 'opacGetArticle']);
 
     //projects
     Route::prefix('/projects')->group(function() { 
-        Route::get('/{category}', [OPACViewController::class, 'opacGetProjects']);
+        Route::get('/{category}', [OPACMaterialsController::class, 'opacGetProjects']);
         Route::get('/{category}/search', [OPACSearchController::class, 'opacSearchProjects']);
     });
-    Route::get('/project/{id}', [OPACViewController::class, 'opacGetProject']);
+    Route::get('/project/{id}', [OPACMaterialsController::class, 'opacGetProject']);
 });
 
 // locker routes

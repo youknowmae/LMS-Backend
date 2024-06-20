@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Material;
 use App\Models\Project;
-use Storage;
+use Illuminate\Support\Facades\Storage;
 
 class OPACSearchController extends Controller
 {
@@ -16,19 +16,11 @@ class OPACSearchController extends Controller
     // BOOKS
     public function opacSearchBooks(Request $request){  
         $search = $request->input('search');
-        $sort = $request->input('sort', 'acquired_date desc');
 
-        $sort = $this->validateSort($sort);
-        
-        if($sort[0] === 'date_published') {
-            $sort[0] = 'acquired_date';
-        }
-
-        $books = Material::select('id', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
+        $books = Material::select('accession', 'call_number', 'title', 'acquired_date', 'authors', 'image_url')
                     ->where('title', 'like', '%' . $search . "%")
                     ->orWhere('authors', 'like', '%' . $search . "%")
-                    ->orWhere('call_number', 'like', '%' . $search . "%")
-                    ->orderBy($sort[0], $sort[1])
+                    ->orderBy('date_published', 'desc')
                     ->paginate(24);
 
         foreach($books as $book) {
@@ -42,15 +34,16 @@ class OPACSearchController extends Controller
     } 
 
     // PERIODICALS
-    public function opacSearchPeriodicals(Request $request, $material_type){
-        if (!in_array($material_type, ['0', '1', '2'])) {
+    public function opacSearchPeriodicals(Request $request, $periodical_type){
+        if (!in_array($periodical_type, ['0', '1', '2'])) {
             return response()->json(['error' => 'Page not found'], 404);
         }
 
         $search = $request->input('search');
 
-        $periodicals = Material::select('id', 'title', 'date_published', 'authors', 'image_url', 'material_type')
-                        ->where('material_type', $material_type)
+        $periodicals = Material::select('accession', 'title', 'date_published', 'authors', 'image_url')
+                        ->where('material_type', 1)
+                        ->where('periodical_type', $periodical_type)
                         ->where(function ($query) use ($search) {
                             $query->where('title', 'like', '%' . $search . "%")
                                 ->orWhere('authors', 'like', '%' . $search . "%");
@@ -70,15 +63,12 @@ class OPACSearchController extends Controller
 
     // ARTICLES
     public function opacSearchArticles(Request $request){
-        $search = $request->input('search');
-        $sort = $request->input('sort', 'date_published desc');
+        $search = $request->input('search');;
 
-        $sort = $this->validateSort($sort);
-
-        $articles = Material::select('id', 'title', 'date_published', 'authors', 'abstract')
+        $articles = Material::select('accession', 'title', 'date_published', 'authors', 'abstract')
                 ->where('title', 'like', '%' . $search . "%")
                 ->orWhere('authors', 'like', '%' . $search . "%")
-                ->orderBy($sort[0], $sort[1])
+                ->orderBy('date_published', 'desc')
                 ->paginate(24);
 
         foreach($articles as $article) {
@@ -90,6 +80,7 @@ class OPACSearchController extends Controller
 
     // PROJECTS
     public function opacSearchProjects(Request $request, $category) {
+
         if(!in_array($category, ['thesis', 'Classroom Based Action Research', 'capstone', 'feasibility study', 'research', 'dissertation'])){
             return response()->json(['error' => 'Page not found'], 404);
         }
@@ -104,7 +95,7 @@ class OPACSearchController extends Controller
                             ->orWhere('authors', 'like', '%' . $search . "%");
                             // ->orWhere('keywords', 'like', '%' . $search . "%");
                 })
-                ->wherehas('program', function($query) use($filter) {
+                ->wherehas('project_program', function($query) use($filter) {
                     if ($filter) {
                         $query->where('department_short', $filter);
                     }
