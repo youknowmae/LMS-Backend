@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller
 {
-    const URL = 'http://26.68.32.39:8000';
+    const URL = 'http://localhost:8000';
 
     public function index()
     {
         $announcements = Announcement::orderby('created_at', 'desc')->get();
         foreach($announcements as $announcement) {
-            if($announcement->image != null)
-                $announcement->image = self::URL . Storage::url($announcement->image);
+            if($announcement->image_url != null)
+                $announcement->image_url = self::URL . Storage::url($announcement->image_url);
         }
 
         return $announcements;
@@ -44,15 +44,15 @@ class AnnouncementController extends Controller
             $file = $request->file('file');
             $path = Storage::disk('public')->put('announcements', $file);
             
-            $announcement->image = $path;
+            $announcement->image_url = $path;
         }
 
         $announcement->save();
 
-        if($announcement->image != null)
-            $announcement->image = self::URL . Storage::url($announcement->image);
+        if($announcement->image_url != null)
+            $announcement->image_url = self::URL . Storage::url($announcement->image_url);
         else {
-            $announcement->image = null;
+            $announcement->image_url = null;
         }
 
         return response()->json(['success' => $announcement], 201);
@@ -84,14 +84,14 @@ class AnnouncementController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $path = Storage::disk('public')->put('announcements', $file);
-            $announcement->image = $path;
+            $announcement->image_url = $path;
             $announcement->save();
         }
 
-        if($announcement->image != null)
-            $announcement->image = self::URL . Storage::url($announcement->image);
+        if($announcement->image_url != null)
+            $announcement->image_url = self::URL . Storage::url($announcement->image_url);
         else {
-            $announcement->image = null;
+            $announcement->image_url = null;
         }
 
         return response()->json(['success' => $announcement], 201);
@@ -100,8 +100,8 @@ class AnnouncementController extends Controller
     public function destroy(Announcement $announcement)
     {
         // Delete the file associated with the announcement if it exists
-        if ($announcement->image) {
-            Storage::disk('public')->delete($announcement->image);
+        if ($announcement->image_url) {
+            Storage::disk('public')->delete($announcement->image_url);
         }
 
         $announcement->delete();

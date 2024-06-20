@@ -6,19 +6,23 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Book;
 use App\Models\Inventory;
+use App\Models\Material;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class InventoryController extends Controller
 {
-    public function getBookInventory($filter)
+    
+    //0 -> available, 1 -> unreturned, 2 -> missing, 3 -> unlabeled, 4 -> damaged
+    public function getBookInventory($status)
     {
-        if(!in_array($filter, ['available', 'unreturned', 'missing', 'unlabeled'])){
+        if(!in_array($status, [0, 1, 2, 3, 4])){
             return response()->json(['error' => 'Page not found'], 404);
         }
 
-        $books = Book::with('location')
-                    ->where('status', $filter)
+        $books = Material::select('accession', 'location', 'title', 'authors', 'inventory_status')
+                    ->where('material_type', 0)
+                    ->where('inventory_status', $status)
                     ->orderByDesc('created_at')
                     ->get();
         
@@ -26,22 +30,21 @@ class InventoryController extends Controller
             $book->authors = json_decode($book->authors);
         }
 
-      
-
         return $books;
     }
 
-    public function searchBookInventory(Request $request, $filter)
+    public function searchBookInventory(Request $request, $status)
     {
         $search = $request->input('search', '');
         
-        if(!in_array($filter, ['available', 'unreturned', 'missing', 'unlabeled'])){
+        if(!in_array($status, [0, 1, 2, 3, 4])){
             return response()->json(['error' => 'Page not found'], 404);
         }
 
-        $books = Book::with('location')
-                    ->where('status', $filter)
-                    ->where('call_number', 'LIKE', "%" . $search . "%")
+        $books = Material::select('accession', 'location', 'title', 'authors', 'inventory_status')
+                    ->where('material_type', 0)
+                    // ->where('inventory_status', $status)
+                    ->where('accession', $search)
                     ->orderByDesc('created_at')
                     ->get();
         
@@ -56,14 +59,14 @@ class InventoryController extends Controller
 
     public function updateBookStatus(Request $request, $id) {
         $data = Validator::make($request->all(), [
-            'status' => 'required|in:available,unreturned,missing,unlabeled'
+            'inventory_status' => 'required|numeric|between:0,4'
         ]);
 
         if($data->fails()) {
             return response()->json(['errors', $data->errors()], 400);
         }
 
-        $book = Book::findorfail($id);
+        $book = Material::findorfail($id);
         $book->update($data->validated());
         $book->save();
 
@@ -71,7 +74,9 @@ class InventoryController extends Controller
     }
 
     public function clearBooksHistory() {
-        Book::where('status', 'available')->update(['status' => 'unlabeled']);
+        Material::where('material_type', 0)
+                ->where('inventory_status', 0)
+                ->update(['inventory_status' => 3]);
         
         return response()->json(['success' => 'History has been cleared.'], 200);
     }

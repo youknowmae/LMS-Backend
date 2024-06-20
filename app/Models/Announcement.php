@@ -14,6 +14,6 @@ class Announcement extends Model
         'category',
         'author_id',
         'text',
-        'images'
+        'image_url'
     ];
 }

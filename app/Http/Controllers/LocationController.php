@@ -16,8 +16,8 @@ class LocationController extends Controller
 
     public function create(Request $request) {
         $location = Validator::make($request->all(), [
-            'location' => 'required|string|max:10|unique:locations',
-            'full_location' => 'required|string|max:32'
+            'location_short' => 'required|string|max:10|unique:locations',
+            'location_full' => 'required|string|max:32'
         ]);
 
         if($location->fails()) {

@@ -11,20 +11,6 @@ class Inventory extends Model
     protected $table = 'inventory_items';
 
     protected $fillable = [
-        'barcode',
-        'accession_number',
-        'title',
-        'author',
-        'location',
-        'status',
-    ];
-
-    protected $casts = [
-        'barcode' => 'string',
-        'accession_number' => 'string',
-        'title' => 'string',
-        'author' => 'string',
-        'location' => 'string',
-        'status' => 'string',
+        'inventory_status',
     ];
 }
