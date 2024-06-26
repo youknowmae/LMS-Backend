@@ -22,7 +22,6 @@ use App\Http\Controllers\LockerController;
 use App\Http\Controllers\CirculationUserController, App\Http\Controllers\UserController, App\Http\Controllers\PatronController,
 App\Http\Controllers\CollegeController, App\Http\Controllers\InventoryController, App\Http\Controllers\LocationController,
 App\Http\Controllers\AnnouncementController, App\Http\Controllers\LockerHistoryController;
-use App\Http\Controllers\OPAC\OpacViewCountController;
 
 Route::post('/studentlogin', [AuthController::class, 'studentLogin']);
 Route::get('/', function (Request $request) {
@@ -281,10 +280,6 @@ Route::group(['prefix' => 'opac'], function () {
         Route::get('/{category}/search', [OPACSearchController::class, 'opacSearchProjects']);
     });
     Route::get('/project/{id}', [OPACMaterialsController::class, 'opacGetProject']);
-
-    Route::get('/getCount', [OpacViewCountController::class, 'getViewCount']);
-    Route::get('/addCount', [OpacViewCountController::class, 'updateViewCount']);
-
 });
 
 // locker routes

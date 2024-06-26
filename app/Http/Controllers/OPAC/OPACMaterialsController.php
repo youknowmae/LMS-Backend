@@ -48,11 +48,11 @@ class OPACMaterialsController extends Controller
             return response()->json(['error' => 'Page not found'], 404);
         }
 
-        $periodicals = Material::select('accession', 'title', 'authors', 'date_published', 'image_url')
+        $periodicals = Material::select('accession', 'title', 'date_published', 'authors', 'image_url')
                                     ->where('material_type', 1)
                                     ->where('periodical_type', $periodical_type)
                                     ->orderBy('date_published', 'desc')
-                                    ->get();
+                                    ->paginate(24);
         
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
@@ -81,7 +81,7 @@ class OPACMaterialsController extends Controller
         $articles = Material::select('accession', 'title', 'date_published', 'authors', 'abstract')
                             ->where('material_type', 2)
                             ->orderBy('date_published', 'desc')
-                            ->get();
+                            ->paginate(24);
                              
         foreach($articles as $article) {
             $article->authors = json_decode($article->authors);
