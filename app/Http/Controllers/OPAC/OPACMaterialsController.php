@@ -52,7 +52,7 @@ class OPACMaterialsController extends Controller
                                     ->where('material_type', 1)
                                     ->where('periodical_type', $periodical_type)
                                     ->orderBy('date_published', 'desc')
-                                    ->paginate(24);
+                                    ->get();
         
         foreach($periodicals as $periodical) {
             if($periodical->image_url != null)
@@ -81,7 +81,7 @@ class OPACMaterialsController extends Controller
         $articles = Material::select('accession', 'title', 'date_published', 'authors', 'abstract')
                             ->where('material_type', 2)
                             ->orderBy('date_published', 'desc')
-                            ->paginate(24);
+                            ->get();
                              
         foreach($articles as $article) {
             $article->authors = json_decode($article->authors);
@@ -105,17 +105,18 @@ class OPACMaterialsController extends Controller
             return response()->json(['error' => 'Page not found'], 404);
         }
 
-        $filter = $request->input('filter', null); //set the filer to null if no filter is placed
+        // $filter = $request->input('filter', null); //set the filer to null if no filter is placed
 
         $projects = Project::select('accession', 'title', 'image_url', 'date_published', 'authors', 'program', 'keywords')
                     ->where('category', $category)
-                    ->wherehas('project_program', function($query) use($filter) {
-                        if ($filter) {
-                            $query->where('department_short', $filter);
-                        }
-                    })
+                    ->with('project_program:program_short,department_short')
+                    // ->wherehas('project_program', function($query) use($filter) {
+                    //     if ($filter) {
+                    //         $query->where('department_short', $filter);
+                    //     }
+                    // })
                     ->orderbyDesc('date_published')
-                    ->paginate(24);
+                    ->get();
 
         foreach ($projects as $project) {
             $project->authors = json_decode($project->authors);
