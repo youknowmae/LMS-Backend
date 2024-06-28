@@ -88,8 +88,9 @@ class User extends Authenticatable
         return $this->hasOneThrough(Department::class, Program::class, 'id', 'id', 'program_id', 'department_id');
     }
 
+//NILAGAY KO ITO PARA SA LOCKER PACHECK NALANG
     public function program() {
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(Program::class, 'program', 'program_short');
     }
 
 

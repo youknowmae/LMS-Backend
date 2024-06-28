@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Program extends Model
 {
     use HasFactory;
-    protected $fillable = ['program', 'full_program', 'category', 'department_id'];
+
+    protected $primaryKey = 'program_short';
+    protected $keyType = 'string';
+    protected $fillable = ['program_short', 'program_full', 'department_short', 'department_full', 'category'];
 
     public function projects()
     {
@@ -19,9 +22,4 @@ class Program extends Model
     {
         return $this->hasMany(User::class);
     }
-
-    public function department() {
-        return $this->belongsTo(Department::class);
-    }
-
 }

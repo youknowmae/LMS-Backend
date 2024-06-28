@@ -252,36 +252,39 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'opac'], function ()
     Route::get('/project/{id}', [ProjectController::class, 'opacGetProject']);
 });
 
-// locker routes
-
-Route::get('/lockers-log', [LockersLogController::class, 'getLockerLogs']);
-Route::get('/lockers-logs-with-users', [LockersLogController::class, 'fetchLockersLogsWithUsers']);
 
 
-//LOCKER MAINTENANCE
-Route::post('/locker', [LockerController::class, 'locker']);
-Route::get('/getlocker', [LockerController::class, 'getlocker']);
 
-Route::get('locker/{lockerid}', [LockerController::class, 'getLockerInfo']);
+// // locker routes
 
-Route::get('/locker/{id}', 'App\Http\Controllers\LockerController@getLockerInfo');
-Route::post('/locker/info', 'LockerController@getLockerInfo');
-Route::get('/locker', 'LockerController@getAllLockers');
-Route::get('/locker-counts', 'LockerController@getLockerCounts');
-
-Route::get('/locker', [LockerController::class, 'getAllLockers']);
-
-Route::get('/locker/{id}', [LockerController::class, 'getLockerInfo'])->where('id', '[0-9]+'); // Kung ang id ay numerical
-Route::get('/locker-counts', [LockerController::class, 'getLockerCounts']);
-Route::get('/history', [LockerController::class, 'getLockerHistory']);
-Route::get('/gender-counts', [LockerController::class, 'getGenderCounts']);
-
-Route::get('/department-counts', [LockerController::class, 'getDepartmentCounts']);
-Route::get('/college-counts', [LockerController::class, 'getCollegeCounts']);
+// Route::get('/lockers-log', [LockersLogController::class, 'getLockerLogs']);
+// Route::get('/lockers-logs-with-users', [LockersLogController::class, 'fetchLockersLogsWithUsers']);
 
 
-Route::get('/college-program-counts', [LockerController::class, 'getcollegeProgramCounts']);
-Route::post('/locker/{lockerId}/scan', [LockerController::class, 'scanLockerQRCode']);
+// //LOCKER MAINTENANCE
+// Route::post('/locker', [LockerController::class, 'locker']);
+// Route::get('/getlocker', [LockerController::class, 'getlocker']);
+
+// Route::get('locker/{lockerid}', [LockerController::class, 'getLockerInfo']);
+
+// Route::get('/locker/{id}', 'App\Http\Controllers\LockerController@getLockerInfo');
+// Route::post('/locker/info', 'LockerController@getLockerInfo');
+// Route::get('/locker', 'LockerController@getAllLockers');
+// Route::get('/locker-counts', 'LockerController@getLockerCounts');
+
+// Route::get('/locker', [LockerController::class, 'getAllLockers']);
+
+// Route::get('/locker/{id}', [LockerController::class, 'getLockerInfo'])->where('id', '[0-9]+'); // Kung ang id ay numerical
+// Route::get('/locker-counts', [LockerController::class, 'getLockerCounts']);
+// Route::get('/history', [LockerController::class, 'getLockerHistory']);
+// Route::get('/gender-counts', [LockerController::class, 'getGenderCounts']);
+
+// Route::get('/department-counts', [LockerController::class, 'getDepartmentCounts']);
+// Route::get('/college-counts', [LockerController::class, 'getCollegeCounts']);
+
+
+// Route::get('/college-program-counts', [LockerController::class, 'getcollegeProgramCounts']);
+// Route::post('/locker/{lockerId}/scan', [LockerController::class, 'scanLockerQRCode']);
 
 
 //LOCKERLOG
@@ -350,3 +353,62 @@ Route::get('/patrons', [PatronController::class, 'index']);
 Route::get('/patrons/{id}', [PatronController::class, 'edit']);
 Route::post('/patrons/{id}', [PatronController::class, 'update']);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// locker routes
+Route::group(['middleware' => ['auth:sanctum', 'ability:locker']], function () {
+    Route::get('/lockers-log', [LockerHistoryController::class, 'getLockerHistory']);
+    Route::get('/lockers-logs-with-users', [LockerHistoryController::class, 'fetchLockersHistoryWithUsers']);
+
+    //LOCKER MAINTENANCE
+    Route::post('/locker', [LockerController::class, 'locker']);
+    Route::get('/getlocker', [LockerController::class, 'getlocker']);
+    //
+
+    Route::get('locker/{lockerid}', [LockerController::class, 'getLockerInfo']);
+    Route::get('/locker/{id}', 'App\Http\Controllers\LockerController@getLockerInfo');
+    Route::post('/locker/info', 'LockerController@getLockerInfo');
+    Route::get('/locker', 'LockerController@getAllLockers');
+    Route::get('/locker-counts', 'LockerController@getLockerCounts');
+    Route::get('/locker', [LockerController::class, 'getAllLockers']);
+    Route::get('/locker/{id}', [LockerController::class, 'getLockerInfo'])->where('id', '[0-9]+');
+    Route::get('/locker-counts', [LockerController::class, 'getLockerCounts']);
+    Route::get('/history', [LockerController::class, 'getLockerHistory']);
+    Route::get('/gender-counts', [LockerController::class, 'getGenderCounts']);
+    Route::get('/dashboard-gender-counts', [LockerController::class, 'getDashboardGenderCounts']);
+    Route::get('/department-counts', [LockerController::class, 'getDepartmentCounts']);
+    Route::get('/college-counts', [LockerController::class, 'getCollegeCounts']);
+    Route::get('/college-program-counts', [LockerController::class, 'getcollegeProgramCounts']);
+    Route::post('/locker/{lockerId}/scan', [LockerController::class, 'scanLockerQRCode']);
+    Route::post('/locker/{lockerId}/scanLocker', [LockerController::class, 'scanLocker']);
+
+    //ADD LOCKER GALING SA MAINTENANCE DATI
+    Route::prefix('/lockers')->group(function () {
+        Route::get('/', [LockerController::class, 'index']);
+        Route::post('/', [LockerController::class, 'store']);
+        Route::get('/latest', [LockerController::class, 'getStartingLockerNumber']);
+        Route::get('/logs', [LockerHistoryController::class, 'getLogs']);
+        Route::get('/{locker}', [LockerController::class, 'show']);
+        Route::post('/{locker}', [LockerController::class, 'update']);
+        Route::delete('/delete/{locker}', [LockerController::class, 'destroy']);
+    });
+    //
+});
