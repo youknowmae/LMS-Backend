@@ -255,7 +255,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
 
 //opac routes
 Route::group(['prefix' => 'opac'], function () {
-    //books
+    //materials
     Route::get('books', [OPACMaterialsController::class, 'getBooks']);
     Route::get('/periodicals/{material_type}', [OPACMaterialsController::class, 'getPeriodicals']);
     Route::get('/articles', [OPACMaterialsController::class, 'getArticles']);
