@@ -96,19 +96,17 @@ class ProjectController extends Controller
 
         // VALIDATION
         $request->validate([
-            'accession' => 'required|string|max:255',
-            'program_id' => 'required|integer|max:255',
+            'accession' => 'required|string|max:20',
             'category' => 'required|string|max:125',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:1024',
-            'language' => 'required|string|max:25',
-            'date_published' => 'required|date',
-            'keywords' => 'required|string|max:1024',
-            // 'abstract' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'abstract' => 'required|string|max:2048',
+            'program' => 'required|string|max:20',
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-        
+            'date_published' => 'required|date',
+            'language' => 'required|string|max:25',
+            'abstract' => 'nullable|string|max:2048',
+            'keywords' => 'required|string|max:125'
+        ]);        
 
         // return 'after validation';
         $model = new Project();
@@ -131,19 +129,6 @@ class ProjectController extends Controller
 
         $model->image_url = $path;
 
-        // // ADD ABSTRACT IMAGE
-        // $ext = $request->file('abstract')->extension();
-
-        // // Check file extension and raise error
-        // if (!in_array($ext, ['png', 'jpg', 'jpeg'])) {
-        //     return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
-        // }
-
-        // // Store image and save path
-        // $path = $request->file('image_url')->store('public/images/projects/abstracts');
-
-        // $model->abstract = $path;
-
         // ADD AUTHORS
         $authors = json_decode($request->authors, true);
 
@@ -157,12 +142,6 @@ class ProjectController extends Controller
         
         $model->save();
 
-        $type = strtolower($model->type);
-        $program = Program::find($model->program_id)->program;
-
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Added', $model->title, $type, $program);
-
         return response()->json($model, 201);
     }
 
@@ -170,14 +149,16 @@ class ProjectController extends Controller
         
         // VALIDATION
         $request->validate([
-            'program' => 'required|string|max:20',
+            'accession' => 'required|string|max:20',
             'category' => 'required|string|max:125',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:1024',
-            'language' => 'required|string|max:25',
-            'date_published' => 'required|date',
-            'abstract' => 'nullable|string|max:2048',
+            'program' => 'required|string|max:20',
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'date_published' => 'required|date',
+            'language' => 'required|string|max:25',
+            'abstract' => 'nullable|string|max:2048',
+            'keywords' => 'required|string|max:125'
         ]);
 
         $model = Project::findOrFail($id);
@@ -196,22 +177,8 @@ class ProjectController extends Controller
                 return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
             }
 
-            // Store image and save path
-            try {
-                $materials = Project::withTrashed()->where('image_url', '=', $model->image_url)->count();
-
-                if(!empty($model->image_url) && $materials == 1) {
-                    
-                    $image = new ImageController();
-                    $image->delete($model->image_url);
-                }
-                
-                $path = $request->file('image_url')->store('public/images/projects');
-                $model->image_url = $path;
-
-            } catch (Exception $e) {
-                // add function
-            }
+            $path = $request->file('image_url')->store('public/images/projects');
+            $model->image_url = $path;
         }
         
         $authors = json_decode($request->authors, true);

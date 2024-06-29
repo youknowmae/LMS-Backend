@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Cataloging\ExcelImportController;
+use App\Http\Controllers\Cataloging\MaterialViewController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\OPAC\OPACSearchController;
 use App\Http\Controllers\OPAC\OPACMaterialsController;
@@ -101,9 +102,6 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
     Route::get('cataloging/logs', [CatalogingLogController::class, 'get']);
     Route::get('books/locations', [BookController::class, 'getLocations']);
 
-    // Get programs
-    Route::get('programs', [ProgramController::class, 'get']);
-
     // View Reports
     Route::group(['prefix' => 'cataloging'], function() {
         Route::get('reports/material-counts', [CatalogingReportController::class, 'getCount']);
@@ -111,40 +109,39 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
         Route::post('reports/excel/{type}', [CatalogingReportController::class, 'generateExcel']);
         Route::get('counts/projects/{department}', [CatalogingReportController::class, 'countProjects']);
         Route::get('logs', [CatalogingLogController::class, 'get']);
-    });    
     
-    // Add Materials
-    Route::post('books/process', [BookController::class, 'add']);
-    Route::post('periodicals/process', [PeriodicalController::class, 'add']);
-    Route::post('articles/process', [ArticleController::class, 'add']);
-    Route::post('projects/process', [ProjectController::class, 'add']);
+        // PROCESSING OF MATERIALS
+        Route::group(['prefix' => 'materials'], function() {
+            Route::post('books/process', [BookController::class, 'add']);
+            Route::post('periodicals/process', [PeriodicalController::class, 'add']);
+            Route::post('articles/process', [ArticleController::class, 'add']);
+    
+            // Update Materials
+            Route::put('books/process/{id}', [BookController::class, 'update']);
+            Route::put('periodicals/process/{id}', [PeriodicalController::class, 'update']);
+            Route::put('articles/process/{id}', [ArticleController::class, 'update']);
+        });
 
-    // Update Materials
-    Route::put('books/process/{id}', [BookController::class, 'update']);
-    Route::put('periodicals/process/{id}', [PeriodicalController::class, 'update']);
-    Route::put('articles/process/{id}', [ArticleController::class, 'update']);
-    Route::put('projects/process/{id}', [ProjectController::class, 'update']);
+        // ARCHIVE Materials
+        Route::delete('material/archive/{id}', [MaterialArchiveController::class, 'store']);
+        Route::delete('project/archive/{id}', [MaterialArchiveController::class, 'storeProject']);
 
-    // Delete Materials
-    Route::delete('material/archive/{id}', [MaterialArchiveController::class, 'store']);
-    Route::delete('project/archive/{id}', [MaterialArchiveController::class, 'storeProject']);
+        // MATERIAL VIEWING
+        Route::get('books/locations', [LocationController::class, 'getLocations']);
+        Route::get('materials/{type}', [MaterialViewController::class, 'getMaterials']);
+        Route::get('materials/{type}/type/{periodical_type}', [MaterialViewController::class, 'getMaterialsByType']);
+        Route::get('material/id/{id}', [MaterialViewController::class, 'getMaterial']);
 
-    // MATERIAL VIEWING
-    Route::get('books', [BookController::class, 'getBooks']);
-    Route::get('periodicals', [PeriodicalController::class, 'getPeriodicals']);
-    Route::get('articles', [ArticleController::class, 'getArticles']);
-    Route::get('projects', [ProjectController::class, 'getProjects']);
-
-    // Get Materials Using ID 
-    Route::get('book/id/{id}', [BookController::class, 'getBook']);
-    Route::get('periodical/id/{id}', [PeriodicalController::class, 'getPeriodical']);
-    Route::get('article/id/{id}', [ArticleController::class, 'getArticle']);
-    Route::get('project/id/{id}', [ProjectController::class, 'getProject']);
-
-    // Get Periodicals and Projects Using Type
-    Route::get('periodicals/type/{type}', [PeriodicalController::class, 'getByType']);
-    Route::get('articles/type/{type}', [ArticleController::class, 'getByType']);
-    Route::get('projects/department/{type}', [ProjectController::class, 'getByDepartment']);
+        // PROJECTS
+        Route::get('projects', [ProjectController::class, 'getProjects']);
+        Route::get('project/id/{id}', [ProjectController::class, 'getProject']);
+        Route::get('projects/department/{type}', [ProjectController::class, 'getByDepartment']);
+        Route::post('projects/process', [ProjectController::class, 'add']);
+        Route::put('projects/process/{id}', [ProjectController::class, 'update']);
+        
+        // Get programs
+        Route::get('programs', [ProgramController::class, 'get']);
+    });    
 });
 
 Route::post('testexcel', [ExcelImportController::class, 'import']);

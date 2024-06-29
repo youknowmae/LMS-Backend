@@ -15,48 +15,25 @@ class BookController extends Controller
     // const URL = 'http://26.68.32.39:8000';
     const URL = 'http://127.0.0.1:8000';
 
-    public function getLocations() {
-        return Location::all();
-    }
-
-    public function getBooks() {        
-        $books = Material::where('material_type', 0)->orderByDesc('updated_at')
-        ->get(['accession', 'title', 'authors', 'location', 'copyright']);
-
-        foreach($books as $book) {
-            $book->authors = json_decode($book->authors);
-        }
-    
-        return $books;
-    }
-
-    public function getBook($id) {
-        $book = Material::where('accession', $id)->firstOrFail();
-        $book->authors = json_decode($book->authors);
-        if($book->image_url != null)
-            $book->image_url = self::URL . Storage::url($book->image_url);
-
-        return $book;
-    }
-
-    /* PROCESSING OF DATA */
-
     public function add(Request $request) {
 
         $request->validate([
             'accession' => 'nullable|string|max:20',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:255',
+            'publisher' => 'required|string|max:255',
+            'remarks' => 'nullable|string|max:512',
+            'pages' => 'required|integer|min:1',
             'copyright' => 'required|integer|min:1901|max:'.date('Y'),
             'volume' => 'nullable|string',
             'edition' => 'nullable|string',
-            'pages' => 'required|integer',
             'acquired_date' => 'required|date',
             'source_of_fund' => 'required|string|max:30',
             'price' => 'nullable|numeric',
             'location' => 'required|string',
             'call_number' => 'required|string|max:50',
-            'remarks' => 'nullable|string|max:512',
+            'author_number' => 'required|string|max:50',
+            'copies' => 'required|integer|min:1',
             'image_url' => 'nullable|mimes:jpeg,jpg,png'
         ]);
 
@@ -72,10 +49,10 @@ class BookController extends Controller
                     $model->material_type = 0;
                     
                     // get id if request has an id
-                    if($i > 0 && $request->accession != null) {
+                    if($i > 0 && $request->accession) {
 
                         $model->accession = $request->accession + $i;
-                    } else if($i == 0 && $request->accession != null) {
+                    } else if($i == 0 && $request->accession) {
 
                         $model->accession = $request->accession;
                     }
@@ -129,19 +106,21 @@ class BookController extends Controller
         
         $request->validate([
             'accession' => 'nullable|string|max:20',
-            'title' => 'nullable|string|max:255',
-            'authors' => 'nullable|string|max:255',
-            'copyright' => 'nullable|integer|min:1901|max:'.date('Y'),
+            'title' => 'required|string|max:255',
+            'authors' => 'required|string|max:255',
+            'publisher' => 'required|string|max:255',
+            'remarks' => 'nullable|string|max:512',
+            'pages' => 'required|integer|min:1',
+            'copyright' => 'required|integer|min:1901|max:'.date('Y'),
             'volume' => 'nullable|string',
             'edition' => 'nullable|string',
-            'pages' => 'nullable|integer',
-            'acquired_date' => 'nullable|date',
-            'source_of_fund' => 'nullable|integer',
+            'acquired_date' => 'required|date',
+            'source_of_fund' => 'required|string|max:30',
             'price' => 'nullable|numeric',
-            'location' => 'nullable|string',
-            'call_number' => 'nullable|string|max:50',
-            'remarks' => 'nullable|string|max:512',
-            'image_url' => 'nullable|mimes:jpeg,jpg,png|max:2048'
+            'location' => 'required|string',
+            'call_number' => 'required|string|max:50',
+            'author_number' => 'required|string|max:50',
+            'image_url' => 'nullable|mimes:jpeg,jpg,png'
         ]);
 
         $model = Material::where('accession', $id)->firstOrFail();
@@ -160,22 +139,8 @@ class BookController extends Controller
                 return response()->json(['Error' => 'Invalid image format. Only PNG, JPG, and JPEG formats are allowed.'], 415);
             }
 
-            // Store image and save path
-            try {
-                $books = Material::where('image_url', '=', $model->image_url)->count();
-
-                if(!empty($model->image_url) && $books == 1) {
-                    
-                    $image = new ImageController();
-                    $image->delete($model->image_url);
-                }
-                
-                $path = $request->file('image_url')->store('public/images/books');
-                $model->update(['image_url' => $path]);
-
-            } catch (Exception $e) {
-                // add function
-            }
+            $path = $request->file('image_url')->store('public/images/books');
+            $model->update(['image_url' => $path]);
         }
 
         $model->title = Str::title($request->title);

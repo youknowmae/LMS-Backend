@@ -12,45 +12,6 @@ class ArticleController extends Controller
     // const URL = 'http://26.68.32.39:8000';
     const URL = 'http://127.0.0.1:8000';
 
-    public function getArticles() {
-        $articles = Material::where([['material_type', 2]])
-        ->orderByDesc('updated_at')
-        ->get(['accession', 'title', 'author', 'publisher', 'copyright']);
-
-        foreach($articles as $article) {
-            if($article->image_url != null)
-                $article->image_url = self::URL .  Storage::url($article->image_url);
-            
-            $article->authors = json_decode($article->authors);
-        }
-        
-        return $articles;
-    }
-
-    public function getByType($type) {
-        $articles = Material::where([['material_type', 2], ['periodical_type', $type]])
-        ->orderByDesc('updated_at')
-        ->get(['accession', 'title', 'authors', 'publisher', 'date_published']);
-
-        foreach($articles as $article) {
-            if($article->image_url != null)
-                $article->image_url = self::URL . Storage::url($article->image_url);
-
-            $article->authors = json_decode($article->authors);
-        }
-        
-        return $articles;
-    }
-
-    public function getArticle($id) {
-        $article = Material::findOrFail($id);
-        $article->authors = json_decode($article->authors);
-
-        return $article;
-    }
-
-    /* FOR PROCESSING */
-
     public function add(Request $request) {
 
         $request->validate([
@@ -58,15 +19,15 @@ class ArticleController extends Controller
             'periodical_type' => 'required|integer',
             'title' => 'required|string|max:255',
             'authors' => 'required|string|max:255',
-            'abstract' => 'required|string|max: 4096',
-            'language' => 'required|string|max:15',
-            'issue' => 'required|string|max:50',
-            'subject' => 'required|string|max:255',
-            'volume' => 'required|string|max:50',
             'publisher' => 'required|string|max:255',
+            'remarks' => 'nullable|string|max:255',
             'pages' => 'required|string|max:25',
-            'date_published' => 'required|date',
-            'remarks' => 'nullable|string|max:255'
+            'abstract' => 'required|string|max: 4096',
+            'volume' => 'required|string|max:50',
+            'issue' => 'required|string|max:50',
+            'language' => 'required|string|max:15',
+            'subject' => 'required|string|max:255',
+            'date_published' => 'required|date'
         ]);
 
         // return response()->json(['res' => 'nearly there'], 200);
@@ -92,18 +53,19 @@ class ArticleController extends Controller
     public function update(Request $request, $id) {
 
         $request->validate([
+            'accession' => 'required|string|max:255',
             'periodical_type' => 'required|integer',
-            'title' => 'nullable|string|max:255',
-            'authors' => 'nullable|string|max:255',
-            'abstract' => 'nullable|string|max:2048',
-            'language' => 'nullable|string|max:15',
-            'issue' => 'nullable|integer',
-            'subject' => 'nullable|string|max:255',
-            'volume' => 'nullable|integer',
-            'publisher' => 'nullable|string|max:255',
-            'pages' => 'nullable|string|max:25',
-            'date_published' => 'nullable|date',
-            'remarks' => 'nullable|string|max:255'
+            'title' => 'required|string|max:255',
+            'authors' => 'required|string|max:255',
+            'publisher' => 'required|string|max:255',
+            'remarks' => 'nullable|string|max:255',
+            'pages' => 'required|string|max:25',
+            'abstract' => 'required|string|max: 4096',
+            'volume' => 'required|string|max:50',
+            'issue' => 'required|string|max:50',
+            'language' => 'required|string|max:15',
+            'subject' => 'required|string|max:255',
+            'date_published' => 'required|date'
         ]);
 
         $model = Material::findOrFail($id);
@@ -121,15 +83,5 @@ class ArticleController extends Controller
         $model->save();
 
         return response()->json($model, 200);
-    }
-    
-    public function delete(Request $request, $id) {
-        $model = Material::findOrFail($id);
-        $model->delete();
-
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Archived', $model->title, 'article', null);
-
-        return response()->json(['Response' => 'Record Deleted'], 200);
     }
 }
