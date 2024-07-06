@@ -15,7 +15,7 @@ class Project extends Model
     protected $primaryKey = 'accession';
     protected $keyType = 'string';
 
-    protected $fillable = ['accession', 'category', 'authors', 'title', 'program', 'image_location', 'date_published',
+    protected $fillable = ['accession', 'category', 'authors', 'title', 'program', 'image_url', 'date_published',
                            'keywords', 'language', 'abstract'];
 
     public function project_program(){

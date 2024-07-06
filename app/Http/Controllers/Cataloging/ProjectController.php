@@ -196,23 +196,28 @@ class ProjectController extends Controller
         return response()->json($model, 200);
     }
 
-    public function delete(Request $request, $id) {
-        $model = Project::findOrFail($id);
-        $materials = Project::withTrashed()->where('image_url', '=', $model->image_url)->count();
+    public function archive(Request $request, $id) {
+        DB::transaction(function () use ($id) {
+            $model = Project::findOrFail($id);
 
-        if(!empty($model->image_url) && $materials == 1) {
+            DB::connection('archives')->table('academic_projects')->insert([
+                'accession' => $model->accession,
+                'category' => $model->category,
+                'title' => $model->title,
+                'authors' => $model->authors,
+                'program' => $model->program,
+                'image_url' => $model->image_url,
+                'date_published' => $model->date_published,
+                'keywords' => $model->keywords,
+                'language' => $model->language,
+                'abstract' => $model->abstract,
+                'created_at' => $model->created_at,
+                'archived_at' => now()
+            ]);
             
-            $image = new ImageController();
-            $image->delete($model->image_url);
-        }
-        $model->delete();
-        
-        $type = strtolower($model->type);
-        $program = Program::find($model->program_id)->program;
+            $model->delete();
+        });
 
-        $log = new CatalogingLogController();
-        $log->add($request->user()->id, 'Archived', $model->title, $type, $program);
-
-        return response()->json(['Response' => 'Record Archived'], 200);
-    }    
+        return response()->json(['Response' => 'Record archived successfully'], 200);
+    }
 }

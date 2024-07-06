@@ -32,7 +32,7 @@ Route::get('/', function (Request $request) {
 Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
 
 // Auth Routes
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login/{system}', [AuthController::class, 'login']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/refresh', [AuthController::class, 'refreshToken']);
@@ -123,7 +123,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
 
         // ARCHIVE Materials
         Route::delete('material/archive/{id}', [MaterialArchiveController::class, 'store']);
-        Route::delete('project/archive/{id}', [MaterialArchiveController::class, 'storeProject']);
+        Route::delete('project/archive/{id}', [ProjectController::class, 'archive']);
 
         // MATERIAL VIEWING
         Route::get('books/locations', [LocationController::class, 'getLocations']);

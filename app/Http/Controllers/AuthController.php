@@ -71,7 +71,7 @@ class AuthController extends Controller
         return $request->user();
     }
 
-    public function login(Request $request) {
+    public function login(Request $request, String $system) {
         $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
@@ -80,24 +80,9 @@ class AuthController extends Controller
             $roles = json_decode($user->role);
             $abilities = [];
 
-            if(in_array('maintenance', $roles))
-                array_push($abilities, 'maintenance');
-
-            if(in_array('cataloging', $roles))
-                array_push($abilities, 'cataloging', 'materials-read');
-
-            if(in_array('circulation', $roles))
-                array_push($abilities, 'circulation');
-
-            if(in_array('locker', $roles))
-                array_push($abilities, 'locker');
-
-            if(in_array('opac', $roles))
-                array_push($abilities, 'opac');
-
-            if(in_array('user', $roles))
-                array_push($abilities, 'user');
-
+            // add ability if role is valids
+            if(in_array($system, $roles))
+                array_push($abilities, $system);
 
             // CREATE TOKENS WITH ABILITIES
             $token = $user->createToken('token-name', $abilities)->plainTextToken;
@@ -110,11 +95,16 @@ class AuthController extends Controller
                     'position' => $user->position,
                 ];
 
+                if(in_array($system, $abilities)) return response()->json($responseData, 200);
+                
+                else return response()->json(['message' => 'Unauthorized User'], 403);
+
+            
                 // $tokenModel = $user->tokens->last();
                 // $expiryTime = now()->addHour();
                 // $tokenModel->update(['expires_at' => $expiryTime]);
 
-                return response()->json($responseData, 200);
+                
             } else if(in_array('user', $roles)) {
                 $student = User::with('student_program')->find($user->id);
                 
