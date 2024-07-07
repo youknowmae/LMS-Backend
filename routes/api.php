@@ -88,9 +88,9 @@ Route::middleware(['auth:sanctum', 'ability:maintenance'])->group(function () {
     });
 
     // DEPARTMENT 
-    Route::get('view/{department}',[ProgramController::class,'viewDepartmentProgram']);
     Route::post('/add-program',[ProgramController::class, 'addProgram']);
-    Route::get('/departments',[CollegeController::class, 'getColleges']);
+    Route::get('/departmentsWithPrograms',[CollegeController::class, 'getDepartmentsWithPrograms']);
+    Route::get('/departments',[CollegeController::class, 'getDepartments']);
     Route::post('/add-department',[CollegeController::class, 'addCollege']);
 });
 
