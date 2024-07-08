@@ -32,9 +32,30 @@ class MaterialFactory extends Factory
             fake()->name()
         ];
 
-        $type = fake()->numberBetween(1, 2);
+        $type = fake()->numberBetween(0, 2);
 
-        if ($type == 1) {
+        if ($type == 0) {
+            $material = [
+                'material_type' => $type,
+                'accession' => $accession,
+                'title' => Str::title(fake()->words(3, true)), 
+                'authors' => json_encode($authors),
+                'language' => fake()->randomElement(['English', 'Tagalog']),
+                'acquired_date' => fake()->date(),   
+                'publisher' => fake()->company(),
+                'copyright' => fake()->year(),
+                'volume' => fake()->numberBetween(1, 3),
+                'edition' => fake()->numberBetween(1, 10),
+                'issue' => fake()->numberBetween(1, 5),
+                'pages' => fake()->randomNumber(3),
+                'remarks' => fake()->sentence(),
+                'source_of_fund' => fake()->randomElement(['Donated', 'Replacement', 'Purchased']),
+                'price' => fake()->numberBetween(1, 1000),
+                'location' => fake()->randomElement(['ABCOMM', 'CAD', 'COM', 'EDUC', 'FIL', 'FOR', 'FS', 'HM']),
+                'call_number' => Str::random(5),
+                'author_number' => Str::random(5)  
+            ];
+        } else if ($type == 1) {
             $material = [
                 'material_type' => $type,
                 'accession' => $accession,

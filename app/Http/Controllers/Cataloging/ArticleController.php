@@ -48,6 +48,38 @@ class ArticleController extends Controller
 
         $model->save();
 
+        $log = new ActivityLogController();
+
+        $logParam = new \stdClass(); // Instantiate stdClass
+
+        switch($model->periodical_type) {
+            case 0:
+                $type = 'journal ';
+                break;
+            
+            case 1:
+                $type = 'magazine ';
+                break;
+            
+            case 2:
+                $type = 'newspaper ';
+                break;
+            
+            default:
+                $type = '';
+                break;
+        }
+
+        $user = $request->user();
+
+        $logParam->system = 'Cataloging';
+        $logParam->username = $user->username;
+        $logParam->fullname = $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name . ' ' . $user->ext_name;
+        $logParam->position = $user->position;
+        $logParam->desc = 'Added ' . $type . 'article of accession ' . $model->accession;
+
+        $log->savePersonnelLog($logParam);
+
         return response()->json($model, 200);
     }
 
