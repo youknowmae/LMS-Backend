@@ -89,6 +89,8 @@ class AuthController extends Controller
 
             if(!in_array('user', $roles)) {
                 $responseData = [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
                     'token' => $token,
                     'id' => $user->id,
                     'displayName' => $user->first_name . ' ' . $user->last_name,
