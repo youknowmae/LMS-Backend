@@ -61,7 +61,7 @@ Route::middleware(['auth:sanctum', 'ability:maintenance'])->group(function () {
         // Route::post('/clear', [InventoryController::class, 'clearHistory']);
     });
 
-    //circulation 
+    //circulation
     Route::get('/patrons', [PatronController::class, 'index']);
     Route::get('/patrons/{id}', [PatronController::class, 'edit']);
     Route::post('/patrons/{id}', [PatronController::class, 'update']);
@@ -81,13 +81,13 @@ Route::middleware(['auth:sanctum', 'ability:maintenance'])->group(function () {
         Route::get('/', [LockerController::class, 'index']);
         Route::post('/', [LockerController::class, 'store']);
         Route::get('/latest', [LockerController::class, 'getStartingLockerNumber']);
-        Route::get('/logs', [LockerHistoryController::class, 'getLogs']);  
+        Route::get('/logs', [LockerHistoryController::class, 'getLogs']);
         Route::get('/{locker}', [LockerController::class, 'show']);
         Route::post('/{locker}', [LockerController::class, 'update']);
         Route::get('/delete/{locker}', [LockerController::class, 'destroy']);   //get muna ayaw gumana ng delete na method. method not allowed daw
     });
 
-    // DEPARTMENT 
+    // DEPARTMENT
     Route::post('/add-program',[ProgramController::class, 'addProgram']);
     Route::get('/departmentsWithPrograms',[CollegeController::class, 'getDepartmentsWithPrograms']);
     Route::get('/departments',[CollegeController::class, 'getDepartments']);
@@ -96,7 +96,7 @@ Route::middleware(['auth:sanctum', 'ability:maintenance'])->group(function () {
 
 // Cataloging Process routes
 Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function () {
-    
+
     // View cataloging logs
     Route::get('cataloging/logs', [CatalogingLogController::class, 'get']);
     Route::get('books/locations', [BookController::class, 'getLocations']);
@@ -108,13 +108,13 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
         Route::post('reports/excel/{type}', [CatalogingReportController::class, 'generateExcel']);
         Route::get('counts/projects/{department}', [CatalogingReportController::class, 'countProjects']);
         Route::get('logs', [CatalogingLogController::class, 'get']);
-    
+
         // PROCESSING OF MATERIALS
         Route::group(['prefix' => 'materials'], function() {
             Route::post('books/process', [BookController::class, 'add']);
             Route::post('periodicals/process', [PeriodicalController::class, 'add']);
             Route::post('articles/process', [ArticleController::class, 'add']);
-    
+
             // Update Materials
             Route::put('books/process/{id}', [BookController::class, 'update']);
             Route::put('periodicals/process/{id}', [PeriodicalController::class, 'update']);
@@ -137,10 +137,10 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
         Route::get('projects/department/{type}', [ProjectController::class, 'getByDepartment']);
         Route::post('projects/process', [ProjectController::class, 'add']);
         Route::put('projects/process/{id}', [ProjectController::class, 'update']);
-        
+
         // Get programs
         Route::get('programs', [ProgramController::class, 'get']);
-    });    
+    });
 });
 
 Route::post('testexcel', [ExcelImportController::class, 'import']);
@@ -156,7 +156,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
 
     // update borrow list
     Route::put('borrow-edit/{id}',[BorrowMaterialController:: class, 'borrowEdit']);
-    
+
     // borrow-list returning book
     Route::put('return-book/{id}', [BorrowMaterialController::class, 'returnbook']);
 
@@ -171,13 +171,13 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
     Route::get('reservation-list/{type}', [ReserveBookController::class, 'reservelist']);
 
     Route::get('queue', [ReserveBookController::class, 'queue']);
-    
 
-    // borrow book 
+
+    // borrow book
     Route::post('/borrow/book', [BorrowMaterialController::class, 'borrowbook']);
     Route::post('/fromreserve/book/{id}', [BorrowMaterialController::class, 'fromreservation']);
     Route::get('circulation/get-user/{id}', [CirculationUserController::class, 'getUser']);
-    Route::get('circulation/get-book/{id}', [CirculationUserController::class, 'getBook']); 
+    Route::get('circulation/get-book/{id}', [CirculationUserController::class, 'getBook']);
     Route::get('circulation/getpatrons', [PatronController::class, 'index']);
     Route::get('borrow-count/{id}', [BorrowMaterialController::class, 'borrowcount']);
 
@@ -193,11 +193,11 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:circulation']], function
 
 /* STUDENT ROUTES */
 // Route::group(['middleware' => ['studentauth']], function () {
-Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () { 
+Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
 
     Route::get('borrow/user/{userId}', [BorrowMaterialController::class, 'getByUserId']);
 
-    // ROUTES FOR VIEWING 
+    // ROUTES FOR VIEWING
     Route::group(['prefix' => 'student/'], function () {
         Route::get('announcements', [AnnouncementController::class, 'index']);
 
@@ -219,7 +219,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
         Route::get('projects/type/{type}', [StudentViewController::class, 'viewProjectByType']);
         Route::get('periodicals/materialtype/{materialType}', [StudentViewController::class, 'getPeriodicalByMaterialType']);
 
-        //Search 
+        //Search
         Route::get('books/search/', [StudentSearchController::class, 'searchBooks']);
         Route::get('periodicals/search/', [StudentSearchController::class, 'searchPeriodicals']);
         Route::get('articles/search/', [StudentSearchController::class, 'searchArticle']);
@@ -231,7 +231,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
     // Reservation Cancel
     Route::delete('/cancel-reservation/{id}', [ReservationController::class, 'cancelReservation']);
     Route::get('students/queue-pos/{id}', [ReserveBookController::class, 'getQueuePosition']);
-    
+
     // API resource route for reservations
     Route::get('reservations/{id}', [ReservationController::class, 'getUserById']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
@@ -240,11 +240,11 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:user']], function () {
     Route::get('reservations/{id}', [ReservationController::class, 'getUserById']);
     Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy']);
     Route::get('borrow/user/{userId}', [BorrowMaterialController::class, 'getByUserId']);
-        
-    Route::get('queue-pos/{id}', [ReserveBookController::class, 'getQueuePosition']);   
+
+    Route::get('queue-pos/{id}', [ReserveBookController::class, 'getQueuePosition']);
 });
 
-// RED ZONE 
+// RED ZONE
 Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function () {
     Route::get('images/delete/single', [ImageController::class, 'delete'])->name('images.delete');
     Route::get('images/delete/all/{type}', [ImageController::class, 'deleteAll']);
@@ -258,40 +258,48 @@ Route::group(['prefix' => 'opac'], function () {
     Route::get('/articles', [OPACMaterialsController::class, 'getArticles']);
 
     Route::get('/material/{id}', [OPACMaterialsController::class, 'getMaterial']);
-    
+
     //projects
     Route::get('projects/{category}', [OPACMaterialsController::class, 'getProjects']);
     Route::get('/project/{id}', [OPACMaterialsController::class, 'getProject']);
 });
 
 // locker routes
-// Route::group(['middleware' => ['auth:sanctum', 'ability:locker']], function () {
-//     Route::get('/lockers-log', [LockersLogController::class, 'getLockerLogs']);
-//     Route::get('/lockers-logs-with-users', [LockersLogController::class, 'fetchLockersLogsWithUsers']);
+Route::group(['middleware' => ['auth:sanctum', 'ability:locker']], function () {
+    Route::get('/lockers-log', [LockerHistoryController::class, 'getLockerHistory']);
+    Route::get('/lockers-logs-with-users', [LockerHistoryController::class, 'fetchLockersHistoryWithUsers']);
 
+    //LOCKER MAINTENANCE
+    Route::post('/locker', [LockerController::class, 'locker']);
+    Route::get('/getlocker', [LockerController::class, 'getlocker']);
+    //
 
-//     //LOCKER MAINTENANCE
-//     Route::post('/locker', [LockerController::class, 'locker']);
-//     Route::get('/getlocker', [LockerController::class, 'getlocker']);
+    Route::get('locker/{lockerid}', [LockerController::class, 'getLockerInfo']);
+    Route::get('/locker/{id}', 'App\Http\Controllers\LockerController@getLockerInfo');
+    Route::post('/locker/info', 'LockerController@getLockerInfo');
+    Route::get('/locker', 'LockerController@getAllLockers');
+    Route::get('/locker-counts', 'LockerController@getLockerCounts');
+    Route::get('/locker', [LockerController::class, 'getAllLockers']);
+    Route::get('/locker/{id}', [LockerController::class, 'getLockerInfo'])->where('id', '[0-9]+');
+    Route::get('/locker-counts', [LockerController::class, 'getLockerCounts']);
+    Route::get('/history', [LockerController::class, 'getLockerHistory']);
+    Route::get('/gender-counts', [LockerController::class, 'getGenderCounts']);
+    Route::get('/dashboard-gender-counts', [LockerController::class, 'getDashboardGenderCounts']);
+    Route::get('/department-counts', [LockerController::class, 'getDepartmentCounts']);
+    Route::get('/college-counts', [LockerController::class, 'getCollegeCounts']);
+    Route::get('/college-program-counts', [LockerController::class, 'getcollegeProgramCounts']);
+    Route::post('/locker/{lockerId}/scan', [LockerController::class, 'scanLockerQRCode']);
+    Route::post('/locker/{lockerId}/scanLocker', [LockerController::class, 'scanLocker']);
 
-//     Route::get('locker/{lockerid}', [LockerController::class, 'getLockerInfo']);
-
-//     Route::get('/locker/{id}', 'App\Http\Controllers\LockerController@getLockerInfo');
-//     Route::post('/locker/info', 'LockerController@getLockerInfo');
-//     Route::get('/locker', 'LockerController@getAllLockers');
-//     Route::get('/locker-counts', 'LockerController@getLockerCounts');
-
-//     Route::get('/locker', [LockerController::class, 'getAllLockers']);
-
-//     Route::get('/locker/{id}', [LockerController::class, 'getLockerInfo'])->where('id', '[0-9]+'); // Kung ang id ay numerical
-//     Route::get('/locker-counts', [LockerController::class, 'getLockerCounts']);
-//     Route::get('/history', [LockerController::class, 'getLockerHistory']);
-//     Route::get('/gender-counts', [LockerController::class, 'getGenderCounts']);
-
-//     Route::get('/department-counts', [LockerController::class, 'getDepartmentCounts']);
-//     Route::get('/college-counts', [LockerController::class, 'getCollegeCounts']);
-
-
-//     Route::get('/college-program-counts', [LockerController::class, 'getcollegeProgramCounts']);
-//     Route::post('/locker/{lockerId}/scan', [LockerController::class, 'scanLockerQRCode']);
-// });
+    //ADD LOCKER GALING SA MAINTENANCE DATI
+    Route::prefix('/lockers')->group(function () {
+        Route::get('/', [LockerController::class, 'index']);
+        Route::post('/', [LockerController::class, 'store']);
+        Route::get('/latest', [LockerController::class, 'getStartingLockerNumber']);
+        Route::get('/logs', [LockerHistoryController::class, 'getLogs']);
+        Route::get('/{locker}', [LockerController::class, 'show']);
+        Route::post('/{locker}', [LockerController::class, 'update']);
+        Route::delete('/delete/{locker}', [LockerController::class, 'destroy']);
+    });
+    //
+});

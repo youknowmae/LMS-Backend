@@ -91,4 +91,8 @@ class User extends Authenticatable
     {
         return json_decode($value, true);
     }
+
+    public function program() {
+        return $this->belongsTo(Program::class, 'program', 'program_short');
+    }
 }
