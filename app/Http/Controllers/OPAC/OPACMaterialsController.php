@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\OPAC;
 
 use App\Http\Controllers\Controller;
+use App\Models\BorrowMaterial;
 use Illuminate\Http\Request;
 use App\Models\Material;
 use App\Models\Project;
@@ -14,17 +15,25 @@ class OPACMaterialsController extends Controller
     const URL = 'http://127.0.0.1:8000';
 
     public function getBooks() {        
-        $books = Material::select('accession', 'title', 'date_published', 'authors', 'image_url')
+        $books = Material::select('accession', 'title', 'edition', 'date_published', 'authors', 'image_url', 'volume')
                     ->where('material_type', 0)
                     ->orderBy('date_published', 'desc')
-                    ->get();
+                    ->get()
+                    ->unique(function ($material) {
+                        return $material->title . '-' . $material->edition . '-' . $material->volume;
+                    })
+                    ->values();
 
         foreach ($books as $book) {
             $book->authors = json_decode($book->authors);
             if ($book->image_url != null) {
-                $book->image_url = self::URL . Storage::url($book->image_url);
+                $book->image_url = self::URL . Storage::url($book   ->image_url);
             }
         }
+
+        $books = $books->map(function ($book) {
+            return $book->only(['accession', 'title', 'date_published', 'authors', 'image_url',]);
+        });
         
         return $books;
     }
@@ -70,6 +79,21 @@ class OPACMaterialsController extends Controller
         $material->authors = json_decode($material->authors);
         if($material->image_url != null)
             $material->image_url = self::URL . Storage::url($material->image_url);
+
+        $totalCopies = Material::where('title', $material->title)
+                            ->where('edition', $material->edition)
+                            ->where('volume', $material->volume)
+                            ->count();
+
+        $borrowedCopies = BorrowMaterial::wherehas('material', function($query) use($material){
+                                                $query->where('title', $material->title)
+                                                    ->where('edition', $material->edition)
+                                                    ->where('volume', $material->volume)
+                                                    ->whereNull('date_returned');
+                                            })
+                                            ->count();
+
+        $material->available_copies = $totalCopies - $borrowedCopies;
 
         return $material;
     }
