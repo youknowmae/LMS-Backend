@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lockers_logs', function (Blueprint $table) {
+        Schema::create('lockers_history', function (Blueprint $table) {
             $table->id();
             $table->foreignId('locker_id')->references('id')->on('lockers');
             $table->foreignId('user_id')->references('id')->on('users');
