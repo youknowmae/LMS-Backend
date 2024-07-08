@@ -2,18 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Department;
+use App\Models\Program;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CollegeController extends Controller
 {
-    // Fetch all colleges (departments)
-    public function getColleges()
-    {
-        return Department::all();
+    public function getDepartmentsWithPrograms()
+    {   
+        $departments = Program::select('program_short', 'program_full', 'department_full', 'department_short')
+                        ->get()
+                        ->groupBy(['department_full', 'department_short']);
+
+        return $departments;
     }
 
+    public function getDepartments() {
+        $departments = Program::select('department_full', 'department_short')
+                        ->groupBy(['department_full', 'department_short'])
+                        ->get();
+
+        return $departments;
+    }
     // Add a new college
     public function addCollege(Request $request)
     {
