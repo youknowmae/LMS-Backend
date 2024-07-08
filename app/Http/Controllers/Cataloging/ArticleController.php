@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cataloging;
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Material;
@@ -81,6 +82,38 @@ class ArticleController extends Controller
         $model->authors = json_encode($authors);
 
         $model->save();
+
+        $log = new ActivityLogController();
+
+        $logParam = new \stdClass(); // Instantiate stdClass
+
+        switch($model->periodical_type) {
+            case 0:
+                $type = 'journal ';
+                break;
+            
+            case 1:
+                $type = 'magazine ';
+                break;
+            
+            case 2:
+                $type = 'newspaper ';
+                break;
+            
+            default:
+                $type = '';
+                break;
+        }
+
+        $user = $request->user();
+
+        $logParam->system = 'Cataloging';
+        $logParam->username = $user->username;
+        $logParam->fullname = $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name . ' ' . $user->ext_name;
+        $logParam->position = $user->position;
+        $logParam->desc = 'Updated ' . $type . 'article of accession ' . $model->accession;
+
+        $log->savePersonnelLog($logParam);
 
         return response()->json($model, 200);
     }

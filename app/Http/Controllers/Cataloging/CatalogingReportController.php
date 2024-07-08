@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Cataloging;
 
+use App\Http\Controllers\Controller;
 use App\Models\Article, App\Models\Book, App\Models\material;
 use Dompdf\Dompdf, Dompdf\Options;
 use Carbon\Carbon;
@@ -21,83 +22,71 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 class CatalogingReportController extends Controller
 {
-    public function countMaterials(){
+
+    public function getCount() {
         // for books
-        $books = Book::all();
+        $books = Material::where('material_type', 0)->get('title');
         $titles = $books->unique('title')->count();
         $volumes = $books->count();
 
         // for materials
-        $materials = Periodical::all();
+        $materials = Material::where('material_type', 1)->get('periodical_type');
 
         $p_count = ['journals' => 0, 'magazines' => 0, 'newspapers' => 0];
         foreach($materials as $x){
-            if($x->material_type == 'journal')
+            if($x->periodical_type == 0)
                 $p_count['journals'] = $p_count['journals'] + 1;
-            elseif($x->material_type == 'magazine')
+            elseif($x->periodical_type == 1)
                 $p_count['magazines'] = $p_count['magazines'] + 1;
-            elseif($x->material_type == 'newspaper')
+            elseif($x->periodical_type == 2)
                 $p_count['newspapers'] = $p_count['newspapers'] + 1;
         }
 
         // for articles
-        $articles = Article::all()->count();
+        $articles = Material::where('material_type', 2)->get('title')->count();
 
-        $projects = Project::with('program')->get();
+        // $projects = Project::get();
 
-        $pr_count = ['ccs' => 0, 'cahs' => 0, 'ceas' => 0, 'chtm' => 0, 'cba' => 0];
-        foreach($projects as $x) {
-            switch($x->program->department){
-                case 'CCS':
-                    $pr_count['ccs'] = $pr_count['ccs'] + 1;
-                    break;
+        // $pr_count = ['ccs' => 0, 'cahs' => 0, 'ceas' => 0, 'chtm' => 0, 'cba' => 0];
+        // foreach($projects as $x) {
+        //     switch($x->program->department){
+        //         case 'CCS':
+        //             $pr_count['ccs'] = $pr_count['ccs'] + 1;
+        //             break;
                 
-                case 'CAHS':
-                    $pr_count['cahs'] = $pr_count['cahs'] + 1;
-                    break;
+        //         case 'CAHS':
+        //             $pr_count['cahs'] = $pr_count['cahs'] + 1;
+        //             break;
 
-                case 'CEAS':
-                    $pr_count['ceas'] = $pr_count['ceas'] + 1;
-                    break;
+        //         case 'CEAS':
+        //             $pr_count['ceas'] = $pr_count['ceas'] + 1;
+        //             break;
 
-                case 'CHTM':
-                    $pr_count['chtm'] = $pr_count['chtm'] + 1;
-                    break;
+        //         case 'CHTM':
+        //             $pr_count['chtm'] = $pr_count['chtm'] + 1;
+        //             break;
 
-                case 'CBA':
-                    $pr_count['cba'] = $pr_count['cba'] + 1;
-                    break;
+        //         case 'CBA':
+        //             $pr_count['cba'] = $pr_count['cba'] + 1;
+        //             break;
 
-                default:
-                    break;
-                }
-        }
+        //         default:
+        //             break;
+        //         }
+        // }
 
-        return [
+        return response()->json([
             'titles' => $titles,
             'volumes' => $volumes,
             'journals' => $p_count['journals'],
             'magazines' => $p_count['magazines'],
             'newspapers' => $p_count['newspapers'],
             'articles' => $articles,
-            'ccs' => $pr_count['ccs'],
-            'cahs' => $pr_count['cahs'],
-            'ceas' => $pr_count['ceas'],
-            'chtm' => $pr_count['chtm'],
-            'cba' => $pr_count['cba']
-        ];
-    }
-
-    public function getCount() {
-        $counts = $this->countMaterials();
-        
-        return response()->json([
-            'titles' => $counts['titles'],
-            'volumes' => $counts['volumes'],
-            'journals' => $counts['journals'],
-            'magazines' => $counts['magazines'],
-            'newspapers' => $counts['newspapers'],
-            'articles' => $counts['articles']
+            // 'ccs' => $pr_count['ccs'],
+            // 'cahs' => $pr_count['cahs'],
+            // 'ceas' => $pr_count['ceas'],
+            // 'chtm' => $pr_count['chtm'],
+            // 'cba' => $pr_count['cba']
         ]);
     }
 

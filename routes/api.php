@@ -9,10 +9,11 @@ use App\Http\Controllers\StudentPortal\StudentSearchController;
 use App\Http\Controllers\StudentPortal\StudentViewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ActivityLogController;
 
 use App\Http\Controllers\AuthController, App\Http\Controllers\CatalogingLogController, App\Http\Controllers\Cataloging\ArticleController,
 App\Http\Controllers\Cataloging\BookController, App\Http\Controllers\Cataloging\PeriodicalController, App\Http\Controllers\Cataloging\ProjectController,
-App\Http\Controllers\CatalogingReportController, App\Http\Controllers\Cataloging\MaterialArchiveController;
+App\Http\Controllers\Cataloging\CatalogingReportController, App\Http\Controllers\Cataloging\MaterialArchiveController;
 
 use App\Http\Controllers\BorrowBookController,App\Http\Controllers\BorrowMaterialController,
 App\Http\Controllers\ReserveBookController, App\Http\Controllers\ReservationController;
@@ -38,6 +39,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/refresh', [AuthController::class, 'refreshToken']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
+
+Route::post('log', [ActivityLogController::class, 'savePersonnelLog']);
 
 // Maintenance route
 Route::middleware(['auth:sanctum', 'ability:maintenance'])->group(function () {
@@ -104,9 +107,9 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:cataloging']], function 
     // View Reports
     Route::group(['prefix' => 'cataloging'], function() {
         Route::get('reports/material-counts', [CatalogingReportController::class, 'getCount']);
+        Route::get('reports/project-counts/{department}', [CatalogingReportController::class, 'countProjects']);
         Route::get('reports/pdf/{type}', [CatalogingReportController::class, 'generatePdf']);
         Route::post('reports/excel/{type}', [CatalogingReportController::class, 'generateExcel']);
-        Route::get('counts/projects/{department}', [CatalogingReportController::class, 'countProjects']);
         Route::get('logs', [CatalogingLogController::class, 'get']);
 
         // PROCESSING OF MATERIALS
