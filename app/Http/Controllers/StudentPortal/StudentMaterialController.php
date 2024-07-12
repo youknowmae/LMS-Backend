@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Material;
 use App\Models\Project;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\JsonResponse;
 
 class StudentMaterialController extends Controller
 {
@@ -47,8 +48,7 @@ class StudentMaterialController extends Controller
             ->where('accession', $accession)
             ->firstOrFail();
 
-        $this->processImageURL($periodical);
-        $this->decodeAuthors($periodical);
+            $this->decodeAuthors($periodical);
 
         return response()->json($periodical);
     }
@@ -114,7 +114,8 @@ class StudentMaterialController extends Controller
     }
 
     // Get a specific article
-    public function viewArticle($accession) {
+ public function viewArticle($accession): JsonResponse
+    {
         $article = Material::where('material_type', 2)
             ->where('accession', $accession)
             ->firstOrFail();
@@ -124,6 +125,7 @@ class StudentMaterialController extends Controller
         return response()->json($article);
     }
 
+   
     // View articles by type
     public function viewArticlesByType($type) {
         $typeMapping = [

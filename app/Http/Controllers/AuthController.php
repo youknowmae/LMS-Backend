@@ -91,6 +91,9 @@ class AuthController extends Controller
                 $responseData = [
                     'first_name' => $user->first_name,
                     'last_name' => $user->last_name,
+                    'domain_account' => $user->domain_email,
+                    'main_address' => $user->main_address,
+                    'course' => $user->program,
                     'token' => $token,
                     'id' => $user->id,
                     'displayName' => $user->first_name . ' ' . $user->last_name,
